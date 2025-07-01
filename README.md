@@ -25,7 +25,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 
 ## Examples
 
-* [Justin Wheeler](https://jwf.io)
+* [Justin Wheeler](https://jwheel.org)
 
 
 ## Installation
@@ -36,7 +36,7 @@ Use the commands below to add the theme to an existing Hugo site:
 ```bash
 cd /path/to/hugo-site/
 mkdir themes/
-git submodule add git@github.com:justjwheelin/toph-hugo-theme.git themes/toph
+git submodule add git@github.com:justwheel/toph-hugo-theme.git themes/toph
 git commit --signoff --message="Add Toph theme as a git submodule"
 git push
 ```
@@ -215,7 +215,7 @@ There are a few ways to contribute to this theme.
 
 ### Share feedback
 
-[Open a new issue to report bugs and request new features.](https://github.com/justjwheelin/toph-hugo-theme/issues/new)
+[Open a new issue to report bugs and request new features.](https://github.com/justwheel/toph-hugo-theme/issues/new)
 
 ### Contribute code
 
