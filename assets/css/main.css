@@ -68,8 +68,9 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 /* ===[ Main body styling ]=== */
 
+/* Darken main links further to guarantee 4.5:1 contrast */
 main a {
-  color: #0056b3; /* Darken the default link color to pass 4.5:1 contrast */
+  color: #003366;
   text-decoration: underline;
 }
 

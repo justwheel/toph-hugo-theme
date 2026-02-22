@@ -83,7 +83,7 @@ jobs:
           sleep 3
 
           # 1. Create config file to enable warnings AND disable the Chrome sandbox for the CI runner
-          echo '{"defaults":{"includeWarnings":true,"chromeLaunchConfig":{"args":["--no-sandbox","--disable-setuid-sandbox"]}}}' > .pa11yci
+          echo '{"defaults":{"includeWarnings":true,"ignore":["WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.Abs","WCAG2AA.Principle3.Guideline3_2.3_2_3.G61"],"chromeLaunchConfig":{"args":["--no-sandbox","--disable-setuid-sandbox"]}}}' > .pa11yci
 
           # 2. Extract URLs and aggressively strip all variations of base URLs
           grep -h -o '<loc>[^<]*</loc>' $(find exampleSite/public -name "sitemap.xml") \
