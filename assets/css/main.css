@@ -42,7 +42,11 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 .dropdown-menu { background-color: var(--accent-color); }
 
-.navbar-light .navbar-nav .nav-link { color: var(--secondary); }
+/* Ensure navbar links are fully opaque to resolve transparency errors */
+.navbar-light .navbar-nav .nav-link {
+  color: var(--secondary);
+  opacity: 1; /* Override Bootstrap's default opacity */
+}
 
 .navbar li a {
   background-color: var(--primary);
@@ -62,9 +66,18 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 /* ===[ Main body styling ]=== */
 
+main a {
+  color: #0056b3; /* Darken the default link color to pass 4.5:1 contrast */
+  text-decoration: underline;
+}
+
+main a:hover {
+  color: #003d82;
+}
+
 main #projects-carousel .pc-fixed-height { height: 10vh; }
 
-main #projects h3 { 
+main #projects h3 {
   background-color: var(--primary);
   color: var(--secondary);
 }
