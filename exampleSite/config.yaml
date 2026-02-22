@@ -9,7 +9,7 @@
 # --- base website settings ---
 
 title: Example Hugo site with Toph theme
-baseURL: https://jwwheeler.gitlab.io/toph-hugo/
+baseURL: https://justwheel.github.io/toph-hugo-theme/
 theme: toph
 languageCode: en-us
 enableEmoji: true
@@ -94,9 +94,9 @@ params:
     title: Lobster Two
     header: Patua One
   images:
-    - /toph-hugo/img/septima.jpg
-  favicon: /toph-hugo/favicon.ico
-  git_repo: https://gitlab.com/jwwheeler/toph-hugo
+    - /toph-hugo-theme/img/septima.jpg
+  favicon: /toph-hugo-theme/favicon.ico
+  git_repo: https://github.com/justwheel/toph-hugo-theme
   # Are you looking for new opportunities? Set hire_me to "true" if you want your LinkedIn to show on the nav bar and
   # for boilerplate text on how to get in touch.
   hire_me: false
