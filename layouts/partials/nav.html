@@ -25,7 +25,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">translations</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <select id="select-language" onchange="location = this.value;">
+                            <select id="select-language" onchange="location = this.value;" aria-label="Select language">
                             {{ $siteLanguages := site.Languages}}
                             {{ $pageLang := .Page.Lang}}
                             {{ range .Page.AllTranslations }}
