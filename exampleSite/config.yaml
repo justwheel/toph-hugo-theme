@@ -38,9 +38,9 @@ privacy:
   googleAnalytics:
     anonymizeIP: true
     respectDoNotTrack: true
-  twitter:
-    enableDNT: true
   vimeo:
+    enableDNT: true
+  x:
     enableDNT: true
   youtube:
     privacyEnhanced: true
