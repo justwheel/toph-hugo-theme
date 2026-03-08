@@ -24,25 +24,27 @@
                     {{ "<!-- language selector -->" | safeHTML }}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">translations</a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <select id="select-language" onchange="location = this.value;" aria-label="Select language">
-                            {{ $siteLanguages := site.Languages}}
-                            {{ $pageLang := .Page.Lang}}
-                            {{ range .Page.AllTranslations }}
-                                {{ $translation := .}}
-                                {{ range $siteLanguages }}
-                                    {{ if eq $translation.Lang .Lang }}
-                                        {{ $selected := false }}
-                                        {{ if eq $pageLang .Lang}}
-                                            <option id="{{ $translation.Language }}" class="active dropdown-item" value="{{ $translation.Permalink }}" selected>{{ .LanguageName }}</option>
-                                        {{ else }}
-                                            <option id="{{ $translation.Language }}" class="dropdown-item" value="{{ $translation.Permalink }}">{{ .LanguageName }}</option>
+                                <optgroup label="Languages">
+                                {{ $siteLanguages := site.Languages}}
+                                {{ $pageLang := .Page.Lang}}
+                                {{ range .Page.AllTranslations }}
+                                    {{ $translation := .}}
+                                    {{ range $siteLanguages }}
+                                        {{ if eq $translation.Lang .Lang }}
+                                            {{ $selected := false }}
+                                            {{ if eq $pageLang .Lang}}
+                                                <option id="{{ $translation.Language }}" class="active dropdown-item" value="{{ $translation.Permalink }}" selected>{{ .LanguageName }}</option>
+                                            {{ else }}
+                                                <option id="{{ $translation.Language }}" class="dropdown-item" value="{{ $translation.Permalink }}">{{ .LanguageName }}</option>
+                                            {{ end }}
                                         {{ end }}
                                     {{ end }}
                                 {{ end }}
-                            {{ end }}
+                                </optgroup>
                             </select>
-                        </ul>
+                        </div>
                     </li>
                     {{ "<!-- /language selector -->" | safeHTML }}
                 {{ end }}
