@@ -16,7 +16,7 @@ From an early point in her life, her parents pushed Clark to pursue an education
 > There were times we didn’t want to go.
 > I cried one morning I didn’t want to go to that school, and he whipped me with a strap and then took me down there”
 >
-> _Charron-Cline_
+> — _Charron-Cline_
 
 One thing that stood out to Clark as a Black student in the 1910s was the lack of Black teachers to teach children.
 Many segregated schools had white teachers teaching black children.
@@ -28,7 +28,7 @@ This also led to Clark’s first experience with political organizing in 1919:
 > I took my students along with me, and we got these signatures.
 > Some would be across the street, and then I’d do it on the other side, and that’s how we did it”
 >
-> _Charron-Cline_
+> — _Charron-Cline_
 
 Ultimately, Clark was pushed towards education at an early age and soon realized the political power that education affords.
 This was a formational experience in her political activist career.

@@ -25,7 +25,7 @@ However, there are moments where Clark reflects on knowing her allies do not ful
 > She got angry with me when I said that she was vitriolic.
 > She didn’t like that. But it was true”
 >
-> _Charron-Cline_
+> — _Charron-Cline_
 
 Despite the challenges of interracial relationships, Clark realized that all women were empowered through the role of teaching.
 This became a grounding aspect of her activism and enabled her to link her activism with civic duty and organization.
@@ -34,6 +34,6 @@ Her teaching was a vehicle for her to help other woman gain greater autonomy and
 
 > “First, when compared to losing one’s job, facing eviction from a white landlord, or risking one’s life by participating in direct action campaigns, teaching adults to read and write appeared a relatively safe entry point into the Movement.”
 >
-> _Charron-Cline_
+> — _Charron-Cline_
 
 Ultimately, despite these challenges and setbacks, Septima Clark was able to persist and continue her teaching through the Civil Rights period, even if it required relocating across the Southeast a couple of times.
