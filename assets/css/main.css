@@ -36,6 +36,7 @@ h2, h4, #toctitle { color: var(--accent-color); }
 /* ===[ Site navigation styling ]=== */
 
 .navbar {
+  background-color: var(--primary);
   position: fixed;
   z-index: 100;
 }
