@@ -1,7 +1,7 @@
 {{ define "main" }}
 {{- .Content }}
 
-<ul class="bg-light p-3">
+<ul class="bg-white p-3">
 <!-- Ranges through content/posts/*{.adoc,.md} -->
 {{ range .Pages }}
     <li><a href="{{.Permalink}}">{{.Date.Format "2006-01-02"}} | {{.Title}}</a></li>
