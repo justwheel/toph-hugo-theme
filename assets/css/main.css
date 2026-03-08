@@ -36,19 +36,15 @@ h2, h4, #toctitle { color: var(--accent-color); }
 /* ===[ Site navigation styling ]=== */
 
 .navbar {
+  --bs-navbar-color: var(--secondary);
+  --bs-navbar-hover-color: var(--secondary);
+  --bs-navbar-active-color: var(--secondary);
   background-color: var(--primary);
   position: fixed;
   z-index: 100;
 }
 
 .dropdown-menu { background-color: var(--accent-color); }
-
-/* Override Bootstrap's rgba nav-link colors for all states */
-.navbar-light .navbar-nav .nav-link,
-.navbar-light .navbar-nav .nav-link.active,
-.navbar-light .navbar-nav .show > .nav-link {
-  color: var(--secondary);
-}
 
 .navbar li a {
   background-color: var(--primary);
