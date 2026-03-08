@@ -3,8 +3,7 @@
 ##### ---- Hugo ---- #####
 # Generated files by hugo
 .hugo_build.lock
-/public/
-/themes/**/exampleSite/public/
+/exampleSite/public/
 /resources/_gen/
 
 # Executable may be added to repository
