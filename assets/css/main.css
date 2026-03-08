@@ -46,7 +46,10 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 .dropdown-menu { background-color: var(--accent-color); }
 
-.navbar li a {
+.navbar .nav-link,
+.navbar .nav-link.active,
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
   background-color: var(--primary);
   border-color: var(--accent-color);
   border-style: solid;
@@ -54,7 +57,7 @@ h2, h4, #toctitle { color: var(--accent-color); }
   text-align: center;
 }
 
-.navbar li a:hover {
+.navbar .nav-link:hover {
   background-color: royalblue;
   text-decoration: underline;
   text-decoration-color: skyblue;
