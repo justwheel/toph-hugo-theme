@@ -43,10 +43,11 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 .dropdown-menu { background-color: var(--accent-color); }
 
-/* Ensure navbar links are fully opaque to resolve transparency errors */
-.navbar-light .navbar-nav .nav-link {
+/* Override Bootstrap's rgba nav-link colors for all states */
+.navbar-light .navbar-nav .nav-link,
+.navbar-light .navbar-nav .nav-link.active,
+.navbar-light .navbar-nav .show > .nav-link {
   color: var(--secondary);
-  opacity: 1; /* Override Bootstrap's default opacity */
 }
 
 .navbar li a {
