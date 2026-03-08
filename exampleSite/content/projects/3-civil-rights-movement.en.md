@@ -19,7 +19,7 @@ Clark kept her Citizenship Schools curriculum relevant and updated to contempora
 
 > “Training sessions and teaching classes afforded grassroots African American women the opportunity to evaluate the local problems they deemed most important while the Movement itself provided a vehicle for addressing them.”
 >
-> _Charron-Cline_
+> — _Charron-Cline_
 
 In this unique way, Clark’s impact goes beyond herself, but also to the many students who were taught under her leadership, and then returned to teach citizenship skills in their communities.
 This is also why she is sometimes left out of the retelling of history because her role was often behind the scenes and not visible.
