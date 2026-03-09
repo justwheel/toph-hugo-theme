@@ -40,21 +40,28 @@ h2, h4, #toctitle { color: var(--accent-color); }
   --bs-navbar-hover-color: var(--secondary);
   --bs-navbar-active-color: var(--secondary);
   background-color: var(--primary);
+  border-bottom: 2px solid var(--accent-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
 }
 
 .dropdown-menu { background-color: var(--accent-color); }
 
 .navbar .nav-link,
-.navbar .nav-link.active,
 .navbar .nav-link:hover,
 .navbar .nav-link:focus {
   background-color: var(--primary);
-  border-color: var(--accent-color);
-  border-style: solid;
   color: var(--secondary);
   text-align: center;
+}
+
+.navbar .nav-link.active {
+  background-color: var(--accent-color);
+  color: var(--secondary);
 }
 
 .navbar .nav-link:hover {
