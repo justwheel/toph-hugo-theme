@@ -25,6 +25,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 
 ## Examples
 
+* [Official theme example website – Septima Poinsette Clark](https://justwheel.github.io/toph-hugo-theme/)
 * [Justin Wheeler](https://jwheel.org)
 
 
