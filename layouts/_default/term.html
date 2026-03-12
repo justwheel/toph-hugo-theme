@@ -1,0 +1,16 @@
+{{ define "main" }}
+{{- .Content }}
+
+<ul class="list-group" role="list">
+{{ range .Pages }}
+    <li class="list-group-item">
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        {{ if not .Date.IsZero }}
+        <small class="text-muted ms-2">
+            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+        </small>
+        {{ end }}
+    </li>
+{{ end }}
+</ul>
+{{ end }}
