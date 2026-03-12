@@ -18,6 +18,15 @@ enableRobotsTXT: false
 googleAnalytics: ""
 
 
+# --- taxonomy and pagination settings ---
+
+taxonomies:
+  tag: tags
+  category: categories
+pagination:
+  pagerSize: 10
+
+
 # --- security settings ---
 
 security:
