@@ -4,7 +4,7 @@
 <ul class="list-group" role="list">
 {{ range .Pages }}
     <li class="list-group-item">
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName }}</a>
         {{ if not .Date.IsZero }}
         <small class="text-muted ms-2">
             <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
