@@ -1,3 +1,74 @@
 {{ define "main" }}
+{{/*
+    single.html — Single content page layout
+
+    This template renders individual content pages. Blog-specific features
+    (metadata, table of contents, post navigation) only appear on pages
+    that are NOT structural content (projects, footer badges). Structural
+    content is identified by its category membership in taxonomy_exclude.
+
+    Key guards:
+      $is_structural — true for pages in excluded categories (projects, footer)
+      .Params.toc    — opt-in table of contents for Markdown posts
+*/}}
+
+{{/*
+    Determine if this page is structural content (e.g., project profiles,
+    footer badges). These pages are used for layout composition, not as
+    standalone blog posts. We identify them two ways:
+      1. Their categories overlap with taxonomy_exclude (e.g., "projects", "footer")
+      2. They set hide_sitemap: true (a convention for embedded content
+         that shouldn't appear as independent pages in search results)
+*/}}
+{{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+{{- $is_structural := .Params.hide_sitemap | default false -}}
+{{- if not $is_structural -}}
+    {{- with .Params.categories -}}
+        {{- range . -}}
+            {{- if in $exclude . -}}
+                {{- $is_structural = true -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{/* --- Blog post metadata (date, author, reading time, tags) --- */}}
+{{ if and (not .Date.IsZero) (not $is_structural) }}
+    {{- partial "post-meta.html" . -}}
+{{ end }}
+
+{{/* --- Table of contents (Markdown only, opt-in via front matter) --- */}}
+{{/*
+    Toph provides unified ToC styling for both Markdown and AsciiDoc.
+
+    AsciiDoc: Uses its native :toc: document attribute. When the site config
+    sets markup.asciidocExt.preserveTOC: true, Asciidoctor renders the ToC
+    directly inside .Content using div#toc > div#toctitle + ul.sectlevel1
+    markup. No template action is needed — the theme CSS styles it.
+
+    Markdown: Opt-in via "toc: true" in front matter. Hugo's .TableOfContents
+    is wrapped in #toc/#toctitle markup to match the AsciiDoc structure, so
+    both formats share the same CSS. We detect AsciiDoc files to avoid
+    rendering a duplicate ToC alongside the one already in .Content.
+*/}}
+{{ if .Params.toc }}
+    {{ with .File }}
+        {{ if not (findRE "adoc" $.Page.File.Ext) }}
+            {{ with $.TableOfContents }}
+            <div id="toc">
+                <div id="toctitle">Table of Contents</div>
+                {{ . }}
+            </div>
+            {{ end }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
 {{- .Content }}
+
+{{/* --- Previous/next post navigation --- */}}
+{{ if and (not .Date.IsZero) (not $is_structural) }}
+    {{- partial "post-nav.html" . -}}
+{{ end }}
+
 {{ end }}
