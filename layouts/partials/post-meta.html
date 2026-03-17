@@ -1,0 +1,85 @@
+{{/*
+    post-meta.html — Blog post metadata display
+
+    Shows publication date, last updated date (from git), author, reading
+    time, word count, and linked taxonomy badges (categories and tags) for
+    blog posts. Only included on pages that have a publication date set
+    (guarded in single.html).
+
+    Key Hugo variables used:
+      .Date                        — publication date from front matter
+      .Lastmod                     — last modified date (from git when enableGitInfo: true)
+      .ReadingTime                 — estimated reading time in minutes
+      .WordCount                   — total word count of the content
+      .Params.author               — optional author override from front matter
+      .Site.Params.biography.name  — fallback author from site config
+      .GetTerms "categories"       — linked category term pages
+      .GetTerms "tags"             — linked tag term pages
+      site.Params.taxonomy_exclude — structural terms to hide (e.g., "footer", "projects")
+
+    The "last updated" date uses Hugo's .Lastmod, which is automatically
+    populated from git commit history when enableGitInfo: true is set in
+    the site config. It only displays when the last modified date differs
+    from the publication date (i.e., the post has been updated since
+    initial publication).
+*/}}
+{{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+
+<aside class="post-meta" aria-label="Post information">
+    <ul class="post-meta-list">
+        <li>
+            Published
+            <time datetime="{{ .Date.Format "2006-01-02" }}">
+                {{- .Date.Format "January 2, 2006" -}}
+            </time>
+        </li>
+        {{/*
+            Show "Updated" date only when it differs from the publication
+            date. Compares formatted date strings to ignore time-of-day
+            differences. .Lastmod is populated from git history when
+            enableGitInfo: true is set in site config.
+        */}}
+        {{ if and .Lastmod (ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02")) }}
+        <li>
+            Updated
+            <time datetime="{{ .Lastmod.Format "2006-01-02" }}">
+                {{- .Lastmod.Format "January 2, 2006" -}}
+            </time>
+        </li>
+        {{ end }}
+        <li>
+            {{- if (isset .Params "author") -}}
+                {{ .Param "author" }}
+            {{- else -}}
+                {{ .Site.Params.biography.name }}
+            {{- end -}}
+        </li>
+        <li>{{ .ReadingTime }} min read</li>
+        <li>{{ .WordCount }} words</li>
+    </ul>
+
+    {{/*
+        Taxonomy badges — show categories and tags as linked pill badges.
+        Categories use the primary color; tags use the accent color.
+        Structural terms (footer, projects) are excluded via taxonomy_exclude.
+    */}}
+    {{- $categories := slice -}}
+    {{- range .GetTerms "categories" -}}
+        {{- if not (in $exclude .LinkTitle) -}}
+            {{- $categories = $categories | append . -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- $tags := .GetTerms "tags" -}}
+
+    {{ if or $categories $tags }}
+    <div class="post-meta-taxonomies">
+        {{- range $categories }}
+        <a class="badge rounded-pill post-meta-category" href="{{ .Permalink }}">{{ .LinkTitle | title }}</a>
+        {{- end }}
+        {{- range $tags }}
+        <a class="badge rounded-pill post-meta-tag" href="{{ .Permalink }}">{{ .LinkTitle | title }}</a>
+        {{- end }}
+    </div>
+    {{ end }}
+</aside>
