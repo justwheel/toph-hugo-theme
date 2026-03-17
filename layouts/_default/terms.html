@@ -1,9 +1,62 @@
+{{/*
+    terms.html — DEFAULT taxonomy terms listing (fallback)
+
+    This template renders a listing page for ANY taxonomy (e.g., /categories/, /tags/).
+    Hugo will use this template when no taxonomy-specific template exists in
+    layouts/<taxonomy-name>/terms.html. For example, if you add a new taxonomy
+    called "series" in config.yaml, Hugo will use THIS template for /series/
+    unless you create layouts/series/terms.html.
+
+    Key Hugo concepts used here:
+      .Pages              — all term pages in this taxonomy (e.g., each individual category)
+      .Pages.ByTitle      — term pages sorted alphabetically by title
+      .Title              — the display name of the term (auto-generated from the URL slug)
+      .Permalink          — the full URL to the term's page (e.g., /categories/activism/)
+      .Pages | len        — the number of content pages tagged with this term
+      .Data.Singular      — the singular form of the taxonomy name (e.g., "tag", "category")
+
+    The list is rendered alphabetically by default. A lightweight sort toggle
+    lets users switch to "most used" order via client-side DOM reordering —
+    each <li> carries a data-count attribute that JavaScript reads to re-sort
+    without a page reload.
+*/}}
 {{ define "main" }}
 {{- .Content }}
 
-<ul class="list-group" role="list">
-{{ range .Pages }}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
+{{ if .Pages }}
+{{/*
+    Sort controls — two toggle buttons for alphabetical vs. most-used.
+    aria-pressed communicates the active state to screen readers.
+    The .Data.Plural variable gives us the taxonomy name (e.g., "tags",
+    "categories") for the count label.
+*/}}
+<div class="terms-controls">
+    <fieldset class="terms-sort" role="radiogroup" aria-label="Sort {{ .Data.Plural }}">
+        <legend class="visually-hidden">Sort order</legend>
+        <button class="terms-sort-btn active" data-sort="alpha" aria-pressed="true">
+            A&ndash;Z
+        </button>
+        <button class="terms-sort-btn" data-sort="count" aria-pressed="false">
+            Most used
+        </button>
+    </fieldset>
+    <span class="terms-total text-muted">{{ .Pages | len }} {{ .Data.Plural }}</span>
+</div>
+
+{{/*
+    Render the list sorted alphabetically via .Pages.ByTitle.
+    Note: .Alphabetical and .ByCount are methods on Hugo's Taxonomy
+    data type (.Data.Terms), NOT on page.Pages. For page collections,
+    use .ByTitle for alphabetical sorting.
+    Each <li> stores its post count in data-count and its lowercased
+    title in data-name so the JavaScript sort can reorder without
+    needing to parse the visible text.
+*/}}
+<ul class="list-group terms-list" role="list">
+{{ range .Pages.ByTitle }}
+    <li class="list-group-item d-flex justify-content-between align-items-center"
+        data-count="{{ .Pages | len }}"
+        data-name="{{ .Title | lower }}">
         <a href="{{ .Permalink }}">{{ .Title }}</a>
         <span class="badge rounded-pill" style="background-color: var(--primary); color: var(--secondary);">
             {{ .Pages | len }}
@@ -11,4 +64,51 @@
     </li>
 {{ end }}
 </ul>
+
+{{/*
+    Client-side sort toggle. When "Most used" is clicked, we re-sort
+    the <li> elements by their data-count (descending), breaking ties
+    alphabetically. "A-Z" restores alphabetical order by data-name.
+    appendChild moves existing DOM nodes rather than duplicating them.
+*/}}
+<script>
+(function() {
+    var list = document.querySelector('.terms-list');
+    if (!list) return;
+    var items = Array.from(list.querySelectorAll('li'));
+    var buttons = document.querySelectorAll('.terms-sort-btn');
+
+    function sortItems(mode) {
+        items.sort(function(a, b) {
+            if (mode === 'count') {
+                var diff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
+                return diff !== 0 ? diff : a.dataset.name.localeCompare(b.dataset.name);
+            }
+            return a.dataset.name.localeCompare(b.dataset.name);
+        });
+        items.forEach(function(item) { list.appendChild(item); });
+    }
+
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            buttons.forEach(function(b) {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+            sortItems(btn.dataset.sort);
+        });
+    });
+})();
+</script>
+
+{{ else }}
+{{/*
+    Empty state — shown when no terms exist for this taxonomy yet.
+    .Data.Singular gives us the taxonomy name in singular form
+    (e.g., "tag", "category") so the message reads naturally.
+*/}}
+<p class="text-muted">No {{ .Data.Singular }} found.</p>
+{{ end }}
 {{ end }}
