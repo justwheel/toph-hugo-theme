@@ -1,10 +1,37 @@
+{{/*
+    term.html — DEFAULT single taxonomy term page (fallback)
+
+    This template renders the page for a SINGLE term within a taxonomy.
+    For example, /categories/activism/ or /tags/history/ — it lists all
+    content pages that are tagged with that specific term.
+
+    Hugo will use this when no taxonomy-specific template exists in
+    layouts/<taxonomy-name>/term.html.
+
+    Key Hugo concepts used here:
+      .Content            — any custom content from the term's _index.md (if it exists)
+      .Pages              — all content pages tagged with this term
+      .Title              — the post title; falls back to the filename if no title is set
+      .Date               — the publish date of the content page
+      .File.BaseFileName  — the filename without extension (used as title fallback)
+      .Data.Singular      — the singular form of the taxonomy name (e.g., "tag", "category")
+*/}}
 {{ define "main" }}
 {{- .Content }}
 
+{{ if .Pages }}
 <ul class="list-group" role="list">
 {{ range .Pages }}
     <li class="list-group-item">
+        {{/*
+            Display the post title. If no title is set in front matter,
+            fall back to the filename (e.g., "my-first-post" from my-first-post.md).
+        */}}
         <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName }}</a>
+        {{/*
+            Only show the date if the page has one set. Hugo initializes .Date
+            to a zero time value when unset, so .Date.IsZero detects that.
+        */}}
         {{ if not .Date.IsZero }}
         <small class="text-muted ms-2">
             <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
@@ -13,4 +40,11 @@
     </li>
 {{ end }}
 </ul>
+{{ else }}
+{{/*
+    Empty state — shown when no content pages use this term.
+    .Data.Singular gives the taxonomy name (e.g., "tag") for a natural message.
+*/}}
+<p class="text-muted">No posts found for this {{ .Data.Singular }}.</p>
+{{ end }}
 {{ end }}
