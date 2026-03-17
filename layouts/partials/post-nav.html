@@ -1,0 +1,35 @@
+{{/*
+    post-nav.html — Previous/next post navigation
+
+    Renders navigation links to adjacent posts within the same content
+    section (e.g., within /blog/). Uses Hugo's .PrevInSection and
+    .NextInSection to find neighboring pages by date.
+
+    Note on Hugo's naming convention:
+      .PrevInSection — the OLDER post (earlier date)
+      .NextInSection — the NEWER post (later date)
+    This can be counterintuitive but is consistent with Hugo's date ordering.
+
+    i18n keys used:
+      misc.previous — label for the older post link
+      misc.next     — label for the newer post link
+*/}}
+{{ if or .PrevInSection .NextInSection }}
+<nav class="post-nav" aria-label="Post navigation">
+    <div class="post-nav-links">
+        {{ with .PrevInSection }}
+        <a class="post-nav-link post-nav-link--prev" href="{{ .Permalink }}">
+            <span class="post-nav-label">{{ i18n "misc.previous" }}</span>
+            <span class="post-nav-title">{{ .Title }}</span>
+        </a>
+        {{ end }}
+
+        {{ with .NextInSection }}
+        <a class="post-nav-link post-nav-link--next" href="{{ .Permalink }}">
+            <span class="post-nav-label">{{ i18n "misc.next" }}</span>
+            <span class="post-nav-title">{{ .Title }}</span>
+        </a>
+        {{ end }}
+    </div>
+</nav>
+{{ end }}
