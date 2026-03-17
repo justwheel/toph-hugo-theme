@@ -25,47 +25,75 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.156.0
+      HUGO_VERSION: "0.158.0"
+      DART_SASS_VERSION: "1.98.0"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
+      # --- Tool installation with caching ---
+      #
+      # Each tool is cached by its version string so upgrades automatically
+      # bust the cache. On cache hits, the install step is skipped entirely.
+
+      - name: Cache Hugo CLI
+        id: cache-hugo
+        uses: actions/cache@v5
+        with:
+          path: /usr/local/bin/hugo
+          key: hugo-${{ env.HUGO_VERSION }}-linux-amd64
+
       - name: Install Hugo CLI
+        if: steps.cache-hugo.outputs.cache-hit != 'true'
         run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+          curl --fail --silent --show-error --location \
+            --output ${{ runner.temp }}/hugo.deb \
+            https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb
+          sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      - name: Cache Dart Sass
+        id: cache-sass
+        uses: actions/cache@v5
+        with:
+          path: /usr/local/bin/sass
+          key: dart-sass-${{ env.DART_SASS_VERSION }}-linux-x64
 
       - name: Install Dart Sass
-        run: sudo snap install dart-sass
+        if: steps.cache-sass.outputs.cache-hit != 'true'
+        run: |
+          curl --fail --silent --show-error --location \
+            --output ${{ runner.temp }}/dart-sass.tar.gz \
+            https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz
+          tar -xzf ${{ runner.temp }}/dart-sass.tar.gz -C ${{ runner.temp }}
+          sudo cp ${{ runner.temp }}/dart-sass/sass /usr/local/bin/sass
 
-      - name: Cache Node modules
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-ci-tools
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: .github/package-lock.json
 
-      - name: Setup Node.js for CI
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install CI accessibility (a11y) tools
-        run: npm install -g serve pa11y-ci
-
-      - name: Cache Ruby Gems
-        uses: actions/cache@v4
-        with:
-          path: ~/.gem
-          key: ${{ runner.os }}-gem-asciidoctor
+      - name: Install CI tools (pa11y-ci, serve)
+        run: npm ci --prefix .github
 
       - name: Install Asciidoctor
-        run: sudo gem install asciidoctor
+        run: sudo gem install asciidoctor --no-document
+
+      # --- Build and test ---
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+
+      - name: Cache Hugo resources
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: hugo-cache-${{ github.run_id }}
+          restore-keys: hugo-cache-
 
       - name: Build with Hugo
         env:
@@ -79,8 +107,14 @@ jobs:
 
       - name: Run Accessibility Audit
         run: |
-          serve -p 3000 exampleSite/public &
-          sleep 3
+          npx --prefix .github serve -p 3000 exampleSite/public &
+          SERVER_PID=$!
+
+          # Wait for the server to be ready (up to 10s)
+          for i in $(seq 1 20); do
+            curl --silent --fail http://localhost:3000 > /dev/null 2>&1 && break
+            sleep 0.5
+          done
 
           # 1. Extract URLs from sitemap and strip base URL variations
           grep -h -o '<loc>[^<]*</loc>' $(find exampleSite/public -name "sitemap.xml") \
@@ -107,14 +141,17 @@ jobs:
 
           # 3. Temporarily disable 'exit on error' to capture the pa11y-ci exit code
           set +e
-          pa11y-ci --config .pa11yci > pa11y-report.txt 2>&1
+          npx --prefix .github pa11y-ci --config .pa11yci > pa11y-report.txt 2>&1
           EXIT_CODE=$?
           set -e
 
-          # 4. Display the report in the logs
+          # 4. Clean up the server
+          kill $SERVER_PID 2>/dev/null || true
+
+          # 5. Display the report in the logs
           cat pa11y-report.txt
 
-          # 5. Fail the build if pa11y-ci returned an error code
+          # 6. Fail the build if pa11y-ci returned an error code
           if [ $EXIT_CODE -ne 0 ]; then
             echo "::error::Accessibility errors detected! Review the report for details."
             exit $EXIT_CODE
@@ -136,14 +173,14 @@ jobs:
 
       - name: Upload Accessibility Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: accessibility-audit-report
           path: pa11y-report.txt
           if-no-files-found: ignore
 
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./exampleSite/public
 
