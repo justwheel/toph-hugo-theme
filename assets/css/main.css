@@ -119,6 +119,88 @@ main .rounded-profile img {
 }
 
 
+/* ===[ Blog post metadata (layouts/partials/post-meta.html) ]=== */
+
+/*
+ * Post metadata bar — sits below the page title (rendered by header.html).
+ * Uses subtle borders to separate it from the main content, with inline
+ * items for a clean editorial look.
+ */
+.post-meta {
+  border-top: 1px solid #e0ddd5;
+  border-bottom: 1px solid #e0ddd5;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/*
+ * Metadata items displayed inline with vertical dividers between them.
+ * Flex-wrap ensures graceful wrapping on narrow screens.
+ */
+.post-meta-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0;
+  align-items: center;
+}
+
+/* Vertical divider between metadata items (skip the first) */
+.post-meta-list li + li {
+  border-inline-start: 1px solid #d0cdc5;
+  padding-inline-start: 1rem;
+  margin-inline-start: 1rem;
+}
+
+/* Hide taxonomy section margin when no badges are shown */
+.post-meta-taxonomies:empty {
+  display: none;
+}
+
+.post-meta-taxonomies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Category badges — primary color to match the site's dominant tone */
+.post-meta-category {
+  background-color: var(--primary);
+  color: var(--secondary);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+/* Tag badges — accent color to differentiate from categories */
+.post-meta-tag {
+  background-color: var(--accent-color);
+  color: var(--secondary);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.post-meta-category:hover,
+.post-meta-tag:hover {
+  opacity: 0.85;
+  text-decoration: none;
+  color: var(--secondary);
+}
+
+/* On mobile, stack metadata items vertically */
+@media screen and (max-width: 600px) {
+  .post-meta-list li + li {
+    border-inline-start: none;
+    padding-inline-start: 0;
+    margin-inline-start: 0;
+  }
+}
+
+
 /* ===[ Footer styling ]=== */
 
 footer { overflow: hidden; }
