@@ -112,16 +112,16 @@
 */}}
 <script>
 (function() {
-    var cloud = document.querySelector('.tag-cloud');
+    const cloud = document.querySelector('.tag-cloud');
     if (!cloud) return;
-    var items = Array.from(cloud.querySelectorAll('.tag-cloud-item'));
-    var buttons = document.querySelectorAll('.tags-sort-btn');
+    const items = Array.from(cloud.querySelectorAll('.tag-cloud-item'));
+    const buttons = document.querySelectorAll('.tags-sort-btn');
 
     function sortItems(mode) {
         cloud.classList.add('tag-cloud--reflow');
         items.sort(function(a, b) {
             if (mode === 'count') {
-                var diff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
+                const diff = parseInt(b.dataset.count, 10) - parseInt(a.dataset.count, 10);
                 return diff !== 0 ? diff : a.dataset.name.localeCompare(b.dataset.name);
             }
             return a.dataset.name.localeCompare(b.dataset.name);

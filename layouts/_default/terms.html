@@ -97,15 +97,15 @@
 */}}
 <script>
 (function() {
-    var list = document.querySelector('.terms-list');
+    const list = document.querySelector('.terms-list');
     if (!list) return;
-    var items = Array.from(list.querySelectorAll('li'));
-    var buttons = document.querySelectorAll('.terms-sort-btn');
+    const items = Array.from(list.querySelectorAll('li'));
+    const buttons = document.querySelectorAll('.terms-sort-btn');
 
     function sortItems(mode) {
         items.sort(function(a, b) {
             if (mode === 'count') {
-                var diff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
+                const diff = parseInt(b.dataset.count, 10) - parseInt(a.dataset.count, 10);
                 return diff !== 0 ? diff : a.dataset.name.localeCompare(b.dataset.name);
             }
             return a.dataset.name.localeCompare(b.dataset.name);
