@@ -8,6 +8,7 @@
     content is identified by its category membership in taxonomy_exclude.
 
     Key guards:
+      $is_blog_post  — true for non-structural pages with a publication date
       $is_structural — true for pages in excluded categories (projects, footer)
       .Params.toc    — opt-in table of contents for Markdown posts
 */}}
@@ -16,24 +17,17 @@
     Determine if this page is structural content (e.g., project profiles,
     footer badges). These pages are used for layout composition, not as
     standalone blog posts. We identify them two ways:
-      1. Their categories overlap with taxonomy_exclude (e.g., "projects", "footer")
+      1. Their categories overlap with taxonomy_exclude (via intersect)
       2. They set hide_sitemap: true (a convention for embedded content
          that shouldn't appear as independent pages in search results)
 */}}
 {{- $exclude := site.Params.taxonomy_exclude | default slice -}}
-{{- $is_structural := .Params.hide_sitemap | default false -}}
-{{- if not $is_structural -}}
-    {{- with .Params.categories -}}
-        {{- range . -}}
-            {{- if in $exclude . -}}
-                {{- $is_structural = true -}}
-            {{- end -}}
-        {{- end -}}
-    {{- end -}}
-{{- end -}}
+{{- $is_structural_by_category := and .Params.categories (gt (len (intersect $exclude .Params.categories)) 0) -}}
+{{- $is_structural := or (.Params.hide_sitemap | default false) $is_structural_by_category -}}
+{{- $is_blog_post := and (not .Date.IsZero) (not $is_structural) -}}
 
 {{/* --- Blog post metadata (date, author, reading time, tags) --- */}}
-{{ if and (not .Date.IsZero) (not $is_structural) }}
+{{ if $is_blog_post }}
     {{- partial "post-meta.html" . -}}
 {{ end }}
 
@@ -51,23 +45,19 @@
     both formats share the same CSS. We detect AsciiDoc files to avoid
     rendering a duplicate ToC alongside the one already in .Content.
 */}}
-{{ if .Params.toc }}
-    {{ with .File }}
-        {{ if not (findRE "adoc" $.Page.File.Ext) }}
-            {{ with $.TableOfContents }}
-            <div id="toc">
-                <div id="toctitle">Table of Contents</div>
-                {{ . }}
-            </div>
-            {{ end }}
-        {{ end }}
+{{ if and .Params.toc (ne .Markup "asciidoc") }}
+    {{ with .TableOfContents }}
+    <div id="toc">
+        <div id="toctitle">Table of Contents</div>
+        {{ . }}
+    </div>
     {{ end }}
 {{ end }}
 
 {{- .Content }}
 
 {{/* --- Previous/next post navigation --- */}}
-{{ if and (not .Date.IsZero) (not $is_structural) }}
+{{ if $is_blog_post }}
     {{- partial "post-nav.html" . -}}
 {{ end }}
 
