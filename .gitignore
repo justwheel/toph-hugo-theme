@@ -169,7 +169,7 @@ Sessionx.vim
 # Temporary
 .netrwhist
 *~
-# Auto-generated tag files
-tags
+# Auto-generated tag files (root only, not layouts/tags/)
+/tags
 # Persistent undo
 [._]*.un~
