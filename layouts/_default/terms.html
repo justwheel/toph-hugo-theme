@@ -19,9 +19,19 @@
     lets users switch to "most used" order via client-side DOM reordering —
     each <li> carries a data-count attribute that JavaScript reads to re-sort
     without a page reload.
+
+    We also filter out "structural" taxonomy terms (like "footer" and "projects")
+    that the Toph theme uses internally for layout purposes, not for blog content.
+    The exclusion list is configurable via params.taxonomy_exclude in config.yaml.
 */}}
 {{ define "main" }}
 {{- .Content }}
+
+{{/*
+    Load the exclusion list from site config (e.g., ["footer", "projects"]).
+    If no list is configured, default to an empty slice so the range still works.
+*/}}
+{{- $exclude := site.Params.taxonomy_exclude | default slice -}}
 
 {{ if .Pages }}
 {{/*
@@ -54,14 +64,27 @@
 */}}
 <ul class="list-group terms-list" role="list">
 {{ range .Pages.ByTitle }}
+    {{/*
+        Compare the lowercase version of .Title against the exclusion list.
+        Hugo auto-capitalizes taxonomy term titles (e.g., "footer" → "Footer"),
+        so we lowercase before comparing to ensure a reliable match.
+    */}}
+    {{- if not (in $exclude (.Title | lower)) }}
     <li class="list-group-item d-flex justify-content-between align-items-center"
         data-count="{{ .Pages | len }}"
         data-name="{{ .Title | lower }}">
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        {{/*
+            Apply | title to ensure consistent Title Case display.
+            Without this, multi-word terms like "civil rights" would render as
+            "Civil rights" (Hugo only capitalizes the first letter by default).
+        */}}
+        <a href="{{ .Permalink }}">{{ .Title | title }}</a>
+        {{/* Badge showing how many posts use this term */}}
         <span class="badge rounded-pill" style="background-color: var(--primary); color: var(--secondary);">
             {{ .Pages | len }}
         </span>
     </li>
+    {{- end }}
 {{ end }}
 </ul>
 

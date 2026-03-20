@@ -294,7 +294,7 @@ footer #footer-box a:hover {
 }
 
 
-/* ===[ Taxonomy: terms list sort controls ]=== */
+/* ===[ Taxonomy: terms list sort controls (layouts/_default/terms.html) ]=== */
 
 /*
  * Sort toggle and count sit on a single row above the terms list.
@@ -341,4 +341,17 @@ footer #footer-box a:hover {
 
 .terms-sort-btn:hover:not(.active) {
   background-color: #f5f4f0;
+}
+
+
+/* ===[ Taxonomy: Term page excerpts (layouts/_default/term.html) ]=== */
+
+/*
+ * Short text previews shown under each post title on term pages.
+ * Uses a smaller font size and muted color so it doesn't compete
+ * with the title link for visual attention.
+ */
+.term-excerpt {
+  font-size: 0.85rem;
+  line-height: 1.5;
 }

@@ -106,6 +106,7 @@ params:
     - /toph-hugo-theme/img/septima.jpg
   favicon: /toph-hugo-theme/favicon.ico
   git_repo: https://github.com/justwheel/toph-hugo-theme
+  taxonomy_exclude: ["footer", "projects"]
   # Are you looking for new opportunities? Set hire_me to "true" if you want your LinkedIn to show on the nav bar and
   # for boilerplate text on how to get in touch.
   hire_me: false
