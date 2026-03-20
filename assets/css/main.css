@@ -440,8 +440,8 @@ footer #footer-box a:hover {
 }
 
 /*
- * The header row places the category title and post-count badge
- * on the same line, with the badge pushed to the far right.
+ * The header row centers the category title and post-count badge
+ * together as a group within the card.
  */
 .category-card-header {
   display: flex;
@@ -455,7 +455,6 @@ footer #footer-box a:hover {
 .category-card-header h2 {
   font-size: 1.5rem;
   margin: 0;
-  flex: 1;
 }
 
 .category-card-header h2 a {
