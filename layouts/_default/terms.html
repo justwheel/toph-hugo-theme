@@ -68,8 +68,9 @@
         Compare the lowercase version of .Title against the exclusion list.
         Hugo auto-capitalizes taxonomy term titles (e.g., "footer" → "Footer"),
         so we lowercase before comparing to ensure a reliable match.
+        Also skip terms with hide_sitemap: true in their _index.md.
     */}}
-    {{- if not (in $exclude (.Title | lower)) }}
+    {{- if and (not (in $exclude (.Title | lower))) (not .Params.hide_sitemap) }}
     <li class="list-group-item d-flex justify-content-between align-items-center"
         data-count="{{ .Pages | len }}"
         data-name="{{ .Title | lower }}">

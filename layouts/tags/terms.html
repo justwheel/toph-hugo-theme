@@ -1,0 +1,155 @@
+{{/*
+    tags/terms.html — Tags taxonomy word cloud
+
+    This template renders the /tags/ page as a visual word cloud where each
+    tag's size and opacity reflect how many posts use it. Hugo's template
+    lookup order prefers layouts/tags/terms.html over layouts/_default/terms.html
+    when rendering the tags taxonomy.
+
+    Design intent:
+      Tags are numerous and varied. A word cloud gives a visual overview of
+      the blog's topic landscape at a glance — popular tags stand out through
+      larger size and full opacity, while niche tags remain visible but subtle.
+
+    Scaling logic:
+      Font size ranges from 0.75rem (1 post) to 2.80rem (most-used tag).
+      Opacity ranges from 0.55 (1 post) to 1.0 (most-used tag).
+      Both use linear interpolation: value = min + (ratio * (max - min))
+      where ratio = (count - minCount) / (maxCount - minCount).
+
+    Key Hugo concepts used here:
+      .Pages               — all tag term pages
+      .Pages | len          — total number of distinct tags
+      .Pages.ByTitle        — tags sorted alphabetically
+      site.Params.taxonomy_exclude — structural terms to filter out
+      .Params.hide_sitemap         — tags with this set are excluded from the cloud
+*/}}
+{{ define "main" }}
+{{- .Content }}
+
+{{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+
+{{/*
+    Build a filtered list of tags, excluding structural terms and tags
+    with hide_sitemap: true (e.g., outlier tags that would skew the
+    word cloud scaling). Also track min/max post counts for scaling.
+*/}}
+{{- $tags := slice -}}
+{{- $maxCount := 0 -}}
+{{- $minCount := 999999 -}}
+{{- range .Pages.ByTitle -}}
+    {{- if and (not (in $exclude (.Title | lower))) (not .Params.hide_sitemap) -}}
+        {{- $tags = $tags | append . -}}
+        {{- $count := .Pages | len -}}
+        {{- if gt $count $maxCount -}}
+            {{- $maxCount = $count -}}
+        {{- end -}}
+        {{- if lt $count $minCount -}}
+            {{- $minCount = $count -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{ if $tags }}
+{{/*
+    Sort controls — same pattern as the default terms template but styled
+    differently to sit above the word cloud. The tags-sort class targets
+    the tag-specific button styles in main.css.
+*/}}
+<div class="tags-controls">
+    <fieldset class="tags-sort" role="radiogroup" aria-label="Sort tags">
+        <legend class="visually-hidden">Sort order</legend>
+        <button class="tags-sort-btn" data-sort="alpha" aria-pressed="false">
+            A&ndash;Z
+        </button>
+        <button class="tags-sort-btn active" data-sort="count" aria-pressed="true">
+            Most used
+        </button>
+    </fieldset>
+    <span class="tags-total">{{ $tags | len }} tags</span>
+</div>
+
+{{/*
+    The word cloud container. Each tag is an inline link whose font-size
+    and opacity are computed via linear interpolation between min and max
+    post counts. Tags with more posts appear larger and more opaque.
+
+    data-count and data-name attributes enable client-side re-sorting
+    without a page reload.
+*/}}
+<div class="tag-cloud" role="list">
+{{- $range := sub $maxCount $minCount -}}
+{{ range $tags }}
+    {{- $count := .Pages | len -}}
+    {{/*
+        Linear interpolation for font size (0.75rem to 2.80rem) and
+        opacity (0.55 to 1.0). When all tags have the same count,
+        $range is 0, so we default ratio to 0 to avoid division by zero.
+    */}}
+    {{- $ratio := 0.0 -}}
+    {{- if gt $range 0 -}}
+        {{- $ratio = div (sub (float $count) (float $minCount)) (float $range) -}}
+    {{- end -}}
+    {{- $fontSize := add 0.75 (mul $ratio 2.05) -}}
+    {{- $opacity := add 0.55 (mul $ratio 0.45) -}}
+    <a class="tag-cloud-item"
+       href="{{ .Permalink }}"
+       role="listitem"
+       data-count="{{ $count }}"
+       data-name="{{ .Title | lower }}"
+       style="font-size: {{ printf "%.2f" $fontSize }}rem; opacity: {{ printf "%.2f" $opacity }};"
+       aria-label="{{ .Title | lower }}, {{ $count }} {{ if eq $count 1 }}post{{ else }}posts{{ end }}">
+        {{- .Title | lower }} ({{ $count }})
+    </a>
+{{ end }}
+</div>
+
+{{/*
+    Client-side sort toggle. Re-sorts .tag-cloud-item elements by data-count
+    (descending, ties broken alphabetically) or data-name (alphabetical).
+    The tag-cloud--reflow class briefly suppresses rendering during DOM
+    reordering to avoid visual flicker.
+*/}}
+<script>
+(function() {
+    var cloud = document.querySelector('.tag-cloud');
+    if (!cloud) return;
+    var items = Array.from(cloud.querySelectorAll('.tag-cloud-item'));
+    var buttons = document.querySelectorAll('.tags-sort-btn');
+
+    function sortItems(mode) {
+        cloud.classList.add('tag-cloud--reflow');
+        items.sort(function(a, b) {
+            if (mode === 'count') {
+                var diff = parseInt(b.dataset.count) - parseInt(a.dataset.count);
+                return diff !== 0 ? diff : a.dataset.name.localeCompare(b.dataset.name);
+            }
+            return a.dataset.name.localeCompare(b.dataset.name);
+        });
+        items.forEach(function(item) { cloud.appendChild(item); });
+        requestAnimationFrame(function() {
+            cloud.classList.remove('tag-cloud--reflow');
+        });
+    }
+
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            buttons.forEach(function(b) {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
+            sortItems(btn.dataset.sort);
+        });
+    });
+
+    /* Default to most-used sort on page load */
+    sortItems('count');
+})();
+</script>
+
+{{ else }}
+<p class="text-muted">No tags found.</p>
+{{ end }}
+{{ end }}

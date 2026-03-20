@@ -30,7 +30,7 @@
         <li>
             Published
             <time datetime="{{ .Date.Format "2006-01-02" }}">
-                {{- .Date.Format "January 2, 2006" -}}
+                {{- .Date.Format "2006 January 02" -}}
             </time>
         </li>
         {{/*
@@ -43,7 +43,7 @@
         <li>
             Updated
             <time datetime="{{ .Lastmod.Format "2006-01-02" }}">
-                {{- .Lastmod.Format "January 2, 2006" -}}
+                {{- .Lastmod.Format "2006 January 02" -}}
             </time>
         </li>
         {{ end }}

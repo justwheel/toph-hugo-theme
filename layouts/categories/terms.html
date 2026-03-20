@@ -1,0 +1,142 @@
+{{/*
+    categories/terms.html — Categories taxonomy terms listing
+
+    This template renders the /categories/ page with rich "magazine-style" cards.
+    Hugo's template lookup order prefers layouts/categories/terms.html over
+    layouts/_default/terms.html when rendering the categories taxonomy.
+
+    Design intent:
+      Categories are few and significant. Each one gets a full card with:
+      - An optional image or logo (from the category's _index.md front matter)
+      - A description (from the category's _index.md body content)
+      - A preview of the 3 most recent posts in that category
+
+    To add an image to a category, create content/categories/<name>/_index.md:
+      ---
+      title: My Category
+      image: /img/my-category.jpg    # or use "logo:" for a logo
+      ---
+      Optional description text here.
+
+    Key Hugo concepts used here:
+      .Pages               — all category term pages
+      .Params.image/logo   — custom front matter fields from the term's _index.md
+      .Content             — rendered Markdown/AsciiDoc body from _index.md
+      .Pages.ByDate.Reverse  — pages sorted newest-first
+      first 3               — Hugo function to take the first N items from a list
+      .Params.description   — optional front-matter summary for a post
+      .Plain                — full page content with HTML stripped (safe plain text)
+      truncate              — Hugo function that trims a string to N chars + "…"
+*/}}
+{{ define "main" }}
+{{- .Content }}
+
+{{/*
+    Load the exclusion list from site config (e.g., ["footer", "projects"]).
+    These are structural categories used by the theme for layout, not blog content.
+    See params.taxonomy_exclude in config.yaml to customize this list.
+*/}}
+{{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+
+<div class="categories-grid">
+{{/*
+    range $i, $term — the $i gives us the zero-based index of each category.
+    We use $i to stagger the CSS entrance animation (each card fades in
+    120ms after the previous one, creating a cascading reveal effect).
+*/}}
+{{ range $i, $term := .Pages.ByTitle }}
+    {{/*
+        Skip structural categories by comparing the lowercased title
+        against the exclusion list from config. Also skip categories
+        with hide_sitemap: true in their _index.md front matter.
+    */}}
+    {{- if and (not (in $exclude (.Title | lower))) (not .Params.hide_sitemap) }}
+    <article class="category-card" style="animation-delay: {{ mul $i 120 }}ms;">
+        <div class="category-card-inner">
+            {{/*
+                Check for an image or logo in the category's _index.md front matter.
+                Either field works — "image" takes priority over "logo" via | default.
+                Images are constrained to consistent dimensions via CSS (see main.css)
+                to handle varying source image sizes gracefully.
+            */}}
+            {{- $image := .Params.image -}}
+            {{- $logo := .Params.logo -}}
+            {{ if or $image $logo }}
+            <div class="category-card-media">
+                <img src="{{ $image | default $logo }}"
+                     alt="{{ .Title | title }}"
+                     loading="lazy">
+            </div>
+            {{ end }}
+            <div class="category-card-body">
+                <header class="category-card-header">
+                    <h2>
+                        {{/* | title ensures consistent Title Case (e.g., "Civil Rights" not "Civil rights") */}}
+                        <a href="{{ .Permalink }}">{{ .Title | title }}</a>
+                    </h2>
+                    {{/*
+                        Post count badge. We use aria-label to make screen readers
+                        announce "5 posts" instead of just reading the number "5".
+                    */}}
+                    <span class="category-count" aria-label="{{ .Pages | len }} {{ if eq (.Pages | len) 1 }}post{{ else }}posts{{ end }}">
+                        {{ .Pages | len }}
+                    </span>
+                </header>
+
+                {{/*
+                    Display the category description if it exists.
+                    "with" is Hugo's nil-safe block — it only renders if .Content
+                    is non-empty. The "." inside the block refers to .Content itself.
+                */}}
+                {{ with .Content }}
+                <div class="category-card-description">
+                    {{ . }}
+                </div>
+                {{ end }}
+
+                {{/*
+                    Show up to 3 most recent posts in this category.
+                    .Pages.ByDate.Reverse sorts all posts newest-first,
+                    then "first 3" takes only the top 3 from that list.
+                */}}
+                {{ if .Pages }}
+                <div class="category-card-recent">
+                    <h3>Recent</h3>
+                    <ul>
+                    {{ range first 3 .Pages.ByDate.Reverse }}
+                        <li>
+                            {{/*
+                                htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
+                                "&rsquo;" → "'") so titles render as plain text, not
+                                escaped strings.
+                            */}}
+                            <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName | htmlUnescape | title }}</a>
+                            {{ if not .Date.IsZero }}
+                            <br>
+                            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006 January 02" }}</time>
+                            {{ end }}
+                            {{/*
+                                Excerpt for each recent post:
+                                  1. Prefer .Params.description (hand-written summary)
+                                  2. Fall back to first 250 chars of .Plain (safe plaintext)
+                                htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
+                                "&rsquo;" → "'") so excerpts render as plain text, not
+                                escaped strings.
+                            */}}
+                            {{ with .Params.description | default (.Plain | htmlUnescape | truncate 250) }}
+                            <p class="term-excerpt text-muted mb-0 mt-1">
+                                {{ . }}
+                            </p>
+                            {{ end }}
+                        </li>
+                    {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+            </div>
+        </div>
+    </article>
+    {{- end }}
+{{ end }}
+</div>
+{{ end }}
