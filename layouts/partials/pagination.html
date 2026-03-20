@@ -1,0 +1,59 @@
+{{/*
+    pagination.html — Bootstrap 5 pagination controls
+
+    Renders page navigation for paginated list pages. Only displays when
+    there are multiple pages. Uses Hugo's .Paginator object which is
+    automatically available on list pages when paginate is set in config.
+
+    Key Hugo variables used:
+      .Paginator              — the paginator object for the current list
+      .Paginator.TotalPages   — total number of pages
+      .Paginator.PageNumber   — current page number (1-based)
+      .Paginator.HasPrev      — true if a previous page exists
+      .Paginator.HasNext      — true if a next page exists
+      .Paginator.Prev         — the previous page object
+      .Paginator.Next         — the next page object
+      .Paginator.Pagers       — slice of all page objects for numbered links
+
+    i18n keys used:
+      misc.previous           — label for the "Previous" button
+      misc.next               — label for the "Next" button
+
+    The partial uses Bootstrap's pagination component with:
+      - Previous/Next buttons with ARIA labels
+      - Numbered page links with active state
+      - Disabled state for prev/next at boundaries
+      - Centered alignment via justify-content-center
+*/}}
+{{ if gt .Paginator.TotalPages 1 }}
+<nav aria-label="{{ i18n "misc.previous" }} / {{ i18n "misc.next" }}">
+    <ul class="pagination justify-content-center mt-4">
+        {{/* Previous page link — disabled on the first page */}}
+        <li class="page-item{{ if not .Paginator.HasPrev }} disabled{{ end }}">
+            <a class="page-link"
+               {{ if .Paginator.HasPrev }}href="{{ .Paginator.Prev.URL }}"{{ end }}
+               aria-label="{{ i18n "misc.previous" }}">
+                &laquo; {{ i18n "misc.previous" }}
+            </a>
+        </li>
+
+        {{/* Numbered page links */}}
+        {{ range .Paginator.Pagers }}
+        <li class="page-item{{ if eq . $.Paginator }}  active{{ end }}">
+            <a class="page-link" href="{{ .URL }}">
+                {{ .PageNumber }}
+            </a>
+        </li>
+        {{ end }}
+
+        {{/* Next page link — disabled on the last page */}}
+        <li class="page-item{{ if not .Paginator.HasNext }} disabled{{ end }}">
+            <a class="page-link"
+               {{ if .Paginator.HasNext }}href="{{ .Paginator.Next.URL }}"{{ end }}
+               aria-label="{{ i18n "misc.next" }}">
+                {{ i18n "misc.next" }} &raquo;
+            </a>
+        </li>
+    </ul>
+</nav>
+{{ end }}

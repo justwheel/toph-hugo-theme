@@ -10,7 +10,7 @@
 
     Key Hugo concepts used here:
       .Content            — any custom content from the term's _index.md (if it exists)
-      .Pages              — all content pages tagged with this term
+      .Paginator.Pages    — paginated subset of content pages for the current page
       .Title              — the post title; falls back to the filename if no title is set
       .Data.Singular      — the singular form of the taxonomy name (e.g., "tag", "category")
       .Date               — the publish date of the content page
@@ -22,9 +22,9 @@
 {{ define "main" }}
 {{- .Content }}
 
-{{ if .Pages }}
+{{ if .Paginator.Pages }}
 <ul class="list-group" role="list">
-{{ range .Pages }}
+{{ range .Paginator.Pages }}
     <li class="list-group-item">
         {{/*
             Display the post title. If no title is set in front matter,
@@ -64,6 +64,9 @@
     </li>
 {{ end }}
 </ul>
+
+{{- partial "pagination.html" . -}}
+
 {{ else }}
 {{/*
     Empty state — shown when no content pages use this term.

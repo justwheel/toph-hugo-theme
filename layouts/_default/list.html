@@ -1,10 +1,52 @@
+{{/*
+    list.html — Paginated content list
+
+    This template renders paginated listing pages (e.g., /blog/).
+    Uses Hugo's built-in .Paginator to split content across pages.
+    The page size is controlled by the "paginate" setting in config.yaml
+    (defaults to 10 if not set).
+
+    Key Hugo variables used:
+      .Content              — any custom content from the section's _index.md
+      .Paginator.Pages      — the subset of pages for the current page
+      .Title                — the section title
+      .Date                 — the publish date of each content page
+      .Params.description   — optional front-matter summary
+      .Plain                — full page content stripped of HTML
+*/}}
 {{ define "main" }}
 {{- .Content }}
 
-<ul class="bg-white p-3">
-<!-- Ranges through content/posts/*{.adoc,.md} -->
-{{ range .Pages }}
-    <li><a href="{{.Permalink}}">{{.Date.Format "2006 January 02"}} | {{.Title}}</a></li>
+{{ if .Paginator.Pages }}
+<ul class="list-group" role="list">
+{{ range .Paginator.Pages }}
+    <li class="list-group-item">
+        {{/*
+            htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
+            "&rsquo;" → "'") so titles render as plain text, not escaped strings.
+        */}}
+        <a href="{{ .Permalink }}">{{ .Title | htmlUnescape }}</a>
+        {{ if not .Date.IsZero }}
+        <small class="text-muted ms-2">
+            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006 January 02" }}</time>
+        </small>
+        {{ end }}
+        {{/*
+            Excerpt: prefer hand-written description, fall back to truncated plaintext.
+            htmlUnescape converts HTML entities so excerpts render cleanly.
+        */}}
+        {{ with .Params.description | default (.Plain | htmlUnescape | truncate 250) }}
+        <p class="term-excerpt text-muted mb-0 mt-1">
+            {{ . }}
+        </p>
+        {{ end }}
+    </li>
 {{ end }}
 </ul>
+
+{{- partial "pagination.html" . -}}
+
+{{ else }}
+<p class="text-muted">No posts found.</p>
+{{ end }}
 {{ end }}
