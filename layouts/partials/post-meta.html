@@ -48,11 +48,7 @@
         </li>
         {{ end }}
         <li>
-            {{- if (isset .Params "author") -}}
-                {{ .Param "author" }}
-            {{- else -}}
-                {{ .Site.Params.biography.name }}
-            {{- end -}}
+            {{- .Param "author" | default .Site.Params.biography.name -}}
         </li>
         <li>{{ .ReadingTime }} min read</li>
         <li>{{ .WordCount }} words</li>
