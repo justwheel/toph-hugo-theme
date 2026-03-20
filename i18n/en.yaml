@@ -32,4 +32,5 @@
 - misc:
     logo: "{{ .Title }} logo"
     next: Next
+    page_navigation: Page navigation
     previous: Previous

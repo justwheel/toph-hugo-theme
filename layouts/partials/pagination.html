@@ -26,12 +26,12 @@
       - Centered alignment via justify-content-center
 */}}
 {{ if gt .Paginator.TotalPages 1 }}
-<nav aria-label="{{ i18n "misc.previous" }} / {{ i18n "misc.next" }}">
+<nav aria-label="{{ i18n "misc.page_navigation" }}">
     <ul class="pagination justify-content-center mt-4">
         {{/* Previous page link — disabled on the first page */}}
         <li class="page-item{{ if not .Paginator.HasPrev }} disabled{{ end }}">
             <a class="page-link"
-               {{ if .Paginator.HasPrev }}href="{{ .Paginator.Prev.URL }}"{{ end }}
+               {{ if .Paginator.HasPrev }}href="{{ .Paginator.Prev.URL }}"{{ else }}tabindex="-1" aria-disabled="true"{{ end }}
                aria-label="{{ i18n "misc.previous" }}">
                 &laquo; {{ i18n "misc.previous" }}
             </a>
@@ -49,7 +49,7 @@
         {{/* Next page link — disabled on the last page */}}
         <li class="page-item{{ if not .Paginator.HasNext }} disabled{{ end }}">
             <a class="page-link"
-               {{ if .Paginator.HasNext }}href="{{ .Paginator.Next.URL }}"{{ end }}
+               {{ if .Paginator.HasNext }}href="{{ .Paginator.Next.URL }}"{{ else }}tabindex="-1" aria-disabled="true"{{ end }}
                aria-label="{{ i18n "misc.next" }}">
                 {{ i18n "misc.next" }} &raquo;
             </a>

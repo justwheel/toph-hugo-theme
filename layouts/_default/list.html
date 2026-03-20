@@ -25,7 +25,7 @@
             htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
             "&rsquo;" → "'") so titles render as plain text, not escaped strings.
         */}}
-        <a href="{{ .Permalink }}">{{ .Title | htmlUnescape }}</a>
+        <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName | htmlUnescape }}</a>
         {{ if not .Date.IsZero }}
         <small class="text-muted ms-2">
             <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006 January 02" }}</time>
