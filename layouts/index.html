@@ -7,6 +7,7 @@
       {{ partial "for-hire.html" . }}
     {{ end }}
     {{ .Site.Home.Content }}
+    {{ partial "recent-posts.html" . }}
     {{ partial "projects-carousel.html" . }}
     {{ partial "projects.html" . }}
   {{ else }}

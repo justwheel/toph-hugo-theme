@@ -1,0 +1,79 @@
+{{/*
+    recent-posts.html — Recent blog posts display for homepage
+
+    Displays the 5 most recent visible blog posts on the homepage. The first
+    post is featured as a large card, while posts 2-5 appear as smaller cards
+    in a responsive grid. Only renders when at least one visible blog post
+    exists.
+
+    Key Hugo variables used:
+      .Site.RegularPages           — all regular (non-section) pages in the site
+      where ... "Section" "blog"   — filter to pages in the blog section
+      .Params.hide_sitemap         — front matter flag to exclude from listings
+      .Title                       — page title
+      .Permalink                   — full URL to the page
+      .Date                        — publication date from front matter
+      .Params.description          — optional excerpt from front matter
+      .Plain                       — page content as plain text (stripped of HTML)
+
+    Filtering behavior:
+      Pages with `hide_sitemap: true` in their front matter are excluded from
+      the recent posts list. This ensures draft posts or unlisted content
+      doesn't appear on the homepage.
+
+    htmlUnescape usage:
+      htmlUnescape converts HTML entities (e.g., "&amp;" → "&", "&rsquo;" → "'")
+      so titles and excerpts render as plain text, not escaped strings. This is
+      especially important for post titles that may contain apostrophes, quotes,
+      or ampersands from WordPress imports.
+*/}}
+{{- $posts := where .Site.RegularPages "Section" "blog" -}}
+{{- $posts = where $posts "Params.hide_sitemap" "!=" true -}}
+{{- $posts = $posts.ByDate.Reverse -}}
+{{- $posts = first 5 $posts -}}
+
+{{ if $posts }}
+<section class="recent-posts">
+    <h2>Recent Posts</h2>
+
+    {{/* Featured card — the most recent blog post */}}
+    {{ with index $posts 0 }}
+    <div class="recent-featured">
+        <div class="recent-featured-label">Latest Post</div>
+        <a class="recent-featured-title" href="{{ .Permalink }}">
+            {{- .Title | htmlUnescape -}}
+        </a>
+        <time class="recent-featured-date" datetime="{{ .Date.Format "2006-01-02" }}">
+            {{- .Date.Format "2006 January 02" -}}
+        </time>
+        <p class="recent-featured-excerpt">
+            {{- .Params.description | default (.Plain | htmlUnescape | truncate 250) -}}
+        </p>
+    </div>
+    {{ end }}
+
+    {{/* Secondary grid — posts 2-5 */}}
+    {{ if gt (len $posts) 1 }}
+    <div class="recent-grid">
+        {{ range after 1 $posts }}
+        <div class="recent-card">
+            <a class="recent-card-title" href="{{ .Permalink }}">
+                {{- .Title | htmlUnescape -}}
+            </a>
+            <time class="recent-card-date" datetime="{{ .Date.Format "2006-01-02" }}">
+                {{- .Date.Format "2006 January 02" -}}
+            </time>
+            <p class="recent-card-excerpt">
+                {{- .Params.description | default (.Plain | htmlUnescape | truncate 140) -}}
+            </p>
+        </div>
+        {{ end }}
+    </div>
+    {{ end }}
+
+    {{/* Footer with "View all posts" link */}}
+    <div class="recent-view-all">
+        <a href="{{ "blog/" | relURL }}">View all posts →</a>
+    </div>
+</section>
+{{ end }}
