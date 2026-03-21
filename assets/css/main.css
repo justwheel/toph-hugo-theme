@@ -17,10 +17,18 @@ h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
 .hanchor {
   font-size: 0.75em;
   opacity: 0;
-  text-decoration: none !important;
   color: #d0cdc5;
   vertical-align: middle;
   transition: opacity 0.15s ease;
+}
+
+h1 .hanchor,
+h2 .hanchor,
+h3 .hanchor,
+h4 .hanchor,
+h5 .hanchor,
+h6 .hanchor {
+  text-decoration: none;
 }
 
 h1:hover .hanchor,
