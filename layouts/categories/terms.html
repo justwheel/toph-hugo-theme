@@ -18,12 +18,15 @@
       ---
       Optional description text here.
 
+    Configurable via params.layouts.categories in config.yaml:
+      recent_posts          — number of recent posts per card (default: 3)
+      excerpt_length        — plaintext excerpt truncation length (default: 250)
+
     Key Hugo concepts used here:
       .Pages               — all category term pages
       .Params.image/logo   — custom front matter fields from the term's _index.md
       .Content             — rendered Markdown/AsciiDoc body from _index.md
       .Pages.ByDate.Reverse  — pages sorted newest-first
-      first 3               — Hugo function to take the first N items from a list
       .Params.description   — optional front-matter summary for a post
       .Plain                — full page content with HTML stripped (safe plain text)
       truncate              — Hugo function that trims a string to N chars + "…"
@@ -37,6 +40,8 @@
     See params.taxonomy_exclude in config.yaml to customize this list.
 */}}
 {{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+{{- $recentPosts := site.Params.layouts.categories.recent_posts | default 3 -}}
+{{- $excerptLength := site.Params.layouts.categories.excerpt_length | default 250 -}}
 
 <div class="categories-grid">
 {{/*
@@ -95,15 +100,15 @@
                 {{ end }}
 
                 {{/*
-                    Show up to 3 most recent posts in this category.
-                    .Pages.ByDate.Reverse sorts all posts newest-first,
-                    then "first 3" takes only the top 3 from that list.
+                    Show the most recent posts in this category. The count
+                    is controlled by params.layouts.categories.recent_posts
+                    in config.yaml (defaults to 3).
                 */}}
                 {{ if .Pages }}
                 <div class="category-card-recent">
                     <h3>Recent</h3>
                     <ul>
-                    {{ range first 3 .Pages.ByDate.Reverse }}
+                    {{ range first $recentPosts .Pages.ByDate.Reverse }}
                         <li>
                             {{/*
                                 htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
@@ -118,12 +123,14 @@
                             {{/*
                                 Excerpt for each recent post:
                                   1. Prefer .Params.description (hand-written summary)
-                                  2. Fall back to first 250 chars of .Plain (safe plaintext)
+                                  2. Fall back to truncated .Plain (safe plaintext).
+                                     Length controlled by params.layouts.categories.excerpt_length
+                                     in config.yaml (defaults to 250).
                                 htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
                                 "&rsquo;" → "'") so excerpts render as plain text, not
                                 escaped strings.
                             */}}
-                            {{ with .Params.description | default (.Plain | htmlUnescape | truncate 250) }}
+                            {{ with .Params.description | default (.Plain | htmlUnescape | truncate $excerptLength) }}
                             <p class="term-excerpt text-muted mb-0 mt-1">
                                 {{ . }}
                             </p>

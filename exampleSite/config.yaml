@@ -117,6 +117,18 @@ params:
     linkedin_url: company/the-king-center-for-nonviolent-social-change/
     x_username: mlk_institute
 
+  # --- layout configuration ---
+  # These values control how much content appears in specific page layouts.
+  # Defaults are tuned for sites with many categories to keep pages scannable
+  # without excessive scrolling. Sites with fewer categories or less content
+  # may benefit from higher values.
+  layouts:
+    categories:
+      # Number of recent posts shown under each category card. Default: 3.
+      recent_posts: 3
+      # Maximum character length for plaintext post excerpts. Default: 250.
+      excerpt_length: 250
+
 
 # --- internationalization settings ---
 
