@@ -747,6 +747,7 @@ footer #footer-box a:hover {
  */
 .recent-featured,
 .recent-card {
+  position: relative;
   border-left: 4px solid var(--accent-color);
   transition: background-color 0.15s ease, border-left-color 0.15s ease;
 }
@@ -773,6 +774,22 @@ footer #footer-box a:hover {
 .recent-card-title:hover {
   color: var(--accent-color);
   text-decoration: underline;
+}
+
+/*
+ * Stretched link — makes the entire card clickable by stretching
+ * the title link's ::after pseudo-element over the card area.
+ * Requires position: relative on the parent card container.
+ */
+.recent-featured-title::after,
+.recent-card-title::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
 }
 
 .recent-card-date {
