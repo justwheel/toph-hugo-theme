@@ -1,0 +1,18 @@
+{{/*
+    render-heading.html — Markdown heading render hook
+
+    Intercepts Markdown headings (h1-h6) and appends a clickable anchor
+    link (🔗) that appears on hover. This lets users right-click the
+    anchor to copy a direct URL to that section.
+
+    Hugo calls this hook for every Markdown heading, providing:
+      .Level   — the heading level (1-6)
+      .Anchor  — the auto-generated id attribute
+      .Text    — the heading text content
+      .Page    — the current page object
+
+    This hook only applies to Markdown content. AsciiDoc headings are
+    handled separately via replaceRE in single.html, using the same
+    CSS class (hanchor) for a consistent visual result.
+*/}}
+<h{{ .Level }} id="{{ .Anchor }}">{{ .Text | safeHTML }}&nbsp;<a class="hanchor" href="#{{ .Anchor }}" aria-label="Anchor link for: {{ .Text | plainify }}">🔗</a></h{{ .Level }}>

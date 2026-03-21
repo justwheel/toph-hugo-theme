@@ -45,7 +45,8 @@
     both formats share the same CSS. We detect AsciiDoc files to avoid
     rendering a duplicate ToC alongside the one already in .Content.
 */}}
-{{ if and .Params.toc (ne .Markup "asciidoc") }}
+{{- $isAsciidoc := and .File (eq .File.Ext "adoc") -}}
+{{ if and .Params.toc (not $isAsciidoc) }}
     {{ with .TableOfContents }}
     <div id="toc">
         <div id="toctitle">Table of Contents</div>
@@ -54,7 +55,22 @@
     {{ end }}
 {{ end }}
 
-{{- .Content }}
+{{/*
+    Heading anchors — clickable 🔗 links next to section headings.
+
+    Markdown: Handled by the render-heading.html hook, which injects
+    anchors at render time. No processing needed here.
+
+    AsciiDoc: Asciidoctor generates headings directly in .Content,
+    bypassing Hugo's render hooks. We use replaceRE to inject the
+    same anchor markup into Asciidoctor-generated headings so both
+    formats get identical anchor behavior.
+*/}}
+{{ if $isAsciidoc }}
+    {{- .Content | replaceRE `(<h[2-6] id="([^"]+)"[^>]*>.+?)(</h[2-6]>)` `${1}&nbsp;<a class="hanchor" href="#${2}" aria-label="Anchor link">🔗</a>${3}` | safeHTML }}
+{{ else }}
+    {{- .Content }}
+{{ end }}
 
 {{/* --- Previous/next post navigation --- */}}
 {{ if $is_blog_post }}

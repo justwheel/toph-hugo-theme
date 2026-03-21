@@ -8,6 +8,34 @@ body {
 
 h1 { font-family: var(--title-font), serif; }
 
+/* Offset anchor scroll targets so they clear the fixed navbar */
+h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* Heading anchor links — hidden until the heading is hovered */
+.hanchor {
+  font-size: 0.75em;
+  opacity: 0;
+  text-decoration: none !important;
+  color: #d0cdc5;
+  vertical-align: middle;
+  transition: opacity 0.15s ease;
+}
+
+h1:hover .hanchor,
+h2:hover .hanchor,
+h3:hover .hanchor,
+h4:hover .hanchor,
+h5:hover .hanchor,
+h6:hover .hanchor {
+  opacity: 1;
+}
+
+.hanchor:hover {
+  color: var(--primary);
+}
+
 h2, h3, h4, #toctitle { font-family: var(--header-font), serif; }
 
 h1 {
