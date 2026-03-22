@@ -92,7 +92,7 @@ Social platforms are defined in `data/social.yaml` as a registry of 11 platforms
 
 Config keys in `params.social` **must match** `data/social.yaml` keys exactly. Mismatched keys silently produce no output.
 
-LinkedIn uses `/%s` (not `/in/%s/`) to support both personal (`in/user`) and company (`company/name`) profiles. Mastodon uses `%s` directly (expects a full URL).
+The LinkedIn URL template is generic (`.../%s`) to support both personal (`in/user`) and company (`company/name`) profiles. Mastodon uses `%s` directly (expects a full URL).
 
 ### CSS architecture
 
@@ -114,7 +114,7 @@ Blog features (post-meta, post-nav, ToC) only render for blog posts.
 
 ### i18n
 
-Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. Arabic and Hindi are disabled in the example site config. Key namespaces: `404_page`, `footer`, `hire_me`, `index`, `hero`, `misc`.
+Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. Arabic and Spanish are disabled in the example site config; Hindi has a translation file but is not configured. Key namespaces: `404_page`, `footer`, `hire_me`, `index`, `hero`, `misc`.
 
 ### Archetypes
 
