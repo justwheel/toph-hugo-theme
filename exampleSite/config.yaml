@@ -39,6 +39,8 @@ security:
 markup:
   asciidocExt:
     preserveTOC: true
+  highlight:
+    style: github
 
 
 # --- privacy settings ---

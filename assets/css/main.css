@@ -275,8 +275,10 @@ main .rounded-profile img {
   align-items: center;
 }
 
-/* Category badges — primary color to match the site's dominant tone */
-.post-meta-category {
+/* Category badges — primary color to match the site's dominant tone.
+ * Prefixed with `main a` to beat the `main a { color: #003366 }` rule
+ * that otherwise overrides badge text color on these <a> elements. */
+main a.post-meta-category {
   background-color: var(--primary);
   color: var(--secondary);
   text-decoration: none;
@@ -284,15 +286,15 @@ main .rounded-profile img {
 }
 
 /* Tag badges — accent color to differentiate from categories */
-.post-meta-tag {
+main a.post-meta-tag {
   background-color: var(--accent-color);
   color: var(--secondary);
   text-decoration: none;
   font-size: 0.8rem;
 }
 
-.post-meta-category:hover,
-.post-meta-tag:hover {
+main a.post-meta-category:hover,
+main a.post-meta-tag:hover {
   opacity: 0.85;
   text-decoration: none;
   color: var(--secondary);
@@ -372,6 +374,15 @@ main .rounded-profile img {
   .post-nav-link--next {
     text-align: start;
   }
+}
+
+
+/* ===[ Code blocks ]=== */
+
+main .highlight pre {
+  border: 1px solid #d0cdc5;
+  border-radius: 4px;
+  padding: 1rem;
 }
 
 
@@ -957,7 +968,9 @@ footer #footer-box a:hover {
   color: var(--primary);
 }
 
-.archive-year-count {
+/* Prefixed with .blog-archive to beat the accordion-button color rule
+ * that otherwise cascades into the badge via inheritance. */
+.blog-archive .archive-year-count {
   background-color: var(--primary);
   color: var(--secondary);
   font-size: 0.7rem;
@@ -984,7 +997,7 @@ footer #footer-box a:hover {
   box-shadow: none;
 }
 
-.archive-month-count {
+.blog-archive .archive-month-count {
   background-color: var(--accent-color);
   color: var(--secondary);
   font-size: 0.65rem;
