@@ -106,7 +106,16 @@ jobs:
             --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Run Accessibility Audit
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
         run: |
+          # Rebuild with localhost baseURL so Pa11y's Chromium fetches
+          # CSS/JS/images from the local server instead of the remote
+          # GitHub Pages deployment (which may have stale assets).
+          cd exampleSite \
+          && hugo --minify --baseURL http://localhost:3000/ \
+          && cd ..
+
           npx --prefix .github serve -p 3000 exampleSite/public &
           SERVER_PID=$!
 
@@ -116,15 +125,11 @@ jobs:
             sleep 0.5
           done
 
-          # 1. Extract URLs from sitemap and strip base URL variations
+          # 1. Extract URLs from sitemap
           grep -h -o '<loc>[^<]*</loc>' $(find exampleSite/public -name "sitemap.xml") \
             | sed 's/<loc>//g; s/<\/loc>//g' \
             | grep -v '\.xml$' \
-            | sort -u \
-            | sed "s|^${{ steps.pages.outputs.base_url }}||" \
-            | sed "s|^https://jwwheeler.gitlab.io/toph-hugo||" \
-            | sed -E "s|^http://localhost:[0-9]+/toph-hugo||" \
-            | sed "s|^|http://localhost:3000|" > urls.txt
+            | sort -u > urls.txt
 
           # 2. Build pa11y-ci config with URLs embedded to ensure defaults apply
           URLS=$(jq -R -s 'split("\n") | map(select(length > 0))' urls.txt)
@@ -158,6 +163,16 @@ jobs:
           else
             echo "No accessibility errors found (warnings may exist)."
           fi
+
+      - name: Rebuild with Pages baseURL for deployment
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          HUGO_ENVIRONMENT: production
+        run: |
+          cd exampleSite \
+          && hugo \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Publish Accessibility Report to PR Summary
         if: always()

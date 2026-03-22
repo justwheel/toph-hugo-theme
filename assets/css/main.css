@@ -17,7 +17,7 @@ h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
 .hanchor {
   font-size: 0.75em;
   opacity: 0;
-  color: #d0cdc5;
+  color: #959083;
   vertical-align: middle;
   transition: opacity 0.15s ease;
 }
@@ -204,7 +204,7 @@ main .rounded-profile img {
 }
 
 .hero-separator {
-  color: #ccc;
+  color: #767676;
   margin: 0 0.15rem;
   user-select: none;
 }
@@ -654,7 +654,7 @@ footer #footer-box a:hover {
 }
 
 .category-card-recent time {
-  color: #888;
+  color: #767676;
   font-size: 0.75rem;
 }
 
@@ -731,7 +731,7 @@ footer #footer-box a:hover {
 
 .tags-total {
   font-size: 0.85rem;
-  color: #888;
+  color: #767676;
 }
 
 /*
@@ -830,7 +830,7 @@ footer #footer-box a:hover {
 
 .recent-featured-date {
   display: block;
-  color: #888;
+  color: #767676;
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
@@ -911,7 +911,7 @@ footer #footer-box a:hover {
 }
 
 .recent-card-date {
-  color: #888;
+  color: #767676;
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
