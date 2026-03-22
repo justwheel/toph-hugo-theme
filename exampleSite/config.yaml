@@ -88,6 +88,7 @@ menu:
 params:
   biography:
     name: Septima Poinsette Clark
+    tagline: "The mother of the Civil Rights Movement who taught a nation to read, write, and rise"
     gender: Female
     email: septima@example.com
     blog: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
