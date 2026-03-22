@@ -1,0 +1,52 @@
+{{/*
+    hero.html — Compact centered hero with profile photo, tagline,
+    social media icons, and about link.
+
+    Reads from:
+      - $.Site.Params.images[0]        — profile photo
+      - $.Site.Params.biography.tagline — one-line tagline
+      - $.Site.Menus.social             — social media links
+      - $.Site.Menus.nav                — about page link
+
+    Icon mapping: menu.social entry names are matched (case-insensitive)
+    to Bootstrap Icons classes. Unrecognized names fall back to bi-link-45deg.
+*/}}
+
+{{- $iconMap := dict
+    "instagram"  "bi-instagram"
+    "threads"    "bi-threads"
+    "tiktok"     "bi-tiktok"
+    "github"     "bi-github"
+    "gitlab"     "bi-gitlab"
+    "linkedin"   "bi-linkedin"
+    "x"          "bi-twitter-x"
+    "twitter"    "bi-twitter-x"
+    "youtube"    "bi-youtube"
+    "facebook"   "bi-facebook"
+    "mastodon"   "bi-mastodon"
+-}}
+
+<div class="hero">
+  {{ with index $.Site.Params.images 0 }}
+  <img class="hero-photo" src="{{ . }}" alt="{{ i18n "hero.photo" }} {{ $.Site.Params.biography.name }}" title="{{ $.Site.Params.biography.name }}">
+  {{ end }}
+
+  {{ with $.Site.Params.biography.tagline }}
+  <p class="hero-tagline">{{ . }}</p>
+  {{ end }}
+
+  <div class="hero-links">
+    {{- range $.Site.Menus.social }}
+      {{- $name := .Name | lower }}
+      {{- $icon := index $iconMap $name | default "bi-link-45deg" }}
+      <a class="hero-social" href="{{ .URL }}" aria-label="{{ .Name }}"><i class="bi {{ $icon }}"></i></a>
+    {{- end }}
+
+    {{- range $.Site.Menus.nav }}
+      {{- if eq .Identifier "about" }}
+        <span class="hero-separator" aria-hidden="true">&middot;</span>
+        <a class="hero-about" href="{{ .URL }}">{{ i18n "hero.about" | default .Name }}</a>
+      {{- end }}
+    {{- end }}
+  </div>
+</div>
