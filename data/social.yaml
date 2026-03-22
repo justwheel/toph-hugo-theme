@@ -1,0 +1,54 @@
+facebook:
+  name: Facebook
+  url: "https://facebook.com/%s"
+  icon: bi-facebook
+
+github:
+  name: GitHub
+  url: "https://github.com/%s"
+  icon: bi-github
+
+gitlab:
+  name: GitLab
+  url: "https://gitlab.com/%s"
+  icon: bi-gitlab
+
+instagram:
+  name: Instagram
+  url: "https://www.instagram.com/%s"
+  icon: bi-instagram
+
+lastfm:
+  name: Last.fm
+  url: "https://www.last.fm/user/%s"
+  icon: bi-music-note-beamed
+
+linkedin:
+  name: LinkedIn
+  url: "https://www.linkedin.com/in/%s/"
+  icon: bi-linkedin
+
+mastodon:
+  name: Mastodon
+  url: "%s"
+  icon: bi-mastodon
+
+threads:
+  name: Threads
+  url: "https://www.threads.com/@%s"
+  icon: bi-threads
+
+tiktok:
+  name: TikTok
+  url: "https://www.tiktok.com/@%s"
+  icon: bi-tiktok
+
+x:
+  name: X
+  url: "https://x.com/%s"
+  icon: bi-twitter-x
+
+youtube:
+  name: YouTube
+  url: "https://youtube.com/@%s"
+  icon: bi-youtube

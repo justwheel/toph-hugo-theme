@@ -5,26 +5,10 @@
     Reads from:
       - $.Site.Params.images[0]        — profile photo
       - $.Site.Params.biography.tagline — one-line tagline
-      - $.Site.Menus.social             — social media links
+      - $.Site.Params.social            — social media profiles (key: username)
+      - $.Site.Data.social              — platform registry (name, url template, icon)
       - $.Site.Menus.nav                — about page link
-
-    Icon mapping: menu.social entry names are matched (case-insensitive)
-    to Bootstrap Icons classes. Unrecognized names fall back to bi-link-45deg.
 */}}
-
-{{- $iconMap := dict
-    "instagram"  "bi-instagram"
-    "threads"    "bi-threads"
-    "tiktok"     "bi-tiktok"
-    "github"     "bi-github"
-    "gitlab"     "bi-gitlab"
-    "linkedin"   "bi-linkedin"
-    "x"          "bi-twitter-x"
-    "twitter"    "bi-twitter-x"
-    "youtube"    "bi-youtube"
-    "facebook"   "bi-facebook"
-    "mastodon"   "bi-mastodon"
--}}
 
 <div class="hero">
   {{ with index $.Site.Params.images 0 }}
@@ -36,10 +20,11 @@
   {{ end }}
 
   <div class="hero-links">
-    {{- range $.Site.Menus.social }}
-      {{- $name := .Name | lower }}
-      {{- $icon := index $iconMap $name | default "bi-link-45deg" }}
-      <a class="hero-social" href="{{ .URL }}" aria-label="{{ .Name }}"><i class="bi {{ $icon }}"></i></a>
+    {{- range $key, $value := $.Site.Params.social }}
+      {{- with index $.Site.Data.social $key }}
+        {{- $url := printf .url $value }}
+        <a class="hero-social" href="{{ $url }}" aria-label="{{ .name }}"><i class="bi {{ .icon }}"></i></a>
+      {{- end }}
     {{- end }}
 
     {{- range $.Site.Menus.nav }}

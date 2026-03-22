@@ -1,6 +1,6 @@
     <meta property="og:site_name" content="{{ site.Title }}" />
     <meta name="application-name" content="{{ site.Title }}" />
-    <meta name="twitter:site" content="@{{ $.Site.Params.social.x_username }}" />
+    {{ with $.Site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
         
     {{ if (isset .Params "author") }}
     <meta name="author" content="{{ .Param "author" }}" />
@@ -27,11 +27,15 @@
         "email": "mailto:{{ $.Site.Params.biography.email }}",
         "url": {{ printf "%s" site.BaseURL }},
         "sameAs": [
-            "https://github.com/{{ $.Site.Params.social.github_username }}",
-            "https://gitlab.com/{{ $.Site.Params.social.gitlab_username }}",
-            "https://www.last.fm/user/{{ $.Site.Params.social.lastfm_username}}",
-            "https://www.linkedin.com/in/{{ $.Site.Params.social.linkedin_url }}/",
-            "https://x.com/{{ $.Site.Params.social.x_username }}"
+            {{- $sameAs := slice -}}
+            {{- range $key, $value := $.Site.Params.social -}}
+                {{- with index $.Site.Data.social $key -}}
+                    {{- $sameAs = $sameAs | append (printf .url $value) -}}
+                {{- end -}}
+            {{- end -}}
+            {{- range $index, $url := $sameAs }}
+            "{{ $url }}"{{ if ne (add $index 1) (len $sameAs) }},{{ end }}
+            {{- end }}
         ],
         "knowsAbout": [
             {{- $len_knowsAbout := len $.Site.Params.biography.knows_about }}

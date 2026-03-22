@@ -12,14 +12,18 @@
                         <a class="nav-link{{ if eq .URL $currentPage.RelPermalink }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .URL }}">{{ .Name }}</a>
                     </li>
                 {{ end }}
+                {{- with $.Site.Params.social }}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">social</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    {{ range .Site.Menus.social }}
-                        <li><a class="dropdown-item" href="{{ .URL }}">{{ .Name }}</a></li>
+                    {{ range $key, $value := . }}
+                        {{ with index $.Site.Data.social $key }}
+                        <li><a class="dropdown-item" href="{{ printf .url $value }}">{{ .name }}</a></li>
+                        {{ end }}
                     {{ end }}
                     </ul>
                 </li>
+                {{- end }}
                 {{- if .IsTranslated }}
                     {{ "<!-- language selector -->" | safeHTML }}
                     <li class="nav-item dropdown">
