@@ -29,6 +29,10 @@
       header: Customize your home page
     rounded_profile_image: Picture of
 
+- hero:
+    about: About
+    photo: Picture of
+
 - misc:
     logo: "{{ .Title }} logo"
     next: Next

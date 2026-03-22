@@ -1,3 +1,7 @@
 ---
+- hero:
+    about: حول
+    photo: صورة
+
 - misc:
     page_navigation: التنقل بين الصفحات
