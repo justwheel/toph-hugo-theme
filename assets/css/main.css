@@ -85,7 +85,19 @@ h2, h4, #toctitle { color: var(--accent-color); }
   z-index: 100;
 }
 
-.dropdown-menu { background-color: var(--accent-color); }
+.dropdown-menu {
+  background-color: var(--accent-color);
+}
+
+.dropdown-menu .dropdown-item {
+  color: var(--secondary);
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
 
 /* Hover-triggered dropdowns — the parent link stays clickable */
 @media (min-width: 992px) {
