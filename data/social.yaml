@@ -25,7 +25,7 @@ lastfm:
 
 linkedin:
   name: LinkedIn
-  url: "https://www.linkedin.com/in/%s/"
+  url: "https://www.linkedin.com/%s"
   icon: bi-linkedin
 
 mastodon:

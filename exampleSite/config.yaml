@@ -67,14 +67,19 @@ menu:
       name: about me
       url: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
       weight: 20
-  social:
-    - identifier: facebook
-      name: Facebook
-      url: https://www.facebook.com/KingInstitute
+    - identifier: blog
+      name: blog
+      url: /blog/
+      weight: 30
+    - identifier: categories
+      name: categories
+      url: /categories/
+      parent: blog
       weight: 10
-    - identifier: x
-      name: Twitter/X
-      url: https://x.com/MLKInstitute
+    - identifier: tags
+      name: tags
+      url: /tags/
+      parent: blog
       weight: 20
 
 
@@ -111,11 +116,19 @@ params:
   # for boilerplate text on how to get in touch.
   hire_me: false
   social:
-    github_username: ""
-    gitlab_username: ""
-    lastfm_username: ""
-    linkedin_url: company/the-king-center-for-nonviolent-social-change/
-    x_username: mlk_institute
+    # --- Active social media profiles ---
+    facebook: KingInstitute
+    linkedin: company/the-king-center-for-nonviolent-social-change
+    x: MLKInstitute
+    # --- Uncomment and set a username/URL to enable ---
+    # github: ""
+    # gitlab: ""
+    # instagram: ""
+    # lastfm: ""
+    # mastodon: ""       # Use full profile URL (e.g., https://mastodon.social/@user)
+    # threads: ""
+    # tiktok: ""
+    # youtube: ""
 
   # --- layout configuration ---
   # These values control how much content appears in specific page layouts.
