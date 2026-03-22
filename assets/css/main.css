@@ -167,7 +167,7 @@ main .rounded-profile img {
   display: block;
   margin: 0 auto 0.75rem;
   height: auto;
-  max-width: 120px;
+  max-width: 250px;
 }
 
 .hero-tagline {
@@ -221,7 +221,7 @@ main .rounded-profile img {
 
 @media screen and (max-width: 600px) {
   .hero-photo {
-    max-width: 80px;
+    max-width: 140px;
   }
 }
 
