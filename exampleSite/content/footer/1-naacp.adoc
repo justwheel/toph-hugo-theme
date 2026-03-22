@@ -5,4 +5,4 @@ hide_sitemap: true
 ---
 
 [link=https://naacp.org/]
-image::/toph-hugo/img/naacp.svg[National Association for the Advancement of Colored People]
+image::/toph-hugo-theme/img/naacp.svg[National Association for the Advancement of Colored People]
