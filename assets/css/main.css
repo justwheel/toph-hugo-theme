@@ -184,6 +184,26 @@ main .rounded-profile img {
 }
 
 
+/* ===[ Cover image (layouts/_default/single.html) ]=== */
+
+/*
+ * Full-width cover image displayed between the page title and post
+ * metadata. The image scales to fill the container width while
+ * maintaining aspect ratio.
+ */
+.cover-image {
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cover-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+
 /* ===[ Homepage hero (layouts/partials/hero.html) ]=== */
 
 .hero {

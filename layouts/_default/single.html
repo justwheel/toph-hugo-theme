@@ -26,6 +26,34 @@
 {{- $is_structural := or (.Params.hide_sitemap | default false) $is_structural_by_category -}}
 {{- $is_blog_post := and (not .Date.IsZero) (not $is_structural) -}}
 
+{{/* --- Cover image (between title and metadata) --- */}}
+{{/*
+    Renders the post's cover image if coverImage is set in front matter.
+    Supports two path formats:
+      - Absolute path (e.g., "/img/photo.jpg") — served from static/img/
+      - Filename only (e.g., "photo.jpg") — resolved from the page bundle's
+        images/ directory via Hugo's .Resources
+*/}}
+{{ if and $is_blog_post .Params.coverImage }}
+    {{- $src := .Params.coverImage -}}
+    {{- $alt := .Title | plainify -}}
+    {{- if not (hasPrefix $src "/") -}}
+        {{/*
+            Non-absolute path — resolve relative to the post's directory.
+            Blog images are stored alongside the post files in
+            content/blog/YYYY/MM/. Since posts are standalone files (not
+            leaf bundles), .Resources is not available. We construct the
+            URL from the post's directory path.
+        */}}
+        {{- with .File -}}
+            {{- $src = printf "/%s/%s" (path.Dir .Path) $.Params.coverImage -}}
+        {{- end -}}
+    {{- end -}}
+    <div class="cover-image">
+        <img src="{{ $src }}" alt="{{ $alt }}" loading="lazy">
+    </div>
+{{ end }}
+
 {{/* --- Blog post metadata (date, author, reading time, tags) --- */}}
 {{ if $is_blog_post }}
     {{- partial "post-meta.html" . -}}
