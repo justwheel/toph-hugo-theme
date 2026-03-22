@@ -8,14 +8,25 @@
             <ul class="navbar-nav">
                 {{ $currentPage := . }}
                 {{ range .Site.Menus.nav }}
+                    {{ if .HasChildren }}
+                    <li class="nav-item dropdown nav-hover-dropdown">
+                        <a class="nav-link dropdown-toggle{{ if eq .URL $currentPage.RelPermalink }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .URL }}">{{ .Name }}</a>
+                        <ul class="dropdown-menu">
+                            {{ range .Children }}
+                            <li><a class="dropdown-item" href="{{ .URL }}">{{ .Name }}</a></li>
+                            {{ end }}
+                        </ul>
+                    </li>
+                    {{ else }}
                     <li class="nav-item">
                         <a class="nav-link{{ if eq .URL $currentPage.RelPermalink }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .URL }}">{{ .Name }}</a>
                     </li>
+                    {{ end }}
                 {{ end }}
                 {{- with $.Site.Params.social }}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">social</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li class="nav-item dropdown nav-hover-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">social</a>
+                    <ul class="dropdown-menu">
                     {{ range $key, $value := . }}
                         {{ with index $.Site.Data.social $key }}
                         <li><a class="dropdown-item" href="{{ printf .url $value }}">{{ .name }}</a></li>
@@ -26,9 +37,9 @@
                 {{- end }}
                 {{- if .IsTranslated }}
                     {{ "<!-- language selector -->" | safeHTML }}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">translations</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li class="nav-item dropdown nav-hover-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
+                        <div class="dropdown-menu">
                             <select id="select-language" onchange="location = this.value;" aria-label="Select language">
                                 <optgroup label="Languages">
                                 {{ $siteLanguages := site.Languages}}

@@ -87,6 +87,23 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 .dropdown-menu { background-color: var(--accent-color); }
 
+/* Hover-triggered dropdowns — the parent link stays clickable */
+@media (min-width: 992px) {
+  .nav-hover-dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+}
+
+/* On mobile (collapsed navbar), show children inline on tap */
+@media (max-width: 991.98px) {
+  .nav-hover-dropdown > .dropdown-menu {
+    display: block;
+    position: static;
+    border: none;
+    padding-left: 1rem;
+  }
+}
+
 .navbar .nav-link,
 .navbar .nav-link:hover,
 .navbar .nav-link:focus {
