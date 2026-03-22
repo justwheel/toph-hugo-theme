@@ -31,8 +31,8 @@
     Renders the post's cover image if coverImage is set in front matter.
     Supports two path formats:
       - Absolute path (e.g., "/img/photo.jpg") — served from static/img/
-      - Filename only (e.g., "photo.jpg") — resolved from the page bundle's
-        images/ directory via Hugo's .Resources
+      - Filename only (e.g., "photo.jpg") — resolved relative to the
+        post's content directory
 */}}
 {{ if and $is_blog_post .Params.coverImage }}
     {{- $src := .Params.coverImage -}}
@@ -46,7 +46,7 @@
             URL from the post's directory path.
         */}}
         {{- with .File -}}
-            {{- $src = printf "/%s/%s" (path.Dir .Path) $.Params.coverImage -}}
+            {{- $src = path.Join "/" (path.Dir .Path) $.Params.coverImage -}}
         {{- end -}}
     {{- end -}}
     <div class="cover-image">
