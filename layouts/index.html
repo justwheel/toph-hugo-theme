@@ -1,22 +1,14 @@
 {{ define "main" }}
-  {{ if .Site.Home.Content }}
-    <span class="rounded-profile">
-      <img src="{{ index $.Site.Params.images 0 }}" alt="{{ i18n "index.rounded_profile_image" }} {{ $.Site.Params.biography.name }}" title="{{ i18n "index.rounded_profile_image" }} {{ $.Site.Params.biography.name }}">
-    </span>
-    {{ if .Param "hire_me" }}
-      {{ partial "for-hire.html" . }}
-    {{ end }}
-    {{ .Site.Home.Content }}
-    {{ partial "recent-posts.html" . }}
-    {{ partial "projects-carousel.html" . }}
-    {{ partial "projects.html" . }}
-  {{ else }}
-    <h2>{{ i18n "index.default.header" | safeHTML }}</h2>
-    <p>{{ i18n "index.default.body" | safeHTML }}</p>
-    <ol>
-      <li>{{ i18n "index.default.customize_step1" | safeHTML }}</li>
-      <li>{{ i18n "index.default.customize_step2" | safeHTML }}</li>
-      <li>{{ i18n "index.default.customize_step3" | safeHTML }}</li>
-    </ol>
+  {{ partial "hero.html" . }}
+  {{ if .Param "hire_me" }}
+    {{ partial "for-hire.html" . }}
+  {{ end }}
+  {{ with .Site.Home.Content }}
+    {{ . }}
+  {{ end }}
+  {{ partial "recent-posts.html" . }}
+  {{ with where .Site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{ partial "projects-carousel.html" $ }}
+    {{ partial "projects.html" $ }}
   {{ end }}
 {{ end }}
