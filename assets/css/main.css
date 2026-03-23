@@ -166,7 +166,19 @@ main img {
 main figure,
 main .imageblock {
   margin: 1.5rem auto;
+  width: fit-content;
   max-width: 100%;
+}
+
+/*
+ * Hugo's Goldmark wraps render hook output in <p> tags, creating
+ * invalid <p><figure>...</figure></p>. Browsers auto-close the <p>,
+ * leaving an empty <p> before the figure. Collapse it to prevent
+ * extra spacing.
+ */
+main p:has(> figure) {
+  margin: 0;
+  padding: 0;
 }
 
 /* Default: full border-radius on images without captions */

@@ -22,6 +22,6 @@
 <figure>
   <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" loading="lazy">
   {{- with .Title }}
-  <figcaption>{{ . }}</figcaption>
+  <figcaption>{{ . | markdownify }}</figcaption>
   {{- end }}
 </figure>
