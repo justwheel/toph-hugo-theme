@@ -149,6 +149,80 @@ main a:hover {
   color: #003d82;
 }
 
+/* Constrain all images within the main content area to container width */
+main img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*
+ * Image figures and captions — uses <figure> and <figcaption> rendered
+ * by the render-image.html hook. The image and caption are visually
+ * connected as a card with shared border and background.
+ */
+main figure {
+  margin: 1.5rem auto;
+  max-width: 100%;
+  text-align: center;
+}
+
+main figure img {
+  border-radius: 4px 4px 0 0;
+  max-width: 100%;
+  height: auto;
+}
+
+/* When there's no caption, give the image full border-radius */
+main figure:not(:has(figcaption)) img {
+  border-radius: 4px;
+}
+
+main figcaption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #555;
+  border: 1px solid #e0ddd5;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 0.5rem 1rem;
+  background: #faf9f6;
+}
+
+/*
+ * AsciiDoc image captions — Asciidoctor renders figures as
+ * .imageblock > .content > img with .title for the caption.
+ * Styled identically to Markdown figcaption for consistency.
+ */
+main .imageblock {
+  margin: 1.5rem auto;
+  text-align: center;
+}
+
+main .imageblock .content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* When an AsciiDoc image has a caption, connect them visually */
+main .imageblock:has(.title) .content img {
+  border-radius: 4px 4px 0 0;
+}
+
+main .imageblock .title {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #555;
+  border: 1px solid #e0ddd5;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 0.5rem 1rem;
+  background: #faf9f6;
+}
+
 main #projects-carousel .pc-fixed-height { height: 10vh; }
 
 main #projects h3 {

@@ -1,0 +1,27 @@
+{{/*
+    render-image.html — Markdown image render hook
+
+    Wraps images in a <figure> element. When a title is provided
+    (via the Markdown syntax ![alt](src "title")), it renders as a
+    <figcaption> below the image. Images without titles render as
+    plain <figure> elements without a caption.
+
+    This hook only applies to Markdown content. AsciiDoc images are
+    rendered by Asciidoctor as .imageblock with .title for captions.
+    Both formats are styled identically via CSS (see main.css).
+
+    Markdown syntax:
+      ![alt text](image.jpg)              → figure without caption
+      ![alt text](image.jpg "Caption")    → figure with figcaption
+
+    AsciiDoc syntax (for reference — handled by Asciidoctor, not this hook):
+      image::image.jpg[Alt text]           → .imageblock without caption
+      .Caption text                        → .imageblock with .title
+      image::image.jpg[Alt text]
+*/}}
+<figure>
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+  {{- with .Title }}
+  <figcaption>{{ . }}</figcaption>
+  {{- end }}
+</figure>
