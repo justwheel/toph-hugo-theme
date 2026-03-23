@@ -133,6 +133,14 @@ params:
     # tiktok: ""
     # youtube: ""
 
+  # Footer legal information displayed at the bottom of every page.
+  # Override to match your site's license.
+  legal:
+    license:
+      name: "CC BY 4.0"
+      url: "https://creativecommons.org/licenses/by/4.0/"
+      title: "Creative Commons Attribution 4.0 International"
+
   # Human-readable date format used across all templates.
   # Uses Go time formatting (https://gohugo.io/functions/time/format/).
   # Default: "2006 January 02" (e.g., "2023 May 09").

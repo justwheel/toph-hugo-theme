@@ -8,7 +8,9 @@
     {{ end }}
     <div class="container-fluid rounded m-2" id="footer-box">
         <ul class="list-unstyled">
-            <li>{{ site.Title }} &copy; <a href="https://creativecommons.org/licenses/by-sa/4.0/" title="Creative Commons Attribution-ShareAlike 4.0 International" target="_blank">CC BY-SA 4.0</a>. {{ .Site.Params.biography.first_online }}-{{ now.Format "2006" }}.</li>
+            {{ with .Site.Params.legal.license }}
+            <li>{{ site.Title }} &copy; <a href="{{ .url }}" title="{{ .title }}" target="_blank">{{ .name }}</a>. {{ $.Site.Params.biography.first_online }}-{{ now.Format "2006" }}.</li>
+            {{ end }}
             <li><a href="{{ .Site.Params.git_repo }}" title="{{ .Site.Params.git_repo }}">{{ i18n "footer.find_this_site" | safeHTML }}</a></li>
         </ul>
     </div>
