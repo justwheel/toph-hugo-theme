@@ -20,7 +20,7 @@
       image::image.jpg[Alt text]
 */}}
 <figure>
-  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" loading="lazy">
   {{- with .Title }}
   <figcaption>{{ . }}</figcaption>
   {{- end }}

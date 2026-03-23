@@ -159,59 +159,30 @@ main img {
 }
 
 /*
- * Image figures and captions — uses <figure> and <figcaption> rendered
- * by the render-image.html hook. The image and caption are visually
+ * Image figures and captions for both Markdown (<figure>) and
+ * AsciiDoc (.imageblock). The image and caption are visually
  * connected as a card with shared border and background.
  */
-main figure {
-  margin: 1.5rem auto;
-  max-width: 100%;
-  text-align: center;
-}
-
-main figure img {
-  border-radius: 4px 4px 0 0;
-  max-width: 100%;
-  height: auto;
-}
-
-/* When there's no caption, give the image full border-radius */
-main figure:not(:has(figcaption)) img {
-  border-radius: 4px;
-}
-
-main figcaption {
-  text-align: center;
-  font-size: 0.85rem;
-  color: #555;
-  border: 1px solid #e0ddd5;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  padding: 0.5rem 1rem;
-  background: #faf9f6;
-}
-
-/*
- * AsciiDoc image captions — Asciidoctor renders figures as
- * .imageblock > .content > img with .title for the caption.
- * Styled identically to Markdown figcaption for consistency.
- */
+main figure,
 main .imageblock {
   margin: 1.5rem auto;
-  text-align: center;
+  max-width: 100%;
 }
 
+/* Default: full border-radius on images without captions */
+main figure img,
 main .imageblock .content img {
-  max-width: 100%;
-  height: auto;
   border-radius: 4px;
 }
 
-/* When an AsciiDoc image has a caption, connect them visually */
+/* When a caption exists, connect image to caption visually */
+main figure:has(figcaption) img,
 main .imageblock:has(.title) .content img {
   border-radius: 4px 4px 0 0;
 }
 
+/* Captions — shared styles for Markdown figcaption and AsciiDoc .title */
+main figcaption,
 main .imageblock .title {
   text-align: center;
   font-size: 0.85rem;
