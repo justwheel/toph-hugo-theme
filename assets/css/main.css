@@ -181,6 +181,11 @@ main p:has(> figure) {
   padding: 0;
 }
 
+/* Prevent markdownify's <p> tags from adding margins inside captions */
+main figcaption p {
+  margin: 0;
+}
+
 /* Default: full border-radius on images without captions */
 main figure img,
 main .imageblock .content img {
