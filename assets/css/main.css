@@ -490,7 +490,8 @@ main a.post-meta-tag:hover {
 
 /* ===[ Code blocks ]=== */
 
-main .highlight pre {
+main .highlight pre,
+main pre {
   border: 1px solid #d0cdc5;
   border-radius: 4px;
   padding: 1rem;
