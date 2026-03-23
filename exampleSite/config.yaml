@@ -133,6 +133,12 @@ params:
     # tiktok: ""
     # youtube: ""
 
+  # Human-readable date format used across all templates.
+  # Uses Go time formatting (https://gohugo.io/functions/time/format/).
+  # Default: "2006 January 02" (e.g., "2023 May 09").
+  # Other examples: "January 2, 2006", "02 Jan 2006", "2006-01-02".
+  date_format: "2006 January 02"
+
   # --- layout configuration ---
   # These values control how much content appears in specific page layouts.
   # Defaults are tuned for sites with many categories to keep pages scannable

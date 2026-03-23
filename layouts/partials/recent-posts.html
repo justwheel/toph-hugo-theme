@@ -44,7 +44,7 @@
             {{- .Title | htmlUnescape -}}
         </a>
         <time class="recent-featured-date" datetime="{{ .Date.Format "2006-01-02" }}">
-            {{- .Date.Format "2006 January 02" -}}
+            {{- .Date.Format (site.Params.date_format | default "2006 January 02") -}}
         </time>
         <p class="recent-featured-excerpt">
             {{- .Params.description | default (.Plain | htmlUnescape | truncate 250) -}}
@@ -61,7 +61,7 @@
                 {{- .Title | htmlUnescape -}}
             </a>
             <time class="recent-card-date" datetime="{{ .Date.Format "2006-01-02" }}">
-                {{- .Date.Format "2006 January 02" -}}
+                {{- .Date.Format (site.Params.date_format | default "2006 January 02") -}}
             </time>
             <p class="recent-card-excerpt">
                 {{- .Params.description | default (.Plain | htmlUnescape | truncate 140) -}}

@@ -118,7 +118,7 @@
                             <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName | htmlUnescape | title }}</a>
                             {{ if not .Date.IsZero }}
                             <br>
-                            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006 January 02" }}</time>
+                            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.date_format | default "2006 January 02") }}</time>
                             {{ end }}
                             {{/*
                                 Excerpt for each recent post:
