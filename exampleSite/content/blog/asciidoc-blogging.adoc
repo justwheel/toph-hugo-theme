@@ -1,0 +1,69 @@
+= Blogging with AsciiDoc in Toph
+Toph Development Team
+:date: 2026-03-23
+:draft: false
+:categories: announcements
+:tags: toph, asciidoc, hugo
+:description: AsciiDoc is a first-class content format in Toph. Here's how to use it for blog posts.
+
+Toph treats AsciiDoc as a first-class content format.
+Everything that works with Markdown also works with AsciiDoc — taxonomy badges, post metadata, cover images, heading anchors, and navigation.
+
+== Why AsciiDoc?
+
+AsciiDoc offers features that Markdown does not:
+
+* Native table of contents with `:toc:` document attribute
+* Admonition blocks (NOTE, TIP, WARNING, IMPORTANT, CAUTION)
+* Include directives for reusing content across pages
+* Built-in support for complex tables and nested lists
+
+If you are already comfortable writing in AsciiDoc, Toph will serve your needs without compromise.
+
+== Creating an AsciiDoc post
+
+Create a file with the `.adoc` extension in your blog directory:
+
+[source,bash]
+----
+hugo new blog/my-post.adoc
+----
+
+Add your front matter as AsciiDoc document attributes:
+
+[source,asciidoc]
+----
+= My Post Title
+Author Name
+:date: 2026-01-15
+:draft: false
+:categories: tech
+:tags: hugo, asciidoc
+:description: A short summary of the post.
+----
+
+== Table of contents
+
+To enable a table of contents, add the `:toc:` attribute to your document header:
+
+[source,asciidoc]
+----
+= My Post Title
+:toc:
+----
+
+Toph's CSS styles the AsciiDoc-generated table of contents identically to Markdown's `toc: true` front matter option.
+Both formats produce the same visual result.
+
+== Heading anchors
+
+Clickable anchor links (🔗) appear on hover for all section headings.
+For Markdown, this is handled by a Hugo render hook.
+For AsciiDoc, Toph injects the same anchor markup via template processing.
+Both formats produce identical results.
+
+== Learn more
+
+* https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc Language Documentation]
+* https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[AsciiDoc Syntax Quick Reference]
+* https://gohugo.io/content-management/formats/#asciidoc[Hugo AsciiDoc Support]
