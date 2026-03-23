@@ -18,6 +18,8 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 - Template-driven layout system
   - [Project profiles](#project-profiles)
   - [Dynamic footer badges](#dynamic-footer-badges)
+  - [Blogging](#blogging)
+- First-class support for both Markdown and AsciiDoc content
 - Schema.org support
 - Search Engine Optimization enhancements
 - [Easy customization of colors and fonts in Hugo configuration](#custom-colors-and-fonts)
@@ -155,6 +157,54 @@ Keep in mind these requirements when adding new footer badges.
   194 pixels
 * **Style suggestions**:
   * Add a light-gray (RGBA: `#272b35ff`) border around the badge.
+
+### Blogging
+
+Toph includes a full-featured blogging system with taxonomy support, pagination, and content discovery.
+
+#### Key features
+
+- **Blog archive** — posts grouped by year and month in a collapsible accordion at `/blog/`
+- **Categories** — magazine-style card grid with images, descriptions, and recent posts at `/categories/`
+- **Tags** — visual word cloud with font-size/opacity scaling by post count at `/tags/`
+- **Post metadata** — publication date, author, reading time, word count, and taxonomy badges
+- **Post navigation** — previous/next links at the bottom of each post
+- **Recent posts** — the 5 most recent posts displayed on the homepage
+- **Cover images** — optional `coverImage` front matter for a featured image on each post
+- **Image captions** — `![alt](src "caption")` renders as `<figure>/<figcaption>`
+- **Heading anchors** — clickable 🔗 links on section headings for sharing direct URLs
+- **Pagination** — configurable page size via `pagination.pagerSize` in config
+- **RSS feed** — custom RSS template with full post content
+- **AsciiDoc support** — all features work identically for both Markdown and AsciiDoc content
+
+#### Creating a blog post
+
+```bash
+hugo new blog/my-first-post.md
+```
+
+This uses the `blog.md` archetype which scaffolds the standard front matter fields.
+Set `draft: false` when ready to publish.
+
+#### Configuration
+
+Add the following to your Hugo configuration to enable taxonomy filtering and pagination:
+
+```yaml
+taxonomies:
+  category: categories
+  tag: tags
+
+pagination:
+  pagerSize: 10
+
+params:
+  taxonomy_exclude: ["footer", "projects"]
+  layouts:
+    categories:
+      recent_posts: 3
+      excerpt_length: 250
+```
 
 ### Custom colors and fonts
 
