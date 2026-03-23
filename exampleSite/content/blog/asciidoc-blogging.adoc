@@ -1,10 +1,16 @@
-= Blogging with AsciiDoc in Toph
-Toph Development Team
-:date: 2026-03-23
-:draft: false
-:categories: announcements
-:tags: toph, asciidoc, hugo
-:description: AsciiDoc is a first-class content format in Toph. Here's how to use it for blog posts.
+---
+title: "Blogging with AsciiDoc in Toph"
+date: 2026-03-23
+draft: false
+categories:
+  - "announcements"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "hugo"
+author: "Toph Development Team"
+description: "AsciiDoc is a first-class content format in Toph. Here's how to use it for blog posts."
+---
 
 Toph treats AsciiDoc as a first-class content format.
 Everything that works with Markdown also works with AsciiDoc — taxonomy badges, post metadata, cover images, heading anchors, and navigation.
@@ -29,27 +35,39 @@ Create a file with the `.adoc` extension in your blog directory:
 hugo new blog/my-post.adoc
 ----
 
-Add your front matter as AsciiDoc document attributes:
+Add YAML front matter at the top of the file, followed by AsciiDoc content:
 
 [source,asciidoc]
 ----
-= My Post Title
-Author Name
-:date: 2026-01-15
-:draft: false
-:categories: tech
-:tags: hugo, asciidoc
-:description: A short summary of the post.
+---
+title: "My Post Title"
+date: 2026-01-15
+draft: false
+categories:
+  - "tech"
+tags:
+  - "hugo"
+  - "asciidoc"
+author: "Author Name"
+description: "A short summary of the post."
+---
+
+Your AsciiDoc content starts here.
 ----
 
 == Table of contents
 
-To enable a table of contents, add the `:toc:` attribute to your document header:
+To enable a table of contents, add the `:toc:` attribute after the front matter:
 
 [source,asciidoc]
 ----
-= My Post Title
+---
+title: "My Post Title"
+toc: true
+---
 :toc:
+
+== First Section
 ----
 
 Toph's CSS styles the AsciiDoc-generated table of contents identically to Markdown's `toc: true` front matter option.
