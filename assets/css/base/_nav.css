@@ -1,0 +1,66 @@
+/* ===[ Site navigation styling ]=== */
+
+.navbar {
+  --bs-navbar-color: var(--secondary);
+  --bs-navbar-hover-color: var(--secondary);
+  --bs-navbar-active-color: var(--secondary);
+  background-color: var(--primary);
+  border-bottom: 2px solid var(--accent-color);
+  box-shadow: 0 2px 4px var(--shadow-navbar);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.dropdown-menu {
+  background-color: var(--accent-color);
+}
+
+.dropdown-menu .dropdown-item {
+  color: var(--secondary);
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
+/* Hover-triggered dropdowns — the parent link stays clickable */
+@media (min-width: 992px) {
+  .nav-hover-dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+}
+
+/* On mobile (collapsed navbar), show children inline on tap */
+@media (max-width: 991.98px) {
+  .nav-hover-dropdown > .dropdown-menu {
+    display: block;
+    position: static;
+    border: none;
+    padding-left: 1rem;
+  }
+}
+
+.navbar .nav-link,
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  background-color: var(--primary);
+  color: var(--secondary);
+  text-align: center;
+}
+
+.navbar .nav-link.active {
+  background-color: var(--accent-color);
+  color: var(--secondary);
+}
+
+.navbar .nav-link:hover {
+  background-color: var(--nav-hover-bg);
+  text-decoration: underline;
+  text-decoration-color: var(--nav-hover-decoration);
+  text-decoration-style: dotted;
+}

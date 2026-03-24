@@ -1,0 +1,107 @@
+/* ===[ Main body styling ]=== */
+
+/* Darken main links further to guarantee 4.5:1 contrast */
+main a {
+  color: var(--text-link);
+  text-decoration: underline;
+}
+
+main a:hover {
+  color: var(--text-link-hover);
+}
+
+/* Constrain all images within the main content area to container width */
+main img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*
+ * Image figures and captions for both Markdown (<figure>) and
+ * AsciiDoc (.imageblock). The image and caption are visually
+ * connected as a card with shared border and background.
+ */
+main figure,
+main .imageblock {
+  margin: 1.5rem auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+/*
+ * Hugo's Goldmark wraps render hook output in <p> tags, creating
+ * invalid <p><figure>...</figure></p>. Browsers auto-close the <p>,
+ * leaving an empty <p> before the figure. Collapse it to prevent
+ * extra spacing.
+ */
+main p:has(> figure) {
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent markdownify's <p> tags from adding margins inside captions */
+main figcaption p {
+  margin: 0;
+}
+
+/* Default: full border-radius on images without captions */
+main figure img,
+main .imageblock .content img {
+  border-radius: 4px;
+}
+
+/* When a caption exists, connect image to caption visually */
+main figure:has(figcaption) img,
+main .imageblock:has(.title) .content img {
+  border-radius: 4px 4px 0 0;
+}
+
+/* Captions — shared styles for Markdown figcaption and AsciiDoc .title */
+main figcaption,
+main .imageblock .title {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 0.5rem 1rem;
+  background: var(--bg-caption);
+}
+
+main #projects-carousel .pc-fixed-height { height: 10vh; }
+
+main #projects h3 {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
+main #toc {
+  background-color: var(--bg-toc);
+  border: 1px solid var(--border-toc);
+  display: inline-grid;
+  padding: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+main #toctitle {
+  text-align: center;
+}
+
+main .rounded-profile img {
+  border-radius: 50%;
+  display: block;
+  margin-bottom: 3rem; margin-left: auto; margin-right: auto;
+  height: auto;
+}
+
+@media screen and (min-width: 601px) {
+  main .rounded-profile img { max-width: 250px; }
+}
+
+@media screen and (max-width: 600px) {
+  main .rounded-profile img { max-width: 140px; }
+}

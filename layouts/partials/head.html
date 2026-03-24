@@ -52,7 +52,7 @@
     </style>
 
     {{ "<!-- stylesheets -->" | safeHTML }}
-    {{- $css := resources.Get "css/main.css" | minify | fingerprint }}
+    {{- $css := resources.Get "css/main.css" | css.Build | fingerprint }}
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}">

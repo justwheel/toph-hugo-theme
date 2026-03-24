@@ -1,0 +1,164 @@
+/* ===[ Homepage: Recent posts (layouts/partials/recent-posts.html) ]=== */
+
+.recent-posts {
+  margin: 2.5rem 0;
+}
+
+.recent-posts h2 {
+  font-family: var(--header-font), serif;
+  font-size: 1.6rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Featured card — the most recent post */
+.recent-featured {
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1.25rem;
+  background: var(--bg-white);
+  margin-bottom: 1.5rem;
+}
+
+.recent-featured-label {
+  font-size: 0.7rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.recent-featured-title {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.recent-featured-title:hover {
+  color: var(--accent-color);
+  text-decoration-thickness: 3px;
+}
+
+.recent-featured-date {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.recent-featured-excerpt {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Secondary posts grid — 4 columns */
+.recent-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.recent-card {
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1rem;
+  background: var(--bg-white);
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * Shared interactive styles for all recent post cards (featured + secondary).
+ * Uses a colored left border that shifts through the config palette on
+ * hover and click, with a subtle background tint.
+ */
+.recent-featured,
+.recent-card {
+  position: relative;
+  border-left: 4px solid var(--accent-color);
+  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+}
+
+.recent-featured:hover,
+.recent-card:hover {
+  background-color: var(--bg-card-hover);
+  border-left-color: var(--primary);
+}
+
+.recent-featured:active,
+.recent-card:active {
+  background-color: var(--bg-card-active);
+  border-left-color: var(--secondary);
+}
+
+.recent-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.recent-card-title:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+/*
+ * Stretched link — makes the entire card clickable by stretching
+ * the title link's ::after pseudo-element over the card area.
+ * Requires position: relative on the parent card container.
+ */
+.recent-featured-title::after,
+.recent-card-title::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.recent-card-date {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.recent-card-excerpt {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  flex: 1;
+}
+
+/* "View all posts" link */
+.recent-view-all {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+
+.recent-view-all a {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-color);
+}
+
+.recent-view-all a:hover {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* On mobile, stack secondary posts vertically */
+@media screen and (max-width: 600px) {
+  .recent-grid {
+    grid-template-columns: 1fr;
+  }
+}

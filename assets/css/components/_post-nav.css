@@ -1,0 +1,66 @@
+/* ===[ Post navigation (layouts/partials/post-nav.html) ]=== */
+
+/*
+ * Prev/next navigation — appears at the bottom of blog posts.
+ * Two-column flex layout with the previous post on the left and
+ * next post on the right. Stacks vertically on mobile.
+ */
+.post-nav {
+  border-top: 1px solid var(--border-light);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+}
+
+.post-nav-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.post-nav-link {
+  display: flex;
+  flex-direction: column;
+  max-width: 45%;
+  text-decoration: none;
+}
+
+/* Push the "next" link to the right side */
+.post-nav-link--next {
+  margin-inline-start: auto;
+  text-align: end;
+}
+
+/* Directional label (Previous / Next) — small caps style */
+.post-nav-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-color);
+  margin-bottom: 0.25rem;
+}
+
+/* Post title in the nav link */
+.post-nav-title {
+  color: var(--primary);
+  font-family: var(--header-font), serif;
+  font-size: 1rem;
+}
+
+.post-nav-link:hover .post-nav-title {
+  text-decoration: underline;
+}
+
+/* On mobile, stack prev/next vertically */
+@media screen and (max-width: 600px) {
+  .post-nav-links {
+    flex-direction: column;
+  }
+
+  .post-nav-link {
+    max-width: 100%;
+  }
+
+  .post-nav-link--next {
+    text-align: start;
+  }
+}

@@ -1,0 +1,38 @@
+/* ===[ Neutral palette ]=== */
+
+/*
+ * Neutral/utility colors used across the theme. Brand colors
+ * (--primary, --secondary, --accent-color) and font variables
+ * are set via inline <style> in head.html from site config.
+ */
+:root {
+  /* Text */
+  --text-body: #330000;
+  --text-muted: #555;
+  --text-secondary: #767676;
+  --text-link: #003366;
+  --text-link-hover: #003d82;
+  --text-anchor: #959083;
+
+  /* Borders */
+  --border-light: #e0ddd5;
+  --border-medium: #d0cdc5;
+  --border-lighter: #e8e5dd;
+  --border-toc: #a2a9b1;
+
+  /* Backgrounds */
+  --bg-white: #fff;
+  --bg-toc: #f8f9fa;
+  --bg-caption: #faf9f6;
+  --bg-hover: #f5f4f0;
+  --bg-card-hover: #f5f0fa;
+  --bg-card-active: #ece4f4;
+
+  /* Navigation accents */
+  --nav-hover-bg: royalblue;
+  --nav-hover-decoration: skyblue;
+
+  /* Shadows */
+  --shadow-navbar: rgba(0, 0, 0, 0.2);
+  --shadow-card: rgba(0, 0, 0, 0.08);
+}

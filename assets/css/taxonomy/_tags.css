@@ -1,0 +1,106 @@
+/* ===[ Taxonomy: Tags word cloud (layouts/tags/terms.html) ]=== */
+
+/*
+ * Sort controls — a small button group for toggling sort order.
+ * Sits above the cloud, aligned with the tag count on the right.
+ */
+.tags-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+}
+
+.tags-sort {
+  display: flex;
+  gap: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tags-sort-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* First button gets rounded left corners, last gets rounded right */
+.tags-sort-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.tags-sort-btn:last-child {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+
+/* Active sort button uses the theme's primary color */
+.tags-sort-btn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--secondary);
+}
+
+.tags-sort-btn:hover:not(.active) {
+  background-color: var(--bg-hover);
+}
+
+.tags-total {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/*
+ * The word cloud itself — a flexbox container that wraps tags naturally.
+ * Tags flow like text, wrapping to new lines, with their varying sizes
+ * creating an organic, cloud-like layout.
+ */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.8rem;
+  padding: 1.5rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  line-height: 1.8;
+}
+
+/*
+ * During sort reflow (applied briefly by JavaScript), we suppress
+ * rendering to avoid visible flicker as DOM nodes are re-ordered.
+ */
+.tag-cloud--reflow {
+  opacity: 0.6;
+}
+
+/*
+ * Individual tag links — pill-shaped buttons with the post count
+ * inline. Font-size and opacity are set by the Hugo template based
+ * on post count. The pill shape makes each tag a clear clickable unit.
+ */
+.tag-cloud-item {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--primary);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.tag-cloud-item:hover {
+  background-color: var(--primary);
+  color: var(--secondary);
+  transform: scale(1.08);
+  opacity: 1 !important;
+  text-decoration: none;
+}

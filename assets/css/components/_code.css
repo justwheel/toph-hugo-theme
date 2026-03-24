@@ -1,0 +1,8 @@
+/* ===[ Code blocks ]=== */
+
+main .highlight pre,
+main pre {
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  padding: 1rem;
+}

@@ -1,0 +1,63 @@
+/* ===[ Blog archive (layouts/blog/list.html) ]=== */
+
+/*
+ * Year accordion items — uses Bootstrap's accordion component with
+ * custom styling for the year header and post count badge.
+ */
+.blog-archive .accordion-button {
+  font-family: var(--header-font), serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.blog-archive .accordion-button:not(.collapsed) {
+  background-color: var(--bg-card-hover);
+  color: var(--primary);
+}
+
+/* Prefixed with .blog-archive to beat the accordion-button color rule
+ * that otherwise cascades into the badge via inheritance. */
+.blog-archive .archive-year-count {
+  background-color: var(--primary);
+  color: var(--secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Month accordion items nested within each year */
+.archive-month-item {
+  border: none;
+}
+
+.archive-month-button {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-color);
+  padding: 0.5rem 1rem;
+  background: none;
+}
+
+.archive-month-button:not(.collapsed) {
+  background-color: transparent;
+  color: var(--accent-color);
+  box-shadow: none;
+}
+
+.blog-archive .archive-month-count {
+  background-color: var(--accent-color);
+  color: var(--secondary);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* Post entries within the archive */
+.archive-posts .list-group-item {
+  border-left: 3px solid transparent;
+  transition: border-left-color 0.15s ease;
+}
+
+.archive-posts .list-group-item:hover {
+  border-left-color: var(--primary);
+}

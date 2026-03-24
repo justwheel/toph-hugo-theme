@@ -1,0 +1,48 @@
+/* ===[ Taxonomy: terms list sort controls (layouts/_default/terms.html) ]=== */
+
+/*
+ * Sort toggle and count sit on a single row above the terms list.
+ * Flexbox pushes the count to the far right of the toggle buttons.
+ */
+.terms-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.terms-sort {
+  display: flex;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.terms-sort-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.terms-sort-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.terms-sort-btn:last-child {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+
+.terms-sort-btn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--secondary);
+}
+
+.terms-sort-btn:hover:not(.active) {
+  background-color: var(--bg-hover);
+}

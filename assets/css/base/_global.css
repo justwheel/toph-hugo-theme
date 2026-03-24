@@ -1,0 +1,69 @@
+/* ===[ Global styling ]=== */
+
+body {
+  background-color: var(--secondary);
+  color: var(--text-body);
+  font-family: var(--default-font), sans-serif;
+}
+
+h1 { font-family: var(--title-font), serif; }
+
+/* Offset anchor scroll targets so they clear the fixed navbar */
+h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* Heading anchor links — hidden until the heading is hovered */
+.hanchor {
+  font-size: 0.75em;
+  opacity: 0;
+  color: var(--text-anchor);
+  vertical-align: middle;
+  transition: opacity 0.15s ease;
+}
+
+h1 .hanchor,
+h2 .hanchor,
+h3 .hanchor,
+h4 .hanchor,
+h5 .hanchor,
+h6 .hanchor {
+  text-decoration: none;
+}
+
+h1:hover .hanchor,
+h2:hover .hanchor,
+h3:hover .hanchor,
+h4:hover .hanchor,
+h5:hover .hanchor,
+h6:hover .hanchor {
+  opacity: 1;
+}
+
+.hanchor:hover {
+  color: var(--primary);
+}
+
+h2, h3, h4, #toctitle { font-family: var(--header-font), serif; }
+
+h1 {
+  color: var(--primary);
+  padding-bottom: 3rem;
+  padding-top: 7rem;
+}
+
+h2, h4, #toctitle { color: var(--accent-color); }
+
+@media screen and (min-width: 601px) {
+  h1 { font-size: 5em; }
+  h2 { font-size: 40pt; }
+  h3, #toctitle { font-size: 28pt; }
+  h4 { font-size: 22pt;}
+}
+
+@media screen and (max-width: 600px) {
+  h1 { font-size: 16vw; }
+  h2 { font-size: 10vw; }
+  h3, #toctitle { font-size: 8vw; }
+  h4 { font-size: 5vw; }
+}
