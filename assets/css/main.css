@@ -1,8 +1,48 @@
+/* ===[ Neutral palette ]=== */
+
+/*
+ * Neutral/utility colors used across the theme. Brand colors
+ * (--primary, --secondary, --accent-color) and font variables
+ * are set via inline <style> in head.html from site config.
+ */
+:root {
+  /* Text */
+  --text-body: #330000;
+  --text-muted: #555;
+  --text-secondary: #767676;
+  --text-link: #003366;
+  --text-link-hover: #003d82;
+  --text-anchor: #959083;
+
+  /* Borders */
+  --border-light: var(--border-light);
+  --border-medium: var(--border-medium);
+  --border-lighter: #e8e5dd;
+  --border-toc: #a2a9b1;
+
+  /* Backgrounds */
+  --bg-white: #fff;
+  --bg-toc: #f8f9fa;
+  --bg-caption: #faf9f6;
+  --bg-hover: #f5f4f0;
+  --bg-card-hover: #f5f0fa;
+  --bg-card-active: #ece4f4;
+
+  /* Navigation accents */
+  --nav-hover-bg: royalblue;
+  --nav-hover-decoration: skyblue;
+
+  /* Shadows */
+  --shadow-navbar: rgba(0, 0, 0, 0.2);
+  --shadow-card: rgba(0, 0, 0, 0.08);
+}
+
+
 /* ===[ Global styling ]=== */
 
 body {
   background-color: var(--secondary);
-  color: #330000;
+  color: var(--text-body);
   font-family: var(--default-font), sans-serif;
 }
 
@@ -17,7 +57,7 @@ h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
 .hanchor {
   font-size: 0.75em;
   opacity: 0;
-  color: #959083;
+  color: var(--text-anchor);
   vertical-align: middle;
   transition: opacity 0.15s ease;
 }
@@ -77,7 +117,7 @@ h2, h4, #toctitle { color: var(--accent-color); }
   --bs-navbar-active-color: var(--secondary);
   background-color: var(--primary);
   border-bottom: 2px solid var(--accent-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--shadow-navbar);
   position: fixed;
   top: 0;
   left: 0;
@@ -130,9 +170,9 @@ h2, h4, #toctitle { color: var(--accent-color); }
 }
 
 .navbar .nav-link:hover {
-  background-color: royalblue;
+  background-color: var(--nav-hover-bg);
   text-decoration: underline;
-  text-decoration-color: skyblue;
+  text-decoration-color: var(--nav-hover-decoration);
   text-decoration-style: dotted;
 }
 
@@ -141,12 +181,12 @@ h2, h4, #toctitle { color: var(--accent-color); }
 
 /* Darken main links further to guarantee 4.5:1 contrast */
 main a {
-  color: #003366;
+  color: var(--text-link);
   text-decoration: underline;
 }
 
 main a:hover {
-  color: #003d82;
+  color: var(--text-link-hover);
 }
 
 /* Constrain all images within the main content area to container width */
@@ -203,12 +243,12 @@ main figcaption,
 main .imageblock .title {
   text-align: center;
   font-size: 0.85rem;
-  color: #555;
-  border: 1px solid #e0ddd5;
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
   border-top: none;
   border-radius: 0 0 4px 4px;
   padding: 0.5rem 1rem;
-  background: #faf9f6;
+  background: var(--bg-caption);
 }
 
 main #projects-carousel .pc-fixed-height { height: 10vh; }
@@ -219,8 +259,8 @@ main #projects h3 {
 }
 
 main #toc {
-  background-color: #f8f9fa;
-  border: 1px solid #a2a9b1;
+  background-color: var(--bg-toc);
+  border: 1px solid var(--border-toc);
   display: inline-grid;
   padding: 0.75rem;
   margin-bottom: 3rem;
@@ -282,7 +322,7 @@ main .rounded-profile img {
 }
 
 .hero-tagline {
-  color: #555;
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin: 0 0 1rem;
 }
@@ -315,7 +355,7 @@ main .rounded-profile img {
 }
 
 .hero-separator {
-  color: #767676;
+  color: var(--text-secondary);
   margin: 0 0.15rem;
   user-select: none;
 }
@@ -345,12 +385,12 @@ main .rounded-profile img {
  * items for a clean editorial look.
  */
 .post-meta {
-  border-top: 1px solid #e0ddd5;
-  border-bottom: 1px solid #e0ddd5;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
   padding: 1rem 0;
   margin-bottom: 2rem;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-muted);
 }
 
 /*
@@ -369,7 +409,7 @@ main .rounded-profile img {
 
 /* Vertical divider between metadata items (skip the first) */
 .post-meta-list li + li {
-  border-inline-start: 1px solid #d0cdc5;
+  border-inline-start: 1px solid var(--border-medium);
   padding-inline-start: 1rem;
   margin-inline-start: 1rem;
 }
@@ -387,7 +427,7 @@ main .rounded-profile img {
 }
 
 /* Category badges — primary color to match the site's dominant tone.
- * Prefixed with `main a` to beat the `main a { color: #003366 }` rule
+ * Prefixed with `main a` to beat the `main a { color: var(--text-link) }` rule
  * that otherwise overrides badge text color on these <a> elements. */
 main a.post-meta-category {
   background-color: var(--primary);
@@ -428,7 +468,7 @@ main a.post-meta-tag:hover {
  * next post on the right. Stacks vertically on mobile.
  */
 .post-nav {
-  border-top: 1px solid #e0ddd5;
+  border-top: 1px solid var(--border-light);
   margin-top: 3rem;
   padding-top: 1.5rem;
 }
@@ -492,7 +532,7 @@ main a.post-meta-tag:hover {
 
 main .highlight pre,
 main pre {
-  border: 1px solid #d0cdc5;
+  border: 1px solid var(--border-medium);
   border-radius: 4px;
   padding: 1rem;
 }
@@ -519,7 +559,7 @@ footer #footer-box a {
 }
 
 footer #footer-box a:hover {
-  color: skyblue;
+  color: var(--nav-hover-decoration);
   text-decoration-style: dashed;
 }
 
@@ -545,9 +585,9 @@ footer #footer-box a:hover {
 }
 
 .terms-sort-btn {
-  background: #fff;
-  border: 1px solid #d0cdc5;
-  color: #555;
+  background: var(--bg-white);
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
   padding: 0.3rem 0.75rem;
   font-size: 0.85rem;
   cursor: pointer;
@@ -570,7 +610,7 @@ footer #footer-box a:hover {
 }
 
 .terms-sort-btn:hover:not(.active) {
-  background-color: #f5f4f0;
+  background-color: var(--bg-hover);
 }
 
 
@@ -628,8 +668,8 @@ footer #footer-box a:hover {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background: #fff;
-  border: 1px solid #e0ddd5;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
   border-left: 4px solid var(--accent-color);
   border-radius: 4px;
   padding: 1rem;
@@ -638,7 +678,7 @@ footer #footer-box a:hover {
 }
 
 .category-card-inner:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--shadow-card);
   border-left-color: var(--primary);
 }
 
@@ -719,7 +759,7 @@ footer #footer-box a:hover {
 
 .category-card-description {
   font-size: 0.95rem;
-  color: #555;
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -732,7 +772,7 @@ footer #footer-box a:hover {
  * Uses a subtle top border to separate it from the description.
  */
 .category-card-recent {
-  border-top: 1px solid #e8e5dd;
+  border-top: 1px solid var(--border-lighter);
   padding-top: 0.75rem;
   margin-top: auto;
 }
@@ -766,7 +806,7 @@ footer #footer-box a:hover {
 }
 
 .category-card-recent time {
-  color: #767676;
+  color: var(--text-secondary);
   font-size: 0.75rem;
 }
 
@@ -811,9 +851,9 @@ footer #footer-box a:hover {
 }
 
 .tags-sort-btn {
-  background: #fff;
-  border: 1px solid #d0cdc5;
-  color: #555;
+  background: var(--bg-white);
+  border: 1px solid var(--border-medium);
+  color: var(--text-muted);
   padding: 0.35rem 0.85rem;
   font-size: 0.85rem;
   cursor: pointer;
@@ -838,12 +878,12 @@ footer #footer-box a:hover {
 }
 
 .tags-sort-btn:hover:not(.active) {
-  background-color: #f5f4f0;
+  background-color: var(--bg-hover);
 }
 
 .tags-total {
   font-size: 0.85rem;
-  color: #767676;
+  color: var(--text-secondary);
 }
 
 /*
@@ -857,8 +897,8 @@ footer #footer-box a:hover {
   align-items: baseline;
   gap: 0.4rem 0.8rem;
   padding: 1.5rem;
-  background: #fff;
-  border: 1px solid #e0ddd5;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
   border-radius: 4px;
   line-height: 1.8;
 }
@@ -910,10 +950,10 @@ footer #footer-box a:hover {
 
 /* Featured card — the most recent post */
 .recent-featured {
-  border: 1px solid #e0ddd5;
+  border: 1px solid var(--border-light);
   border-radius: 4px;
   padding: 1.25rem;
-  background: #fff;
+  background: var(--bg-white);
   margin-bottom: 1.5rem;
 }
 
@@ -942,13 +982,13 @@ footer #footer-box a:hover {
 
 .recent-featured-date {
   display: block;
-  color: #767676;
+  color: var(--text-secondary);
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
 
 .recent-featured-excerpt {
-  color: #555;
+  color: var(--text-muted);
   font-size: 0.9rem;
   margin-top: 0.5rem;
   line-height: 1.5;
@@ -962,10 +1002,10 @@ footer #footer-box a:hover {
 }
 
 .recent-card {
-  border: 1px solid #e0ddd5;
+  border: 1px solid var(--border-light);
   border-radius: 4px;
   padding: 1rem;
-  background: #fff;
+  background: var(--bg-white);
   display: flex;
   flex-direction: column;
 }
@@ -984,13 +1024,13 @@ footer #footer-box a:hover {
 
 .recent-featured:hover,
 .recent-card:hover {
-  background-color: #f5f0fa;
+  background-color: var(--bg-card-hover);
   border-left-color: var(--primary);
 }
 
 .recent-featured:active,
 .recent-card:active {
-  background-color: #ece4f4;
+  background-color: var(--bg-card-active);
   border-left-color: var(--secondary);
 }
 
@@ -1023,13 +1063,13 @@ footer #footer-box a:hover {
 }
 
 .recent-card-date {
-  color: #767676;
+  color: var(--text-secondary);
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
 
 .recent-card-excerpt {
-  color: #555;
+  color: var(--text-muted);
   font-size: 0.8rem;
   line-height: 1.4;
   margin-top: 0.5rem;
@@ -1076,7 +1116,7 @@ footer #footer-box a:hover {
 }
 
 .blog-archive .accordion-button:not(.collapsed) {
-  background-color: #f5f0fa;
+  background-color: var(--bg-card-hover);
   color: var(--primary);
 }
 
