@@ -94,7 +94,7 @@ main #toctitle {
 main .rounded-profile img {
   border-radius: 50%;
   display: block;
-  margin-bottom: 3rem; margin-left: auto; margin-right: auto;
+  margin: 0 auto 3rem;
   height: auto;
 }
 
