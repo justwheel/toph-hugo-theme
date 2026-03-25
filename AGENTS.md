@@ -7,7 +7,7 @@ This file provides guidance to AI agents (including Claude Code) when working wi
 
 Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 (CDN) and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
 
-- **Hugo minimum version**: 0.123.0 (CI uses 0.158.0 Extended)
+- **Hugo minimum version**: 0.158.0 Extended (required for `css.Build`)
 - **Bootstrap**: 5.3.8 via CDN (not vendored)
 - **Bootstrap Icons**: 1.11.3 via CDN
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
@@ -34,7 +34,7 @@ Asciidoctor must be installed for `.adoc` content (`gem install asciidoctor`).
 
 ## CI pipeline
 
-The GitHub Actions workflow (`.github/workflows/hugo.yml`) runs on PRs and pushes to `main`:
+The GitHub Actions workflow (`.github/workflows/hugo.yml`) runs on all pushes and PRs targeting `main`:
 
 1. Installs Hugo Extended, Dart Sass, Node.js 24, pa11y-ci, serve, and Asciidoctor
 2. Builds the site with the GitHub Pages baseURL
@@ -76,7 +76,7 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
 | `nav.html` | Fixed navbar with hover-triggered dropdowns, social links from data registry, translation selector |
 | `hero.html` | Compact centered hero: profile photo, tagline, social icons, about link |
 | `header.html` | Page title (`biography.name` on home, `.Title` elsewhere) |
-| `footer.html` | Footer badges + footer-box (copyright, CC BY-SA 4.0, repo link) |
+| `footer.html` | Footer badges + footer-box (configurable license, repo link) |
 | `seo-meta.html` | Schema.org Person JSON-LD, OpenGraph, Twitter cards |
 | `pagination.html` | Bootstrap 5 pagination with i18n and ARIA labels |
 | `post-meta.html` | Date, updated, author, reading time, word count, taxonomy badges |
@@ -96,9 +96,51 @@ The LinkedIn URL template is generic (`.../%s`) to support both personal (`in/us
 
 ### CSS architecture
 
-All styles live in `assets/css/main.css`, processed by Hugo Pipes (minify + fingerprint). Colors and fonts are injected as CSS custom properties from `params.colors` and `params.fonts` in the site config via `head.html`.
+Styles are processed by Hugo's `css.Build` function (requires Hugo 0.158.0+), which resolves `@import` statements into a single output file at build time. The template in `head.html` uses:
 
-Key specificity pattern: `main a { color: #003366 }` (specificity 0,0,1,1) overrides bare class selectors on `<a>` elements inside `<main>`. Badge and link classes that need their own color must be prefixed with `main a.classname` (specificity 0,0,2,1) to win.
+```go-html-template
+{{- $css := resources.Get "css/main.css" | css.Build | fingerprint }}
+```
+
+#### File structure
+
+```
+assets/css/
+  main.css                        @import entrypoint (no CSS rules)
+  base/
+    _variables.css                :root custom properties (neutral palette)
+    _global.css                   Body, headings, anchor links
+    _nav.css                      Fixed navbar, dropdowns, hover states
+    _content.css                  Main body: links, images, figures, ToC, profile
+  components/
+    _cover.css                    Cover image for blog posts
+    _hero.css                     Homepage hero section
+    _post-meta.css                Blog post metadata bar
+    _post-nav.css                 Prev/next post navigation
+    _code.css                     Code block borders
+    _footer.css                   Footer badges and footer-box
+  taxonomy/
+    _terms-controls.css           Sort toggle controls
+    _term-excerpt.css             Term page excerpts
+    _categories.css               Categories grid layout
+    _tags.css                     Tags word cloud
+  blog/
+    _recent-posts.css             Homepage recent posts cards
+    _blog-archive.css             Blog archive accordion
+```
+
+#### Rules for modifying CSS
+
+1. **Never add CSS rules to `main.css`** — it is an import-only entrypoint.
+2. **Edit the appropriate partial** for the component you are changing. Each file corresponds to a specific layout partial or page template, noted in its section comment header.
+3. **To add a new component**, create a new `_component-name.css` file in the appropriate directory (`base/`, `components/`, `taxonomy/`, or `blog/`) and add an `@import` line to `main.css` in the matching group.
+4. **All color values must use CSS custom properties** — never hardcode hex values, `rgba()`, or named colors outside of `base/_variables.css`. Define new variables in `_variables.css` and reference them with `var()`.
+5. **Brand colors** (`--primary`, `--secondary`, `--accent-color`) and font variables are injected via inline `<style>` in `head.html` from Hugo site config. These cannot be defined in CSS files. The neutral palette in `_variables.css` coexists on `:root` without conflict.
+6. **Underscore prefix convention**: partial filenames start with `_` to signal they are not standalone stylesheets.
+
+#### Key specificity pattern
+
+`main a { color: var(--text-link) }` (specificity 0,0,1,1) overrides bare class selectors on `<a>` elements inside `<main>`. Badge and link classes that need their own color must be prefixed with `main a.classname` (specificity 0,0,2,1) to win.
 
 ### Structural vs. blog content
 
@@ -111,6 +153,7 @@ Blog features (post-meta, post-nav, ToC) only render for blog posts.
 ### Render hooks
 
 - `_default/_markup/render-heading.html` — Adds anchor links to Markdown headings (AsciiDoc headings are post-processed with `replaceRE` in `single.html`)
+- `_default/_markup/render-image.html` — Wraps images in `<figure>/<figcaption>` when a title is provided
 
 ### i18n
 
