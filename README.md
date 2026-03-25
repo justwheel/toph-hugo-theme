@@ -10,6 +10,10 @@ toph
 
 Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](https://gohugo.io/) static site generator.
 
+> **Hugo 0.158.0 or later is required.**
+> Toph uses Hugo's [`css.Build`](https://gohugo.io/functions/css/build/) function (introduced in [v0.158.0](https://github.com/gohugoio/hugo/releases/tag/v0.158.0), released March 16, 2026) to bundle modular CSS.
+> Older Hugo versions will fail to build.
+
 
 ## Features
 
@@ -19,6 +23,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
   - [Project profiles](#project-profiles)
   - [Dynamic footer badges](#dynamic-footer-badges)
   - [Blogging](#blogging)
+- [Modular CSS architecture](#css-architecture) with customizable color palette
 - First-class support for both Markdown and AsciiDoc content
 - Schema.org support
 - Search Engine Optimization enhancements
@@ -174,6 +179,8 @@ Toph includes a full-featured blogging system with taxonomy support, pagination,
 - **Image captions** — `![alt](src "caption")` renders as `<figure>/<figcaption>`
 - **Heading anchors** — clickable 🔗 links on section headings for sharing direct URLs
 - **Pagination** — configurable page size via `pagination.pagerSize` in config
+- **Configurable date format** — set `params.date_format` to any [Go time format](https://gohugo.io/functions/time/format/) (default: `"2006 January 02"`)
+- **Configurable footer license** — set `params.legal.license` with `name`, `url`, and `title` fields
 - **RSS feed** — custom RSS template with full post content
 - **AsciiDoc support** — all features work identically for both Markdown and AsciiDoc content
 
@@ -205,6 +212,26 @@ params:
       recent_posts: 3
       excerpt_length: 250
 ```
+
+### CSS architecture
+
+Toph uses Hugo's `css.Build` function to bundle modular CSS files into a single stylesheet at build time.
+The source CSS is organized under `assets/css/` in four directories:
+
+```
+assets/css/
+  main.css                 @import entrypoint (no rules, only imports)
+  base/                    Variables, global styles, navbar, main content area
+  components/              Cover image, hero, post metadata, post nav, code blocks, footer
+  taxonomy/                Sort controls, term excerpts, categories grid, tags word cloud
+  blog/                    Recent posts, blog archive accordion
+```
+
+All neutral/utility colors (text, borders, backgrounds, shadows) are defined as CSS custom properties in `base/_variables.css`.
+Brand colors (`--primary`, `--secondary`, `--accent-color`) and fonts are set from Hugo config via an inline `<style>` block in `head.html`.
+Both sets of variables coexist on `:root` without conflict.
+
+To add new CSS for a new component, create a new `_component-name.css` file in the appropriate directory and add an `@import` line to `main.css`.
 
 ### Custom colors and fonts
 
@@ -271,7 +298,7 @@ There are a few ways to contribute to this theme.
 ### Contribute code
 
 Fork and clone this repository.
-Then, open a Merge Request when you have changes to propose.
+Then, open a Pull Request when you have changes to propose.
 
 
 ## Legal
