@@ -29,7 +29,7 @@
         "sameAs": [
             {{- $sameAs := slice -}}
             {{- range $key, $value := $.Site.Params.social -}}
-                {{- with index $.Site.Data.social $key -}}
+                {{- with index hugo.Data.social $key -}}
                     {{- $sameAs = $sameAs | append (printf .url $value) -}}
                 {{- end -}}
             {{- end -}}

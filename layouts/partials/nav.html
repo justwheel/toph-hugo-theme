@@ -28,7 +28,7 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">social</a>
                     <ul class="dropdown-menu">
                     {{ range $key, $value := . }}
-                        {{ with index $.Site.Data.social $key }}
+                        {{ with index hugo.Data.social $key }}
                         <li><a class="dropdown-item" href="{{ printf .url $value }}">{{ .name }}</a></li>
                         {{ end }}
                     {{ end }}

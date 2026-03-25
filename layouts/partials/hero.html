@@ -6,7 +6,7 @@
       - $.Site.Params.images[0]        — profile photo
       - $.Site.Params.biography.tagline — one-line tagline
       - $.Site.Params.social            — social media profiles (key: username)
-      - $.Site.Data.social              — platform registry (name, url template, icon)
+      - hugo.Data.social                — platform registry (name, url template, icon)
       - $.Site.Menus.nav                — about page link
 */}}
 
@@ -21,7 +21,7 @@
 
   <div class="hero-links">
     {{- range $key, $value := $.Site.Params.social }}
-      {{- with index $.Site.Data.social $key }}
+      {{- with index hugo.Data.social $key }}
         {{- $url := printf .url $value }}
         <a class="hero-social" href="{{ $url }}" aria-label="{{ .name }}"><i class="bi {{ .icon }}"></i></a>
       {{- end }}
