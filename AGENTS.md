@@ -176,6 +176,44 @@ This project enforces WCAG AA contrast ratios via Pa11y CI:
 - Bootstrap `.dropdown-item` defaults to dark text — must override `color: var(--secondary)` for colored dropdown backgrounds
 
 
+## Security
+
+### Secrets and credentials
+
+Never commit plaintext credentials, API keys, tokens, passwords, or private keys to this repository. It is public — anything pushed is permanently exposed.
+
+**Before staging any commit**, check for:
+- API keys, access tokens, or secrets in config files, templates, or content
+- `.env` files, `credentials.json`, service account keys, or SSH private keys
+- Hardcoded URLs containing tokens or authentication parameters (e.g., `?key=...`, `?token=...`)
+- Hugo config values that look like real credentials rather than example placeholders
+
+The example site config (`exampleSite/config.yaml`) must only contain demonstrative, non-sensitive values. If a feature requires an API key or secret (e.g., analytics, comment systems), document the config key with a placeholder like `"YOUR_API_KEY_HERE"` and note in comments that the real value should come from an environment variable or a file excluded by `.gitignore`.
+
+### Template output safety
+
+Hugo auto-escapes template output by default. Preserve this behavior:
+- **Never use `safeHTML`, `safeJS`, or `safeURL`** unless the input is fully controlled by the theme (not user content). Each use is a potential XSS vector — justify it in a code comment if unavoidable.
+- Treat all `.Params` values, `.Content`, and front matter fields as untrusted input. Hugo's auto-escaping handles this correctly as long as `safe*` functions are not applied.
+- Validate that `href` and `src` attributes built from config or params cannot inject `javascript:` URIs.
+
+### External resources
+
+Bootstrap and Bootstrap Icons are loaded via CDN. When updating CDN URLs:
+- Verify the resource hash matches the official release (check against the Bootstrap docs or CDN provider's published hashes)
+- Use `integrity` and `crossorigin="anonymous"` attributes on all `<link>` and `<script>` tags loading external resources
+- Never load JavaScript or CSS from unofficial mirrors or unverified sources
+
+### General assessment approach
+
+When evaluating any change for security:
+1. **Identify trust boundaries** — what data comes from site config (theme operator), front matter (content author), or rendered Markdown/AsciiDoc (content author)? Each may have different trust levels in a multi-author setup.
+2. **Assume public exposure** — this is an open-source theme deployed to public sites. Anything in the repo, the built output, or the HTML source is visible to everyone.
+3. **Minimize attack surface** — avoid adding JavaScript unless strictly necessary. Static HTML with CDN resources has a small attack surface; keep it that way.
+4. **Check `.gitignore` coverage** — if a new feature introduces files that could contain secrets (environment configs, local overrides), ensure the relevant patterns are in `.gitignore` before any code is written.
+5. **Review Hugo function usage** — `safeHTML`, `safeJS`, `safeURL`, `safeCSS`, and `htmlUnescape` all bypass Hugo's built-in escaping. Grep for these before any release or merge to `main`.
+
+
 ## Git conventions
 
 - **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body
