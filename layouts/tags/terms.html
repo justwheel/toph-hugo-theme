@@ -97,7 +97,7 @@
        role="listitem"
        data-count="{{ $count }}"
        data-name="{{ .Title | lower }}"
-       style="font-size: {{ printf "%.2f" $fontSize }}rem; opacity: {{ printf "%.2f" $opacity }};"
+       style="font-size: {{ printf "%.2f" $fontSize }}rem; --tag-opacity: {{ printf "%.2f" $opacity }};"
        aria-label="{{ .Title | lower }}, {{ $count }} {{ if eq $count 1 }}post{{ else }}posts{{ end }}">
         {{- .Title | lower }} ({{ $count }})
     </a>

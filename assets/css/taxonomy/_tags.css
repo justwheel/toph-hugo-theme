@@ -83,13 +83,16 @@
 
 /*
  * Individual tag links — pill-shaped buttons with the post count
- * inline. Font-size and opacity are set by the Hugo template based
- * on post count. The pill shape makes each tag a clear clickable unit.
+ * inline. Font-size is set inline by the Hugo template; opacity is
+ * driven by the --tag-opacity custom property (also set inline) so
+ * the hover state can override it through the normal CSS cascade
+ * without needing !important.
  */
 .tag-cloud-item {
   display: inline-block;
   text-decoration: none;
   color: var(--primary);
+  opacity: var(--tag-opacity, 1);
   padding: 0.2rem 0.6rem;
   border: 1px solid var(--primary);
   border-radius: 999px;
@@ -101,6 +104,6 @@
   background-color: var(--primary);
   color: var(--secondary);
   transform: scale(1.08);
-  opacity: 1 !important;
+  opacity: 1;
   text-decoration: none;
 }
