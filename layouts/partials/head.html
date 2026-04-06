@@ -29,7 +29,7 @@
 
     {{- with .OutputFormats.Get "rss" }}
     {{ "<!-- RSS feed discovery -->" | safeHTML }}
-    <link rel="{{ .Rel }}" type="{{ .MediaType }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+    <link rel="{{ .Rel }}" type="{{ .MediaType }}" href="{{ .Permalink }}" title="{{ if $.IsHome }}{{ site.Title }}{{ else }}{{ printf "%s | %s" $.Title site.Title }}{{ end }}">
     {{- end }}
 
     {{ "<!-- colors and fonts from Hugo config -->" | safeHTML }}
