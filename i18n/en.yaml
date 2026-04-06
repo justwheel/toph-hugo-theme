@@ -38,3 +38,7 @@
     next: Next
     page_navigation: Page navigation
     previous: Previous
+
+- nav:
+    social: social
+    translations: translations

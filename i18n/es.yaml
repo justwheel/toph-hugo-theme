@@ -29,8 +29,16 @@
       header: Personaliza tu página de inicio
     rounded_profile_image: Imagen de
 
+- hero:
+    about: Acerca de
+    photo: Foto de
+
 - misc:
     logo: "Logotipo de {{ .Title }}"
     next: Próximo
     page_navigation: Navegación de páginas
     previous: Anterior
+
+- nav:
+    social: redes sociales
+    translations: idiomas

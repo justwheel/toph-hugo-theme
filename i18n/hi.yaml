@@ -1,3 +1,11 @@
 ---
+- hero:
+    about: परिचय
+    photo: फ़ोटो
+
 - misc:
     page_navigation: पृष्ठ नेविगेशन
+
+- nav:
+    social: सोशल मीडिया
+    translations: भाषाएँ

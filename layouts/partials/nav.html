@@ -25,7 +25,7 @@
                 {{ end }}
                 {{- with $.Site.Params.social }}
                 <li class="nav-item dropdown nav-hover-dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">social</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">{{ i18n "nav.social" }}</a>
                     <ul class="dropdown-menu">
                     {{ range $key, $value := . }}
                         {{ with index hugo.Data.social $key }}
@@ -38,7 +38,7 @@
                 {{- if .IsTranslated }}
                     {{ "<!-- language selector -->" | safeHTML }}
                     <li class="nav-item dropdown nav-hover-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">{{ i18n "nav.translations" }}</a>
                         <ul class="dropdown-menu">
                             {{ range .AllTranslations }}
                             <li><a class="dropdown-item{{ if eq .Lang $currentPage.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
