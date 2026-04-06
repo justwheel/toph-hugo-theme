@@ -27,6 +27,11 @@
     <link rel="shortcut icon" href="{{ $favicon }}" type="image/x-icon" />
     <link rel="apple-touch-icon" href="{{ $favicon }}" type="image/x-icon">
 
+    {{- with .OutputFormats.Get "rss" }}
+    {{ "<!-- RSS feed discovery -->" | safeHTML }}
+    <link rel="{{ .Rel }}" type="{{ .MediaType }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+    {{- end }}
+
     {{ "<!-- colors and fonts from Hugo config -->" | safeHTML }}
     {{- $color_primary := $.Param "colors.primary" -}}
     {{- $color_secondary := $.Param "colors.secondary" -}}

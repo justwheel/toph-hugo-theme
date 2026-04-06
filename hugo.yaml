@@ -1,0 +1,28 @@
+# Theme-level Hugo configuration for Toph.
+#
+# This file is NOT the same as theme.toml. theme.toml is metadata about
+# the theme (name, author, license, min Hugo version). This file provides
+# default Hugo build configuration that any site using Toph inherits
+# automatically.
+#
+# Hugo merges this config with the site's own config.yaml at build time.
+# The site's config always takes precedence, so anything set here is an
+# overridable default. Hugo restricts theme configs to four keys:
+#
+#   - outputFormats
+#   - mediaTypes
+#   - params
+#   - menu
+#
+# All other config keys (e.g., baseURL, title, outputs) are ignored if
+# set here. See https://gohugo.io/getting-started/configuration/#theme
+#
+# Why this file exists:
+# We override the RSS output format path so feeds are served at /rss/
+# instead of alongside HTML pages. For example, /blog/index.xml becomes
+# /blog/rss/index.xml. This produces cleaner, more intentional feed URLs
+# and matches the convention of platforms like Ghost and WordPress.
+
+outputFormats:
+  rss:
+    path: rss
