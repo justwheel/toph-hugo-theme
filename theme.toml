@@ -3,10 +3,11 @@
 name = "Toph"
 license = "MPL-2.0"
 licenselink = "https://github.com/justwheel/toph-hugo-theme/blob/main/LICENSE.txt"
-description = "A lightweight, responsive theme for a biography site, for use with Hugo static site generator"
+description = "a lightweight, responsive Bootstrap 5 theme for a biography site and blog with RSS feed"
 homepage = "https://jwheel.org"
-tags = ["biography", "minimal"]
-features = []
+demosite = "https://justwheel.github.io/toph-hugo-theme/"
+tags = ["a11y-friendly", "biography", "blog", "bootstrap5", "minimal", "rss"]
+features = ["asciidoc", "localization", "markdown", "right-to-left"]
 min_version = "0.158.0"
 
 [author]
