@@ -36,32 +36,16 @@
                 </li>
                 {{- end }}
                 {{- if .IsTranslated }}
-                    {{ "<!-- language selector -->" | safeHTML }}
-                    <li class="nav-item dropdown nav-hover-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
-                        <div class="dropdown-menu">
-                            <select id="select-language" onchange="location = this.value;" aria-label="Select language">
-                                <optgroup label="Languages">
-                                {{ $siteLanguages := site.Languages}}
-                                {{ $pageLang := .Page.Lang}}
-                                {{ range .Page.AllTranslations }}
-                                    {{ $translation := .}}
-                                    {{ range $siteLanguages }}
-                                        {{ if eq $translation.Lang .Lang }}
-                                            {{ $selected := false }}
-                                            {{ if eq $pageLang .Lang}}
-                                                <option id="{{ $translation.Language }}" class="active dropdown-item" value="{{ $translation.Permalink }}" selected>{{ .LanguageName }}</option>
-                                            {{ else }}
-                                                <option id="{{ $translation.Language }}" class="dropdown-item" value="{{ $translation.Permalink }}">{{ .LanguageName }}</option>
-                                            {{ end }}
-                                        {{ end }}
-                                    {{ end }}
-                                {{ end }}
-                                </optgroup>
-                            </select>
-                        </div>
-                    </li>
-                    {{ "<!-- /language selector -->" | safeHTML }}
+                {{ "<!-- language selector -->" | safeHTML }}
+                <li class="nav-item dropdown nav-hover-dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
+                    <ul class="dropdown-menu">
+                    {{ range .Page.AllTranslations }}
+                        <li><a class="dropdown-item{{ if eq .Lang $.Page.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
+                    {{ end }}
+                    </ul>
+                </li>
+                {{ "<!-- /language selector -->" | safeHTML }}
                 {{ end }}
             </ul>
         </div>
