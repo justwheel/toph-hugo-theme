@@ -36,16 +36,16 @@
                 </li>
                 {{- end }}
                 {{- if .IsTranslated }}
-                {{ "<!-- language selector -->" | safeHTML }}
-                <li class="nav-item dropdown nav-hover-dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
-                    <ul class="dropdown-menu">
-                    {{ range .Page.AllTranslations }}
-                        <li><a class="dropdown-item{{ if eq .Lang $.Page.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
-                    {{ end }}
-                    </ul>
-                </li>
-                {{ "<!-- /language selector -->" | safeHTML }}
+                    {{ "<!-- language selector -->" | safeHTML }}
+                    <li class="nav-item dropdown nav-hover-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">translations</a>
+                        <ul class="dropdown-menu">
+                            {{ range .AllTranslations }}
+                            <li><a class="dropdown-item{{ if eq .Lang $currentPage.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
+                            {{ end }}
+                        </ul>
+                    </li>
+                    {{ "<!-- /language selector -->" | safeHTML }}
                 {{ end }}
             </ul>
         </div>
