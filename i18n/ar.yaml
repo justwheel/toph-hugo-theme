@@ -1,4 +1,7 @@
 ---
+- footer:
+    find_this_site: الكود المصدري
+
 - hero:
     about: حول
     photo: صورة

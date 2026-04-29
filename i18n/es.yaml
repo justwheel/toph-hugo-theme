@@ -4,7 +4,11 @@
     header: "Página no encontrada"
 
 - footer:
-    find_this_site: Encuentra este sitio en GitLab
+    find_this_site: Código fuente
+
+- hero:
+    about: Acerca de
+    photo: Foto de
 
 - hire_me:
     body: >
@@ -28,10 +32,6 @@
       customize_step3: Configure su servidor web para redirigir automáticamente el tráfico de la página de inicio a una página específica.
       header: Personaliza tu página de inicio
     rounded_profile_image: Imagen de
-
-- hero:
-    about: Acerca de
-    photo: Foto de
 
 - misc:
     logo: "Logotipo de {{ .Title }}"

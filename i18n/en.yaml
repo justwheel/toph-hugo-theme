@@ -4,7 +4,11 @@
     header: Page not found
 
 - footer:
-    find_this_site: Find this site on GitLab
+    find_this_site: Source code
+
+- hero:
+    about: About
+    photo: Picture of
 
 - hire_me:
     body: >
@@ -28,10 +32,6 @@
       customize_step3: Configure your web server to automatically redirect home page traffic to a specific page.
       header: Customize your home page
     rounded_profile_image: Picture of
-
-- hero:
-    about: About
-    photo: Picture of
 
 - misc:
     logo: "{{ .Title }} logo"
