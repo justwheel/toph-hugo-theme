@@ -28,14 +28,17 @@
 
 {{/* --- Cover image (between title and metadata) --- */}}
 {{/*
-    Renders the post's cover image if coverImage is set in front matter.
+    Renders the post's cover image from .Params.images (Hugo's standard
+    convention). Using .Params.images also enables the built-in OpenGraph
+    and Twitter Card templates to use the image for social sharing.
+
     Supports two path formats:
       - Absolute path (e.g., "/img/photo.jpg") — served from static/img/
       - Filename only (e.g., "photo.jpg") — resolved relative to the
         post's content directory
 */}}
-{{ if and $is_blog_post .Params.coverImage }}
-    {{- $src := .Params.coverImage -}}
+{{ if and $is_blog_post .Params.images }}
+    {{- $src := index .Params.images 0 -}}
     {{- $alt := .Title | plainify -}}
     {{- if not (hasPrefix $src "/") -}}
         {{/*
@@ -46,7 +49,7 @@
             URL from the post's directory path.
         */}}
         {{- with .File -}}
-            {{- $src = path.Join "/" (path.Dir .Path) $.Params.coverImage -}}
+            {{- $src = path.Join "/" (path.Dir .Path) $src -}}
         {{- end -}}
     {{- end -}}
     <div class="cover-image">
