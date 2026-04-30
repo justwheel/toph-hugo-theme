@@ -32,7 +32,8 @@
     convention). Using .Params.images also enables the built-in OpenGraph
     and Twitter Card templates to use the image for social sharing.
 
-    Supports two path formats:
+    Supports three path formats:
+      - Remote URL (e.g., "https://cdn.example.com/photo.jpg") — used as-is
       - Absolute path (e.g., "/img/photo.jpg") — served from static/img/
       - Filename only (e.g., "photo.jpg") — resolved relative to the
         post's content directory
@@ -40,7 +41,7 @@
 {{ if and $is_blog_post .Params.images }}
     {{- $src := index .Params.images 0 -}}
     {{- $alt := .Title | plainify -}}
-    {{- if not (hasPrefix $src "/") -}}
+    {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
         {{/*
             Non-absolute path — resolve relative to the post's directory.
             Blog images are stored alongside the post files in
