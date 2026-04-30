@@ -75,6 +75,7 @@ main a.post-meta-tag:hover {
 /* On mobile, stack metadata items vertically */
 @media screen and (max-width: 600px) {
   .post-meta-list {
+    align-items: flex-start;
     flex-direction: column;
     gap: 0.35rem;
   }
