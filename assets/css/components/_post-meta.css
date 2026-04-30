@@ -74,6 +74,11 @@ main a.post-meta-tag:hover {
 
 /* On mobile, stack metadata items vertically */
 @media screen and (max-width: 600px) {
+  .post-meta-list {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
   .post-meta-list li + li {
     border-inline-start: none;
     padding-inline-start: 0;
