@@ -23,7 +23,10 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
   - [Project profiles](#project-profiles)
   - [Dynamic footer badges](#dynamic-footer-badges)
   - [Blogging](#blogging)
+- [Shortcodes](#shortcodes) for rich content embeds
 - [Modular CSS architecture](#css-architecture) with customizable color palette
+- RSS feeds at `/rss/` with autodiscovery in `<head>`
+- [Multilingual support](#internationalization) (English, Spanish, Arabic with RTL, Hindi)
 - First-class support for both Markdown and AsciiDoc content
 - Schema.org support
 - Search Engine Optimization enhancements
@@ -175,13 +178,13 @@ Toph includes a full-featured blogging system with taxonomy support, pagination,
 - **Post metadata** — publication date, author, reading time, word count, and taxonomy badges
 - **Post navigation** — previous/next links at the bottom of each post
 - **Recent posts** — the 5 most recent posts displayed on the homepage
-- **Cover images** — optional `coverImage` front matter for a featured image on each post
+- **Cover images** — optional `images` front matter (Hugo's standard `.Params.images`) for a featured image and automatic OpenGraph/Twitter card previews
 - **Image captions** — `![alt](src "caption")` renders as `<figure>/<figcaption>`
 - **Heading anchors** — clickable 🔗 links on section headings for sharing direct URLs
 - **Pagination** — configurable page size via `pagination.pagerSize` in config
 - **Configurable date format** — set `params.date_format` to any [Go time format](https://gohugo.io/functions/time/format/) (default: `"2006 January 02"`)
 - **Configurable footer license** — set `params.legal.license` with `name`, `url`, and `title` fields
-- **RSS feed** — custom RSS template with full post content
+- **RSS feed** — custom template with full post content, served at `/rss/` with autodiscovery `<link>` in `<head>`
 - **AsciiDoc support** — all features work identically for both Markdown and AsciiDoc content
 
 #### Creating a blog post
@@ -213,6 +216,47 @@ params:
       excerpt_length: 250
 ```
 
+### Shortcodes
+
+Toph provides shortcodes for embedding rich content in blog posts and pages.
+Shortcodes work in both Markdown and AsciiDoc content.
+
+#### PDF download
+
+The `pdf-download` shortcode renders a styled download card for local PDF files.
+The card displays a PDF icon, document title, optional description, auto-computed file size, and a download button.
+
+##### Parameters
+
+| Parameter     | Required | Description                                     |
+|---------------|----------|-------------------------------------------------|
+| `file`        | Yes      | Path to the PDF file in `static/` (e.g., `/docs/report.pdf`) |
+| `title`       | Yes      | Display title for the document                  |
+| `description` | No       | Brief summary of the PDF content                |
+
+##### Usage
+
+```markdown
+{{< pdf-download file="/docs/report.pdf" title="Annual Report 2025" >}}
+```
+
+With an optional description:
+
+```markdown
+{{< pdf-download
+    file="/docs/report.pdf"
+    title="Annual Report 2025"
+    description="Full financial and operational summary for fiscal year 2025." >}}
+```
+
+##### File size formatting
+
+File size is computed at build time from the file in `static/` and displayed in SI units:
+
+- Under 1 MB: integer KB (e.g., "54 KB")
+- 1 MB to 999 MB: one decimal MB (e.g., "2.3 MB")
+- 1 GB and above: one decimal GB (e.g., "1.5 GB")
+
 ### CSS architecture
 
 Toph uses Hugo's `css.Build` function to bundle modular CSS files into a single stylesheet at build time.
@@ -222,7 +266,7 @@ The source CSS is organized under `assets/css/` in four directories:
 assets/css/
   main.css                 @import entrypoint (no rules, only imports)
   base/                    Variables, global styles, navbar, main content area
-  components/              Cover image, hero, post metadata, post nav, code blocks, footer
+  components/              Cover image, hero, PDF download, post metadata, post nav, code blocks, footer
   taxonomy/                Sort controls, term excerpts, categories grid, tags word cloud
   blog/                    Recent posts, blog archive accordion
 ```
@@ -285,6 +329,24 @@ default = "Open Sans"
 title = "Bungee Shade"
 header = "Roboto Slab"
 ```
+
+
+### Internationalization
+
+Toph supports multilingual sites with built-in translations for four languages:
+
+| Language | Code | Notes |
+|----------|------|-------|
+| English  | `en` | Default |
+| Arabic   | `ar` | Right-to-left (RTL) layout |
+| Hindi    | `hi` | |
+| Spanish  | `es` | |
+
+Translation strings are stored in `i18n/{en,es,ar,hi}.yaml`.
+All navigation labels, footer text, and UI strings are localized.
+
+To enable multiple languages, configure the `languages` section in your Hugo config.
+See the [Hugo multilingual documentation](https://gohugo.io/content-management/multilingual/) for details.
 
 
 ## Contributing
