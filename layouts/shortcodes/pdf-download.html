@@ -1,0 +1,29 @@
+{{- $file := .Get "file" -}}
+{{- $title := .Get "title" -}}
+{{- $description := .Get "description" -}}
+{{- $statPath := printf "static%s" $file -}}
+{{- $stat := os.Stat $statPath -}}
+{{- $bytes := $stat.Size -}}
+{{- $size := "" -}}
+{{- if ge $bytes 1000000000 -}}
+  {{- $size = printf "%.1f GB" (div (float $bytes) 1000000000.0) -}}
+{{- else if ge $bytes 1000000 -}}
+  {{- $size = printf "%.1f MB" (div (float $bytes) 1000000.0) -}}
+{{- else -}}
+  {{- $size = printf "%d KB" (div $bytes 1000) -}}
+{{- end -}}
+<a class="pdf-download" href="{{ $file }}" download>
+  <span class="pdf-download__icon">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+  </span>
+  <span class="pdf-download__info">
+    <span class="pdf-download__title">{{ $title }}</span>
+    {{- with $description }}
+    <span class="pdf-download__description">{{ . }}</span>
+    {{- end }}
+    <span class="pdf-download__meta">PDF &middot; {{ $size }}</span>
+  </span>
+  <span class="pdf-download__button">
+    <i class="bi bi-download"></i> Download
+  </span>
+</a>
