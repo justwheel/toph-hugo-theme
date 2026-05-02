@@ -1,7 +1,7 @@
 {{- $file := .Get "file" -}}
 {{- $title := .Get "title" -}}
 {{- $description := .Get "description" -}}
-{{- $statPath := printf "static%s" $file -}}
+{{- $statPath := path.Join "static" $file -}}
 {{- $stat := os.Stat $statPath -}}
 {{- $bytes := $stat.Size -}}
 {{- $size := "" -}}
@@ -12,7 +12,7 @@
 {{- else -}}
   {{- $size = printf "%d KB" (div $bytes 1000) -}}
 {{- end -}}
-<a class="pdf-download" href="{{ $file }}" download>
+<a class="pdf-download" href="{{ $file | relURL }}" download>
   <span class="pdf-download__icon">
     <i class="bi bi-file-earmark-pdf-fill"></i>
   </span>
