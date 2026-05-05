@@ -19,7 +19,55 @@
       <link>{{ .Permalink }}</link>
       <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
       <guid>{{ .Permalink }}</guid>
-      <description>{{ printf "<![CDATA[%s]]>" .Content | safeHTML }}</description>
+      {{- with .Params.images }}
+      {{- $src := index . 0 -}}
+      {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
+        {{- with $.File -}}
+          {{- $src = path.Join "/" (path.Dir .Path) $src -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $absUrl := $src -}}
+      {{- if not (findRE "^https?://" $src) -}}
+        {{- $absUrl = $src | absURL -}}
+      {{- end -}}
+      {{- $statPath := "" -}}
+      {{- $trimmed := strings.TrimPrefix "/" $src -}}
+      {{- with os.Stat (path.Join "content" $trimmed) -}}
+        {{- $statPath = path.Join "content" $trimmed -}}
+      {{- else -}}
+        {{- with os.Stat (path.Join "static" $trimmed) -}}
+          {{- $statPath = path.Join "static" $trimmed -}}
+        {{- else -}}
+          {{- with os.Stat (path.Join "assets" $trimmed) -}}
+            {{- $statPath = path.Join "assets" $trimmed -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+      {{- with os.Stat $statPath -}}
+        {{- $ext := path.Ext $src | strings.ToLower -}}
+        {{- $mime := "image/jpeg" -}}
+        {{- if eq $ext ".png" }}{{ $mime = "image/png" -}}
+        {{- else if eq $ext ".gif" }}{{ $mime = "image/gif" -}}
+        {{- else if eq $ext ".svg" }}{{ $mime = "image/svg+xml" -}}
+        {{- else if eq $ext ".webp" }}{{ $mime = "image/webp" -}}
+        {{- end }}
+      <enclosure url="{{ $absUrl }}" length="{{ .Size }}" type="{{ $mime }}" />
+      {{- end }}
+      {{- end }}
+      <description>{{ printf "<![CDATA[" | safeHTML }}
+      {{- with .Params.images -}}
+        {{- $src := index . 0 -}}
+        {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
+          {{- with $.File -}}
+            {{- $src = path.Join "/" (path.Dir .Path) $src -}}
+          {{- end -}}
+        {{- end -}}
+        {{- if not (findRE "^https?://" $src) -}}
+          {{- $src = $src | absURL -}}
+        {{- end -}}
+        <img src="{{ $src }}" alt="{{ $.Title | plainify }}">
+      {{- end -}}
+      {{ .Content }}{{ printf "]]>" | safeHTML }}</description>
     </item>
     {{- end }}
   </channel>
