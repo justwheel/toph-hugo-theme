@@ -14,60 +14,49 @@
     <lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>
     {{- with .OutputFormats.Get "rss" }}<atom:link href="{{ .Permalink }}" rel="self" type="{{ .MediaType }}" />{{ end }}
     {{- range .RegularPages }}
-    <item>
-      <title>{{ .Title }}</title>
-      <link>{{ .Permalink }}</link>
-      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
-      <guid>{{ .Permalink }}</guid>
-      {{- with .Params.images }}
+    {{- $absUrl := "" -}}
+    {{- $encLength := 0 -}}
+    {{- $encMime := "" -}}
+    {{- with .Params.images -}}
       {{- $src := index . 0 -}}
       {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
         {{- with $.File -}}
           {{- $src = path.Join "/" (path.Dir .Path) $src -}}
         {{- end -}}
       {{- end -}}
-      {{- $absUrl := $src -}}
       {{- if not (findRE "^https?://" $src) -}}
         {{- $absUrl = $src | absURL -}}
-      {{- end -}}
-      {{- $statPath := "" -}}
-      {{- $trimmed := strings.TrimPrefix "/" $src -}}
-      {{- with os.Stat (path.Join "content" $trimmed) -}}
-        {{- $statPath = path.Join "content" $trimmed -}}
+        {{- $trimmed := strings.TrimPrefix "/" $src -}}
+        {{- $fileInfo := false -}}
+        {{- if fileExists (path.Join "content" $trimmed) -}}
+          {{- $fileInfo = os.Stat (path.Join "content" $trimmed) -}}
+        {{- else if fileExists (path.Join "static" $trimmed) -}}
+          {{- $fileInfo = os.Stat (path.Join "static" $trimmed) -}}
+        {{- else if fileExists (path.Join "assets" $trimmed) -}}
+          {{- $fileInfo = os.Stat (path.Join "assets" $trimmed) -}}
+        {{- end -}}
+        {{- with $fileInfo -}}
+          {{- $encLength = .Size -}}
+          {{- $mimeTypes := dict ".jpg" "image/jpeg" ".jpeg" "image/jpeg" ".png" "image/png" ".gif" "image/gif" ".svg" "image/svg+xml" ".webp" "image/webp" -}}
+          {{- $encMime = index $mimeTypes (path.Ext $src | strings.ToLower) | default "image/jpeg" -}}
+        {{- end -}}
       {{- else -}}
-        {{- with os.Stat (path.Join "static" $trimmed) -}}
-          {{- $statPath = path.Join "static" $trimmed -}}
-        {{- else -}}
-          {{- with os.Stat (path.Join "assets" $trimmed) -}}
-            {{- $statPath = path.Join "assets" $trimmed -}}
-          {{- end -}}
-        {{- end -}}
+        {{- $absUrl = $src -}}
       {{- end -}}
-      {{- with os.Stat $statPath -}}
-        {{- $ext := path.Ext $src | strings.ToLower -}}
-        {{- $mime := "image/jpeg" -}}
-        {{- if eq $ext ".png" }}{{ $mime = "image/png" -}}
-        {{- else if eq $ext ".gif" }}{{ $mime = "image/gif" -}}
-        {{- else if eq $ext ".svg" }}{{ $mime = "image/svg+xml" -}}
-        {{- else if eq $ext ".webp" }}{{ $mime = "image/webp" -}}
-        {{- end }}
-      <enclosure url="{{ $absUrl }}" length="{{ .Size }}" type="{{ $mime }}" />
+    {{- end }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
+      <guid>{{ .Permalink }}</guid>
+      {{- if $encLength }}
+      <enclosure url="{{ $absUrl }}" length="{{ $encLength }}" type="{{ $encMime }}" />
       {{- end }}
-      {{- end }}
-      <description>{{ printf "<![CDATA[" | safeHTML }}
-      {{- with .Params.images -}}
-        {{- $src := index . 0 -}}
-        {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
-          {{- with $.File -}}
-            {{- $src = path.Join "/" (path.Dir .Path) $src -}}
-          {{- end -}}
-        {{- end -}}
-        {{- if not (findRE "^https?://" $src) -}}
-          {{- $src = $src | absURL -}}
-        {{- end -}}
-        <img src="{{ $src }}" alt="{{ $.Title | plainify }}">
+      <description>{{ "<![CDATA[" | safeHTML }}
+      {{- if $absUrl -}}
+        <img src="{{ $absUrl }}" alt="{{ .Title | plainify }}">
       {{- end -}}
-      {{ .Content }}{{ printf "]]>" | safeHTML }}</description>
+      {{ .Content | safeHTML }}{{ "]]>" | safeHTML }}</description>
     </item>
     {{- end }}
   </channel>
