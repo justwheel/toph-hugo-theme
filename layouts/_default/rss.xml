@@ -51,7 +51,7 @@
       {{- end }}
       <description>{{ "<![CDATA[" | safeHTML }}
       {{- if $absUrl -}}
-        <img src="{{ $absUrl }}" alt="{{ .Title | plainify }}">
+        <img src="{{ $absUrl }}" alt="{{ .Title | plainify | htmlEscape }}">
       {{- end -}}
       {{ .Content | safeHTML }}{{ "]]>" | safeHTML }}</description>
     </item>
