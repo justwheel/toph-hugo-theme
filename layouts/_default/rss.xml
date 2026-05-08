@@ -21,12 +21,8 @@
     {{- $encMime := "" -}}
     {{- with .Params.images -}}
       {{- $src := index . 0 -}}
-      {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
-        {{- with $page.File -}}
-          {{- $src = path.Join "/" (path.Dir .Path) $src -}}
-        {{- end -}}
-      {{- end -}}
-      {{- if not (findRE "^https?://" $src) -}}
+      {{- $src = partial "resolve-image-path.html" (dict "src" $src "file" $page.File) -}}
+      {{- if not (findRE "^(https?:)?//" $src) -}}
         {{- $absUrl = $src | absURL -}}
         {{- $trimmed := strings.TrimPrefix "/" $src -}}
         {{- $fileInfo := false -}}
@@ -42,7 +38,7 @@
           {{- $encMime = index $mimeTypes (path.Ext $src | strings.ToLower) | default "image/jpeg" -}}
         {{- end -}}
       {{- else -}}
-        {{- $absUrl = $src -}}
+        {{- $absUrl = $src | absURL -}}
       {{- end -}}
     {{- end }}
     <item>

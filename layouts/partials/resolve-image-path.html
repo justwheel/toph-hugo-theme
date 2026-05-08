@@ -1,0 +1,19 @@
+{{- /*
+    resolve-image-path.html — Resolve a front matter image path
+
+    Handles three formats:
+      - Remote URL (https:// or protocol-relative //) — returned as-is
+      - Absolute path (/img/photo.jpg) — returned as-is
+      - Relative filename (photo.jpg) — resolved relative to the page's
+        content directory using the provided .file context
+
+    Usage:
+      {{ $src = partial "resolve-image-path.html" (dict "src" $src "file" .File) }}
+*/ -}}
+{{- $src := .src -}}
+{{- if and (not (hasPrefix $src "/")) (not (findRE "^(https?:)?//" $src)) -}}
+  {{- with .file -}}
+    {{- $src = path.Join "/" (path.Dir .Path) $src -}}
+  {{- end -}}
+{{- end -}}
+{{- return $src -}}

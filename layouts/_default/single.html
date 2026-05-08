@@ -41,18 +41,7 @@
 {{ if and $is_blog_post .Params.images }}
     {{- $src := index .Params.images 0 -}}
     {{- $alt := .Title | plainify -}}
-    {{- if and (not (hasPrefix $src "/")) (not (findRE "^https?://" $src)) -}}
-        {{/*
-            Non-absolute path — resolve relative to the post's directory.
-            Blog images are stored alongside the post files in
-            content/blog/YYYY/MM/. Since posts are standalone files (not
-            leaf bundles), .Resources is not available. We construct the
-            URL from the post's directory path.
-        */}}
-        {{- with .File -}}
-            {{- $src = path.Join "/" (path.Dir .Path) $src -}}
-        {{- end -}}
-    {{- end -}}
+    {{- $src = partial "resolve-image-path.html" (dict "src" $src "file" .File) -}}
     <div class="cover-image">
         <img src="{{ $src }}" alt="{{ $alt }}" loading="lazy">
     </div>
