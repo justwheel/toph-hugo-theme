@@ -82,6 +82,7 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
 | `post-meta.html` | Date, updated, author, reading time, word count, taxonomy badges |
 | `post-nav.html` | Prev/next post navigation within section |
 | `recent-posts.html` | Homepage: 1 featured + 4 secondary cards with stretched links |
+| `resolve-image-path.html` | Shared image path resolution: handles remote URLs (https://), protocol-relative (//), absolute (/path), and relative (filename) paths |
 | `projects.html` | Project profiles with icons |
 | `projects-carousel.html` | Image carousel above projects |
 | `for-hire.html` | Optional hire-me banner |
@@ -150,10 +151,15 @@ assets/css/
 
 Blog features (post-meta, post-nav, ToC) only render for blog posts.
 
-### Render hooks
+### Render hooks and shared partials
 
 - `_default/_markup/render-heading.html` — Adds anchor links to Markdown headings (AsciiDoc headings are post-processed with `replaceRE` in `single.html`)
 - `_default/_markup/render-image.html` — Wraps images in `<figure>/<figcaption>` when a title is provided
+- `partials/resolve-image-path.html` — Shared image path resolution used by both `single.html` (cover images) and `rss.xml` (feed images). Accepts `dict "src" $src "file" .File` and returns the resolved path. Handles remote URLs (`https://`), protocol-relative URLs (`//`), absolute paths (`/path`), and relative filenames (resolved via `.File`).
+
+### Shortcodes
+
+- `pdf-download.html` — Styled download card for local PDF files with auto-computed file size via `os.Stat`. Parameters: `file` (path in `static/`), `title`, optional `description`. CSS in `assets/css/components/_pdf-download.css`.
 
 ### i18n
 

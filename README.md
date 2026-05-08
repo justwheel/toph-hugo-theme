@@ -184,7 +184,7 @@ Toph includes a full-featured blogging system with taxonomy support, pagination,
 - **Pagination** — configurable page size via `pagination.pagerSize` in config
 - **Configurable date format** — set `params.date_format` to any [Go time format](https://gohugo.io/functions/time/format/) (default: `"2006 January 02"`)
 - **Configurable footer license** — set `params.legal.license` with `name`, `url`, and `title` fields
-- **RSS feed** — custom template with full post content, served at `/rss/` with autodiscovery `<link>` in `<head>`
+- **RSS feed** — custom template with full post content, served at `/rss/` with autodiscovery `<link>` in `<head>`. Posts with cover images include the image as both an inline `<img>` and an RSS 2.0 `<enclosure>` element with file size and MIME type
 - **AsciiDoc support** — all features work identically for both Markdown and AsciiDoc content
 
 #### Creating a blog post
