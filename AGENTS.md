@@ -58,6 +58,7 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
   _default/
     list.html        Paginated content list with excerpts
     single.html      Single page with blog guards ($is_structural, $is_blog_post)
+    rss.xml          RSS 2.0 feed with full content, cover images, and <enclosure>
     terms.html       Fallback taxonomy terms list with sort toggle
     term.html        Fallback single term page with pagination
   blog/
@@ -89,7 +90,7 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
 
 ### Data-driven social media
 
-Social platforms are defined in `data/social.yaml` as a registry of 11 platforms, each with a `name`, `url` template (using `%s` for the username), and Bootstrap `icon` class. Site config references platforms by registry key (e.g., `social.github: "username"`). The nav partial and hero partial both look up platforms via `$.Site.Data.social`.
+Social platforms are defined in `data/social.yaml` as a registry of 11 platforms, each with a `name`, `url` template (using `%s` for the username), and Bootstrap `icon` class. Site config references platforms by registry key (e.g., `social.github: "username"`). The nav partial and hero partial both look up platforms via `hugo.Data.social`.
 
 Config keys in `params.social` **must match** `data/social.yaml` keys exactly. Mismatched keys silently produce no output.
 
@@ -119,6 +120,7 @@ assets/css/
     _post-meta.css                Blog post metadata bar
     _post-nav.css                 Prev/next post navigation
     _code.css                     Code block borders
+    _pdf-download.css             PDF download shortcode card
     _footer.css                   Footer badges and footer-box
   taxonomy/
     _terms-controls.css           Sort toggle controls
