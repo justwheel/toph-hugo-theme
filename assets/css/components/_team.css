@@ -1,0 +1,125 @@
+/* ===[ Team member grid (layouts/partials/team.html) ]=== */
+
+.team-section {
+  margin: 2.5rem 0;
+}
+
+.team-section h2 {
+  font-family: var(--header-font), serif;
+  font-size: 1.6rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Card grid — 3 columns on desktop, 1 on mobile */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Individual team card */
+.team-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 4px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: background-color 0.15s ease, border-left-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.team-card:hover {
+  background-color: var(--bg-card-hover);
+  border-left-color: var(--primary);
+  box-shadow: 0 4px 12px var(--shadow-card);
+}
+
+.team-card:active {
+  background-color: var(--bg-card-active);
+  border-left-color: var(--secondary);
+}
+
+/* Circular profile photo with grayscale filter */
+.team-card-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  margin-bottom: 1rem;
+}
+
+.team-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Name link — stretched to make the entire card clickable */
+.team-card-name {
+  font-family: var(--header-font), serif;
+  font-size: 1.1rem;
+  margin: 0 0 0.25rem;
+}
+
+main .team-card-name a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+main .team-card-name a:hover {
+  color: var(--accent-color);
+  text-decoration-thickness: 3px;
+}
+
+main .team-card-name a::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* Role descriptor */
+.team-card-role {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.25rem;
+}
+
+/* Lifespan / active years */
+.team-card-years {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+/* Biography excerpt */
+.team-card-excerpt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* On mobile, single column with smaller photos */
+@media screen and (max-width: 600px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-card-photo {
+    width: 100px;
+    height: 100px;
+  }
+}

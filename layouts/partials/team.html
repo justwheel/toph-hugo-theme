@@ -1,0 +1,52 @@
+{{/*
+    team.html — Team member profile grid
+
+    Displays team members as a responsive card grid with circular grayscale
+    photos, names, roles, and brief descriptions. Team members are content
+    files in content/team/ with categories: ["team"] and hide_sitemap: true.
+
+    Reads from:
+      .Site.RegularPages   — all regular pages, filtered by category
+      .Title               — member name
+      .Params.link         — optional external biography URL
+      .Params.photo        — asset path relative to assets/ (Hugo-processed)
+      .Params.role         — position or title
+      .Params.title_text   — optional text for the img title attribute (hover)
+      .Params.years        — lifespan or active years
+      .Plain               — biography text (truncated for card excerpt)
+*/}}
+
+{{- $members := where .Site.RegularPages ".Params.categories" "intersect" (slice "team") -}}
+
+{{ if $members }}
+<section class="team-section">
+    <h2>Fellow Leaders</h2>
+
+    <div class="team-grid">
+        {{ range $members }}
+        {{- $page := . -}}
+        <article class="team-card">
+            {{ with .Params.photo }}
+              {{ with resources.Get . }}
+                {{ $processed := .Process "resize 240x webp" }}
+                <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
+                     width="{{ $processed.Width }}" height="{{ $processed.Height }}"
+                     alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
+                     loading="lazy">
+              {{ end }}
+            {{ end }}
+            <div class="team-card-body">
+                <h3 class="team-card-name">
+                    <a href="{{ .Params.link | default .Permalink }}">{{ .Title }}</a>
+                </h3>
+                {{ with .Params.role }}<p class="team-card-role">{{ . }}</p>{{ end }}
+                {{ with .Params.years }}<p class="team-card-years">{{ . }}</p>{{ end }}
+                <p class="team-card-excerpt">
+                    {{- .Plain | htmlUnescape | truncate 120 -}}
+                </p>
+            </div>
+        </article>
+        {{ end }}
+    </div>
+</section>
+{{ end }}

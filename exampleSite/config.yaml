@@ -69,10 +69,14 @@ menu:
       name: about me
       url: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
       weight: 20
+    - identifier: team
+      name: fellow leaders
+      url: /team/
+      weight: 30
     - identifier: blog
       name: blog
       url: /blog/
-      weight: 30
+      weight: 40
     - identifier: categories
       name: categories
       url: /categories/
@@ -114,7 +118,7 @@ params:
     - /toph-hugo-theme/img/septima.jpg
   favicon: /toph-hugo-theme/favicon.ico
   git_repo: https://github.com/justwheel/toph-hugo-theme
-  taxonomy_exclude: ["footer", "projects"]
+  taxonomy_exclude: ["footer", "projects", "team"]
   # Are you looking for new opportunities? Set hire_me to "true" if you want your LinkedIn to show on the nav bar and
   # for boilerplate text on how to get in touch.
   hire_me: false

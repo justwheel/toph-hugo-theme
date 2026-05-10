@@ -1,0 +1,47 @@
+{{/*
+    team/list.html — Team section list page (/team/)
+
+    Renders all team members in a card grid with photos, names, roles,
+    and longer biography excerpts than the homepage partial. The section's
+    _index.md content is rendered above the grid as an introduction.
+
+    Team members are content files with categories: ["team"] and
+    hide_sitemap: true, following the same structural content pattern
+    as projects.
+*/}}
+{{ define "main" }}
+{{- .Content }}
+
+{{- $members := where .Site.RegularPages ".Params.categories" "intersect" (slice "team") -}}
+
+{{ if $members }}
+<div class="team-grid">
+    {{ range $members }}
+    {{- $page := . -}}
+    <article class="team-card">
+        {{ with .Params.photo }}
+          {{ with resources.Get . }}
+            {{ $processed := .Process "resize 240x webp" }}
+            <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
+                 width="{{ $processed.Width }}" height="{{ $processed.Height }}"
+                 alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
+                 loading="lazy">
+          {{ end }}
+        {{ end }}
+        <div class="team-card-body">
+            <h3 class="team-card-name">
+                <a href="{{ .Params.link | default .Permalink }}">{{ .Title }}</a>
+            </h3>
+            {{ with .Params.role }}<p class="team-card-role">{{ . }}</p>{{ end }}
+            {{ with .Params.years }}<p class="team-card-years">{{ . }}</p>{{ end }}
+            <p class="team-card-excerpt">
+                {{- .Plain | htmlUnescape | truncate 250 -}}
+            </p>
+        </div>
+    </article>
+    {{ end }}
+</div>
+{{ else }}
+<p class="text-muted">No team members found.</p>
+{{ end }}
+{{ end }}

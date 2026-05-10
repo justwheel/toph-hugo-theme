@@ -11,4 +11,7 @@
     {{ partial "projects-carousel.html" $ }}
     {{ partial "projects.html" $ }}
   {{ end }}
+  {{ with where .Site.RegularPages ".Params.categories" "intersect" (slice "team") }}
+    {{ partial "team.html" $ }}
+  {{ end }}
 {{ end }}
