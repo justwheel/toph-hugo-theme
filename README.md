@@ -21,6 +21,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 - Responsive-ready
 - Template-driven layout system
   - [Project profiles](#project-profiles)
+  - [Team profiles](#team-profiles)
   - [Dynamic footer badges](#dynamic-footer-badges)
   - [Blogging](#blogging)
 - [Shortcodes](#shortcodes) for rich content embeds
@@ -123,6 +124,67 @@ Otherwise what we like to refer to in aggregate as _Open Work_.
 [3]: https://www.rit.edu/
 ```
 
+### Team profiles
+
+Toph includes a team profile feature for displaying a group of people alongside the site's primary biography.
+Team members appear in a responsive card grid on the homepage and on a dedicated `/team/` section page.
+Photos are rendered as circular, grayscale images using Hugo image processing.
+
+#### How to use
+
+1. Create a new `content/team/` section.
+1. Create a `_index.md` (or `_index.en.md`) file with a title and optional introductory text.
+1. Create a new Markdown or AsciiDoc file for each team member with a numbered prefix for ordering (e.g., `1-first-person.en.md`).
+1. In each team member file, add the following front matter:
+    1. `title: ""` —
+     Name of the team member.
+    1. `date: YYYY-MM-DD` —
+     Used for ordering.
+     Members are sorted by date in descending order.
+    1. `hide_sitemap: true` —
+     Prevents the individual page from appearing in the sitemap.
+    1. `categories: ["team"]` —
+     Required for the template to identify team content.
+    1. `link: ""` —
+     Optional external biography URL.
+     If set, the member's name links to this URL.
+     If omitted, the name links to the member's Hugo page.
+    1. `photo: ""` —
+     Optional image path.
+     Local asset paths (e.g., `pages/team/photo.jpg`) are processed by Hugo (square crop + WebP conversion).
+     Remote URLs (`https://...`) and absolute paths (`/img/...`) are rendered as-is.
+    1. `role: ""` —
+     Short descriptor displayed under the name (e.g., "Lead Engineer").
+    1. `title_text: ""` —
+     Optional text for the image's `title` attribute (displayed on hover).
+     Useful for photo attribution or captions.
+    1. `years: ""` —
+     Lifespan or active years, displayed as metadata.
+1. Add `"team"` to `params.taxonomy_exclude` in your Hugo config.
+1. Optionally set `params.team.page_title` to customize the section heading (default: "Team").
+1. Rebuild the site.
+   The homepage now shows the team grid, and `/team/` shows the full section page.
+
+Example of a team member file, found in `content/team/`:
+
+```markdown
+---
+title: "Ada Lovelace"
+slug: ada-lovelace
+date: 1852-11-27
+hide_sitemap: true
+categories: ["team"]
+link: "https://en.wikipedia.org/wiki/Ada_Lovelace"
+photo: "pages/team/ada-lovelace.jpg"
+role: "Mathematician & Writer"
+title_text: "Public domain portrait, 1840."
+years: "1815 – 1852"
+---
+
+Ada Lovelace is widely regarded as the first computer programmer.
+She wrote the first algorithm intended to be processed by a machine.
+```
+
 ### Dynamic footer badges
 
 Toph can show affiliation or supporter badges in the footer of the site.
@@ -209,7 +271,7 @@ pagination:
   pagerSize: 10
 
 params:
-  taxonomy_exclude: ["footer", "projects"]
+  taxonomy_exclude: ["footer", "projects", "team"]
   layouts:
     categories:
       recent_posts: 3
@@ -266,7 +328,7 @@ The source CSS is organized under `assets/css/` in four directories:
 assets/css/
   main.css                 @import entrypoint (no rules, only imports)
   base/                    Variables, global styles, navbar, main content area
-  components/              Cover image, hero, PDF download, post metadata, post nav, code blocks, footer
+  components/              Cover image, hero, PDF download, team card grid, post metadata, post nav, code blocks, footer
   taxonomy/                Sort controls, term excerpts, categories grid, tags word cloud
   blog/                    Recent posts, blog archive accordion
 ```

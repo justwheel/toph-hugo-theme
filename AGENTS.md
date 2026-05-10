@@ -54,13 +54,15 @@ CI tools live in `.github/package.json` (pa11y-ci, serve). Install with `npm ci 
 
 ```
 baseof.html          HTML skeleton: head, nav, header, <main>, footer
-  index.html         Homepage: hero, for-hire, content, recent-posts, projects
+  index.html         Homepage: hero, for-hire, content, recent-posts, projects, team
   _default/
     list.html        Paginated content list with excerpts
     single.html      Single page with blog guards ($is_structural, $is_blog_post)
     rss.xml          RSS 2.0 feed with full content, cover images, and <enclosure>
     terms.html       Fallback taxonomy terms list with sort toggle
     term.html        Fallback single term page with pagination
+  team/
+    list.html        Team section list page with card grid
   blog/
     list.html        Blog archive with year/month Bootstrap accordion
   categories/
@@ -86,6 +88,8 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
 | `resolve-image-path.html` | Shared image path resolution: handles remote URLs (https://), protocol-relative (//), absolute (/path), and relative (filename) paths |
 | `projects.html` | Project profiles with icons |
 | `projects-carousel.html` | Image carousel above projects |
+| `team.html` | Homepage team card grid; receives filtered collection from caller |
+| `team-card-photo.html` | Team member photo: local assets (Hugo `.Fill` + WebP) or remote URLs |
 | `for-hire.html` | Optional hire-me banner |
 
 ### Data-driven social media
@@ -121,6 +125,7 @@ assets/css/
     _post-nav.css                 Prev/next post navigation
     _code.css                     Code block borders
     _pdf-download.css             PDF download shortcode card
+    _team.css                     Team member card grid
     _footer.css                   Footer badges and footer-box
   taxonomy/
     _terms-controls.css           Sort toggle controls
@@ -147,7 +152,7 @@ assets/css/
 
 ### Structural vs. blog content
 
-`single.html` uses guards to distinguish structural content (projects, footer badges) from blog posts:
+`single.html` uses guards to distinguish structural content (projects, footer badges, team members) from blog posts:
 - **`$is_structural`**: pages whose categories overlap with `params.taxonomy_exclude` or have `hide_sitemap: true`
 - **`$is_blog_post`**: non-structural pages with a publication date
 
