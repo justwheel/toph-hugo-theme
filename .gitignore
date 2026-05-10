@@ -4,6 +4,7 @@
 # Generated files by hugo
 .hugo_build.lock
 /exampleSite/public/
+/exampleSite/resources/_gen/
 /resources/_gen/
 
 # Executable may be added to repository
