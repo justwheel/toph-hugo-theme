@@ -18,7 +18,7 @@
 
 {{ if . }}
 <section class="team-section">
-    <h2>Fellow Leaders</h2>
+    <h2>{{ site.Params.team.page_title | default "Team" }}</h2>
 
     <div class="team-grid">
         {{ range . }}

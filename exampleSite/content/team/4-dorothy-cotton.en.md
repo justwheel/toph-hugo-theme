@@ -1,7 +1,7 @@
 ---
 title: "Dorothy Cotton"
 slug: dorothy-cotton
-date: 2026-05-10T04:00:00Z
+date: 2018-06-10
 hide_sitemap: true
 categories: ["team"]
 link: "https://kinginstitute.stanford.edu/encyclopedia/cotton-dorothy-foreman"

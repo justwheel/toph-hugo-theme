@@ -1,7 +1,7 @@
 ---
 title: "Fannie Lou Hamer"
 slug: fannie-lou-hamer
-date: 2026-05-10T03:00:00Z
+date: 1977-03-14
 hide_sitemap: true
 categories: ["team"]
 link: "https://kinginstitute.stanford.edu/hamer-fannie-lou"

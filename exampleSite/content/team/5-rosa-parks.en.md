@@ -1,7 +1,7 @@
 ---
 title: "Rosa Parks"
 slug: rosa-parks
-date: 2026-05-10T05:00:00Z
+date: 2005-10-24
 hide_sitemap: true
 categories: ["team"]
 link: "https://www.loc.gov/exhibitions/rosa-parks-in-her-own-words/about-this-exhibition/the-bus-boycott/highlander-folk-school/"

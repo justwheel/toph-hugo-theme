@@ -1,7 +1,7 @@
 ---
 title: "Bernice Robinson"
 slug: bernice-robinson
-date: 2026-05-10T02:00:00Z
+date: 1994-09-03
 hide_sitemap: true
 categories: ["team"]
 link: "https://www.scencyclopedia.org/sce/entries/robinson-bernice-violanthe/"

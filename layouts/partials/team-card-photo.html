@@ -16,7 +16,7 @@
          loading="lazy">
   {{ else }}
     {{ with resources.Get . }}
-      {{ $processed := .Process "resize 240x webp" }}
+      {{ $processed := .Fill "240x240 webp" }}
       <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
            width="{{ $processed.Width }}" height="{{ $processed.Height }}"
            alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}

@@ -1,7 +1,7 @@
 ---
 title: "Ella Baker"
 slug: ella-baker
-date: 2026-05-10T01:00:00Z
+date: 1986-12-13
 hide_sitemap: true
 categories: ["team"]
 link: "https://kinginstitute.stanford.edu/encyclopedia/baker-ella-josephine"
