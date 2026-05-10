@@ -1,0 +1,26 @@
+{{/*
+    team-card-photo.html — Team member profile photo
+
+    Renders a circular, grayscale profile photo for a team card.
+    Receives a team member page as context.
+
+    Supports two path formats in .Params.photo:
+      - Remote URL or absolute path (https://, //, /) — rendered as-is
+      - Asset path (pages/team/name.jpg) — Hugo-processed (resize + WebP)
+*/}}
+{{- $page := . -}}
+{{ with .Params.photo }}
+  {{ if or (hasPrefix . "/") (findRE "^(https?:)?//" .) }}
+    <img class="team-card-photo" src="{{ . }}"
+         alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
+         loading="lazy">
+  {{ else }}
+    {{ with resources.Get . }}
+      {{ $processed := .Process "resize 240x webp" }}
+      <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
+           width="{{ $processed.Width }}" height="{{ $processed.Height }}"
+           alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
+           loading="lazy">
+    {{ end }}
+  {{ end }}
+{{ end }}
