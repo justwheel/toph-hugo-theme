@@ -12,22 +12,13 @@
 {{ define "main" }}
 {{- .Content }}
 
-{{- $members := where .Site.RegularPages ".Params.categories" "intersect" (slice "team") -}}
+{{- $members := where .RegularPages ".Params.categories" "intersect" (slice "team") -}}
 
 {{ if $members }}
 <div class="team-grid">
     {{ range $members }}
-    {{- $page := . -}}
     <article class="team-card">
-        {{ with .Params.photo }}
-          {{ with resources.Get . }}
-            {{ $processed := .Process "resize 240x webp" }}
-            <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
-                 width="{{ $processed.Width }}" height="{{ $processed.Height }}"
-                 alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
-                 loading="lazy">
-          {{ end }}
-        {{ end }}
+        {{ partial "team-card-photo.html" . }}
         <div class="team-card-body">
             <h3 class="team-card-name">
                 <a href="{{ .Params.link | default .Permalink }}">{{ .Title }}</a>

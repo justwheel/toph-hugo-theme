@@ -5,36 +5,25 @@
     photos, names, roles, and brief descriptions. Team members are content
     files in content/team/ with categories: ["team"] and hide_sitemap: true.
 
-    Reads from:
-      .Site.RegularPages   — all regular pages, filtered by category
+    Receives the filtered page collection from the caller (e.g., index.html)
+    rather than re-querying .Site.RegularPages. Each page exposes:
       .Title               — member name
       .Params.link         — optional external biography URL
-      .Params.photo        — asset path relative to assets/ (Hugo-processed)
+      .Params.photo        — image path: asset path (Hugo-processed) or URL
       .Params.role         — position or title
       .Params.title_text   — optional text for the img title attribute (hover)
       .Params.years        — lifespan or active years
       .Plain               — biography text (truncated for card excerpt)
 */}}
 
-{{- $members := where .Site.RegularPages ".Params.categories" "intersect" (slice "team") -}}
-
-{{ if $members }}
+{{ if . }}
 <section class="team-section">
     <h2>Fellow Leaders</h2>
 
     <div class="team-grid">
-        {{ range $members }}
-        {{- $page := . -}}
+        {{ range . }}
         <article class="team-card">
-            {{ with .Params.photo }}
-              {{ with resources.Get . }}
-                {{ $processed := .Process "resize 240x webp" }}
-                <img class="team-card-photo" src="{{ $processed.RelPermalink }}"
-                     width="{{ $processed.Width }}" height="{{ $processed.Height }}"
-                     alt="{{ $page.Title }}"{{ with $page.Params.title_text }} title="{{ . }}"{{ end }}
-                     loading="lazy">
-              {{ end }}
-            {{ end }}
+            {{ partial "team-card-photo.html" . }}
             <div class="team-card-body">
                 <h3 class="team-card-name">
                     <a href="{{ .Params.link | default .Permalink }}">{{ .Title }}</a>
