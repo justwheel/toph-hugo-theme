@@ -11,7 +11,7 @@
 title: Example Hugo site with Toph theme
 baseURL: https://justwheel.github.io/toph-hugo-theme/
 theme: toph
-languageCode: en-us
+locale: en-us
 enableEmoji: true
 enableGitInfo: true
 enableRobotsTXT: false
@@ -172,10 +172,10 @@ defaultContentLang: en
 languages:
   ar:
     disabled: true
-    languageDirection: rtl
-    languageName: عربي
+    direction: rtl
+    label: عربي
   en:
-    languageName: English
+    label: English
   es:
     disabled: true
-    languageName: español
+    label: español

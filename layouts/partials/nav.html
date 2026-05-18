@@ -41,7 +41,7 @@
                         <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">{{ i18n "nav.translations" }}</a>
                         <ul class="dropdown-menu">
                             {{ range .AllTranslations }}
-                            <li><a class="dropdown-item{{ if eq .Lang $currentPage.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
+                            <li><a class="dropdown-item{{ if eq .Lang $currentPage.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.Label }}</a></li>
                             {{ end }}
                         </ul>
                     </li>
