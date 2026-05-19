@@ -24,7 +24,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: "0.159.0"
+      HUGO_VERSION: "0.161.1"
       DART_SASS_VERSION: "1.98.0"
     steps:
       - name: Checkout
@@ -85,7 +85,7 @@ jobs:
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Cache Hugo resources
         uses: actions/cache@v5
@@ -194,7 +194,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./exampleSite/public
 
@@ -208,4 +208,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
