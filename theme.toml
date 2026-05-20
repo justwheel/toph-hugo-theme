@@ -8,7 +8,7 @@ homepage = "https://jwheel.org"
 demosite = "https://justwheel.github.io/toph-hugo-theme/"
 tags = ["a11y-friendly", "biography", "blog", "bootstrap5", "minimal", "rss"]
 features = ["asciidoc", "localization", "markdown", "right-to-left"]
-min_version = "0.158.0"
+min_version = "0.161.0"
 
 [author]
   name = "Justin Wheeler"

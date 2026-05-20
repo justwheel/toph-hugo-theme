@@ -1,11 +1,11 @@
 /* Toph Hugo Theme — CSS entrypoint
  *
  * Processed by Hugo css.Build which inlines all @import directives.
- * Brand colors (--primary, --secondary, --accent-color) and font
- * variables are set via inline <style> in head.html from site config.
+ * CSS custom properties are injected via css.Build vars from
+ * data/style.yaml (neutrals) and site config (brand colors/fonts).
  */
 
-@import './base/_variables.css';
+@import 'hugo:vars';
 
 /* Base */
 @import './base/_global.css';

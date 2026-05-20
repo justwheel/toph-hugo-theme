@@ -1,0 +1,44 @@
+# Neutral/utility CSS custom properties for the Toph theme.
+#
+# Each top-level key is a group. Keys are flattened to CSS variable
+# names by joining group and key with a hyphen:
+#   text.body → --text-body
+#   bg.card-hover → --bg-card-hover
+#
+# Brand colors and fonts are set per-site via Hugo config
+# (params.colors, params.fonts). Hugo injects all values into the
+# stylesheet at build time via css.Build vars.
+#
+# To override a value for your site, create a matching
+# data/style.yaml in your site root — Hugo merges theme and
+# site data files, with the site taking precedence.
+
+text:
+  body: "#330000"
+  muted: "#555"
+  secondary: "#767676"
+  link: "#003366"
+  link-hover: "#003d82"
+  anchor: "#959083"
+
+border:
+  light: "#e0ddd5"
+  medium: "#d0cdc5"
+  lighter: "#e8e5dd"
+  toc: "#a2a9b1"
+
+bg:
+  white: "#fff"
+  toc: "#f8f9fa"
+  caption: "#faf9f6"
+  hover: "#f5f4f0"
+  card-hover: "#f5f0fa"
+  card-active: "#ece4f4"
+
+nav:
+  hover-bg: royalblue
+  hover-decoration: skyblue
+
+shadow:
+  navbar: "rgba(0, 0, 0, 0.2)"
+  card: "rgba(0, 0, 0, 0.08)"

@@ -42,22 +42,24 @@
     {{- $font_title_weight := $.Param "fonts.title_weight" -}}
     {{- $font_header := $.Param "fonts.header" -}}
     {{- $font_header_weight := $.Param "fonts.header_weight" }}
-    <style type="text/css">
-    :root {
-        {{ "/* Default colors */" | safeCSS }}
-        --primary: {{ $color_primary }};
-        --secondary: {{ $color_secondary }};
-        --accent-color: {{ $color_accent }};
-
-        {{ "/* Default fonts */" | safeCSS }}
-        --default-font: "{{ $font_default }}";
-        --title-font: "{{ $font_title }}";
-        --header-font: "{{ $font_header }}";
-    }
-    </style>
 
     {{ "<!-- stylesheets -->" | safeHTML }}
-    {{- $css := resources.Get "css/main.css" | css.Build | fingerprint }}
+    {{- $brand := dict
+        "primary" $color_primary
+        "secondary" $color_secondary
+        "accent-color" $color_accent
+        "default-font" (css.Quoted $font_default)
+        "title-font" (css.Quoted $font_title)
+        "header-font" (css.Quoted $font_header)
+    -}}
+    {{- $neutral := dict -}}
+    {{- range $group, $entries := hugo.Data.style -}}
+        {{- range $key, $val := $entries -}}
+            {{- $neutral = merge $neutral (dict (printf "%s-%s" $group $key) $val) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $vars := merge $brand $neutral -}}
+    {{- $css := resources.Get "css/main.css" | css.Build (dict "vars" $vars) | fingerprint }}
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}">
