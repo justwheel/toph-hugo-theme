@@ -2,7 +2,7 @@
   "private": true,
   "description": "CI-only dependencies for the Toph Hugo theme pipeline",
   "devDependencies": {
-    "pa11y-ci": "^3.1.0",
-    "serve": "^14.2.4"
+    "pa11y-ci": "^4.0.0",
+    "serve": "^14.2.6"
   }
 }
