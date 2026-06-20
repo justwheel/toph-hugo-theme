@@ -77,17 +77,8 @@ jobs:
 
       - name: Install CI tools (pa11y-ci, serve)
         run: npm ci --prefix .github
-
-      - name: Cache Puppeteer Chrome
-        id: cache-chrome
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-chrome-${{ hashFiles('.github/package-lock.json') }}
-
-      - name: Install Puppeteer Chrome
-        if: steps.cache-chrome.outputs.cache-hit != 'true'
-        run: npx --prefix .github puppeteer browsers install chrome
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
 
       - name: Install Asciidoctor
         run: sudo gem install asciidoctor --no-document
@@ -147,6 +138,7 @@ jobs:
           {
             "defaults": {
               "chromeLaunchConfig": {
+                "executablePath": "$(which google-chrome-stable)",
                 "args": ["--no-sandbox", "--disable-setuid-sandbox"]
               }
             },
