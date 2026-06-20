@@ -3,6 +3,11 @@
     <meta name="description" content="{{ . }}" />
     {{- end }}
     <link rel="canonical" href="{{ .Permalink }}" />
+    {{- if .IsTranslated }}
+    {{- range .AllTranslations }}
+    <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
+    {{- end }}
+    {{- end }}
     <meta property="og:site_name" content="{{ site.Title }}" />
     <meta name="application-name" content="{{ site.Title }}" />
     {{ with $.Site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
