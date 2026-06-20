@@ -1,19 +1,67 @@
 /* ===[ Site navigation styling ]=== */
 
 .navbar {
+  --bs-navbar-active-color: var(--secondary);
+  --bs-navbar-brand-color: var(--secondary);
+  --bs-navbar-brand-hover-color: var(--secondary);
   --bs-navbar-color: var(--secondary);
   --bs-navbar-hover-color: var(--secondary);
-  --bs-navbar-active-color: var(--secondary);
   background-color: var(--primary);
   border-bottom: 2px solid var(--accent-color);
   box-shadow: 0 2px 4px var(--shadow-navbar);
-  position: fixed;
-  top: 0;
   left: 0;
+  position: fixed;
   right: 0;
+  top: 0;
   z-index: 100;
 }
 
+.navbar .container-fluid {
+  position: relative;
+}
+
+/* Site title centered in the navbar on all viewports */
+.navbar-brand {
+  background-color: var(--accent-color);
+  border-radius: 0.25rem;
+  color: var(--secondary);
+  font-family: var(--title-font), serif;
+  font-size: clamp(0.9rem, 1.5vw + 0.5rem, 1.25rem);
+  left: 50%;
+  padding: 0.2em 0.6em;
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: var(--secondary);
+  opacity: 0.85;
+}
+
+/* Nav links */
+.navbar .nav-link,
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  background-color: var(--primary);
+  color: var(--secondary);
+  text-align: center;
+}
+
+.navbar .nav-link.active {
+  background-color: var(--accent-color);
+  color: var(--secondary);
+}
+
+.navbar .nav-link:hover {
+  background-color: var(--nav-hover-bg);
+  text-decoration: underline;
+  text-decoration-color: var(--nav-hover-decoration);
+  text-decoration-style: dotted;
+}
+
+/* Dropdown menus */
 .dropdown-menu {
   background-color: var(--accent-color);
 }
@@ -38,29 +86,9 @@
 /* On mobile (collapsed navbar), show children inline on tap */
 @media (max-width: 991.98px) {
   .nav-hover-dropdown > .dropdown-menu {
-    display: block;
-    position: static;
     border: none;
+    display: block;
     padding-left: 1rem;
+    position: static;
   }
-}
-
-.navbar .nav-link,
-.navbar .nav-link:hover,
-.navbar .nav-link:focus {
-  background-color: var(--primary);
-  color: var(--secondary);
-  text-align: center;
-}
-
-.navbar .nav-link.active {
-  background-color: var(--accent-color);
-  color: var(--secondary);
-}
-
-.navbar .nav-link:hover {
-  background-color: var(--nav-hover-bg);
-  text-decoration: underline;
-  text-decoration-color: var(--nav-hover-decoration);
-  text-decoration-style: dotted;
 }
