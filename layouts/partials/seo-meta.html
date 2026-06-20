@@ -1,4 +1,4 @@
-    {{- $description := .Description | default .Site.Params.description -}}
+    {{- $description := .Description | default site.Params.description -}}
     {{- with $description }}
     <meta name="description" content="{{ . }}" />
     {{- end }}
