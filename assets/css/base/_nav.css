@@ -33,6 +33,7 @@
   padding: 0.2em 0.6em;
   position: absolute;
   text-overflow: ellipsis;
+  top: 0;
   transform: translateX(-50%);
   white-space: nowrap;
 }
