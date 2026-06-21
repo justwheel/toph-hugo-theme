@@ -111,7 +111,7 @@
                 "@type": "ListItem",
                 "position": 1,
                 "name": {{ site.Title | jsonify | safeJS }},
-                "item": {{ site.BaseURL | jsonify | safeJS }}
+                "item": {{ site.Home.Permalink | jsonify | safeJS }}
             }{{- if and .IsPage .Section (ne .Section "") }},
             {
                 "@type": "ListItem",
