@@ -112,7 +112,7 @@
                 "position": 1,
                 "name": {{ site.Title | jsonify | safeJS }},
                 "item": {{ site.BaseURL | jsonify | safeJS }}
-            }{{- if and .Section (ne .Section "") }},
+            }{{- if and .IsPage .Section (ne .Section "") }},
             {
                 "@type": "ListItem",
                 "position": 2,

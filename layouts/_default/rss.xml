@@ -5,7 +5,7 @@
 {{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
+    <title>{{ if .IsHome }}{{ site.Title | htmlEscape }}{{ else }}{{ .Title | htmlEscape }} | {{ site.Title | htmlEscape }}{{ end }}</title>
     <link>{{ .Permalink }}</link>
     <description>{{ with .Site.Params.description }}{{ . }}{{ end }}</description>
     <generator>Hugo -- gohugo.io</generator>
