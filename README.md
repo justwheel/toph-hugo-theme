@@ -26,11 +26,12 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
   - [Blogging](#blogging)
 - [Shortcodes](#shortcodes) for rich content embeds
 - [Modular CSS architecture](#css-architecture) with customizable color palette
-- RSS feeds at `/rss/` with autodiscovery in `<head>`
+- Navbar brand with site title (responsive, centered on mobile)
+- RSS feeds at `/rss/` with site name in titles and autodiscovery in `<head>`
 - [Multilingual support](#internationalization) (English, Spanish, Arabic with RTL, Hindi)
 - First-class support for both Markdown and AsciiDoc content
-- Schema.org support
-- Search Engine Optimization enhancements
+- [Search engine optimization](#search-engine-optimization): meta description, canonical URL, hreflang, structured data (WebSite, Person, Article, BreadcrumbList JSON-LD)
+- 404 page with localized "Return to homepage" link
 - [Easy customization of colors and fonts in Hugo configuration](#custom-colors-and-fonts)
 
 
@@ -278,6 +279,59 @@ params:
       excerpt_length: 250
 ```
 
+### Search engine optimization
+
+Toph includes comprehensive SEO features that work automatically with minimal configuration.
+
+#### Meta tags
+
+- **Meta description** — uses the page's `description` front matter field, falling back to `params.description` in the site config. Google uses this as the primary source for search result snippets.
+- **Canonical URL** — automatically set to each page's permalink. Prevents duplicate content issues, especially on multilingual sites.
+- **hreflang alternate links** — automatically generated for translated pages so search engines know the relationship between language versions.
+- **OpenGraph and Twitter Cards** — Hugo's built-in templates are included automatically.
+
+#### Navbar brand
+
+The site title (`site.Title`) appears in the navbar on every page.
+On mobile, the brand is centered in the navbar bar.
+On desktop, it flows inline as a standard Bootstrap `navbar-brand` element.
+Long titles are protected with `max-width` and `text-overflow: ellipsis`.
+
+#### Homepage title
+
+The homepage `<title>` tag appends the biography tagline if configured:
+
+```
+Justin Wheeler — Building the human infrastructure of open source
+```
+
+Set `params.biography.tagline` in your Hugo config.
+If no tagline is set, the title is just the site name.
+
+#### Structured data (JSON-LD)
+
+Toph generates Schema.org structured data as JSON-LD in the `<head>` of every page:
+
+| Schema | Pages | Purpose |
+|--------|-------|---------|
+| **WebSite** | Homepage only | Identifies the site as a named entity with a URL and description |
+| **Person** | All pages | Site owner identity with name, social profiles, expertise, and optional job title / employer |
+| **Article** | Blog posts only | Headline, dates, author, publisher, description, and cover image for rich search results |
+| **BreadcrumbList** | Non-home, non-404 pages | Navigation hierarchy (2 levels for top-level pages, 3 for section content) |
+
+##### Optional Person schema fields
+
+Add these to `params.biography` in your Hugo config to enrich the Person schema:
+
+```yaml
+params:
+  biography:
+    job_title: "Fedora Community Architect"
+    employer: "Red Hat"
+```
+
+Both fields are optional and guarded with `{{ with }}` — they are omitted from the JSON-LD if not configured.
+
 ### Shortcodes
 
 Toph provides shortcodes for embedding rich content in blog posts and pages.
@@ -405,7 +459,7 @@ Toph supports multilingual sites with built-in translations for four languages:
 | Spanish  | `es` | |
 
 Translation strings are stored in `i18n/{en,es,ar,hi}.yaml`.
-All navigation labels, footer text, and UI strings are localized.
+All navigation labels, footer text, 404 page messages, and UI strings are localized.
 
 To enable multiple languages, configure the `languages` section in your Hugo config.
 See the [Hugo multilingual documentation](https://gohugo.io/content-management/multilingual/) for details.

@@ -7,7 +7,7 @@ This file provides guidance to AI agents (including Claude Code) when working wi
 
 Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 (CDN) and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
 
-- **Hugo minimum version**: 0.158.0 Extended (required for `css.Build`)
+- **Hugo minimum version**: 0.161.0 Extended (required for `css.Build` with nested `vars`)
 - **Bootstrap**: 5.3.8 via CDN (not vendored)
 - **Bootstrap Icons**: 1.11.3 via CDN
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
@@ -176,6 +176,35 @@ Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. Arabic
 
 - `default.md` — Generic content
 - `blog.md` — Blog post with title, date, draft, categories, tags, author, description
+
+
+## Hugo template conventions
+
+### Global `site` function (ALWAYS use)
+
+Always use Hugo's global `site` function to access site-level data in templates.
+Never use `$.Site` or `.Site`.
+
+| Use this | Not this |
+|----------|----------|
+| `site.Title` | `$.Site.Title` or `.Site.Title` |
+| `site.Params.description` | `$.Site.Params.description` |
+| `site.BaseURL` | `$.Site.BaseURL` |
+
+The global `site` function is not context-dependent — it works correctly inside `with`, `range`, and other blocks that rebind the `.` context.
+`$.Site` requires the root template context to be available, which breaks if the template is refactored or nested inside a block that shadows `$`.
+The global function is shorter, more idiomatic, and eliminates an entire class of scoping bugs.
+
+When modifying existing templates that use `$.Site` or `.Site`, convert them to `site` as part of the change.
+Do not leave mixed usage in the same file.
+
+### JSON-LD structured data
+
+Use `| jsonify | safeJS` when outputting dynamic values inside `<script type="application/ld+json">` blocks.
+The `jsonify` filter handles quoting and escaping special characters (double quotes, newlines) correctly.
+The `safeJS` filter prevents Hugo from HTML-escaping the JSON output inside `<script>` tags.
+
+For arrays and slices (e.g., `sameAs`, `knowsAbout`), pass the entire slice to `jsonify` rather than manually iterating with comma tracking.
 
 
 ## WCAG AA accessibility
