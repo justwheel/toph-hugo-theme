@@ -101,7 +101,7 @@
     </script>
     {{- end }}
 
-    {{- if not .IsHome }}
+    {{- if and (not .IsHome) (ne .Kind "404") }}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
