@@ -99,6 +99,8 @@ params:
     email: septima@example.com
     blog: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
     first_online: 1898
+    job_title: "Citizenship Teacher"
+    employer: "Highlander Folk School"
     knows_about: [
       "activism",
       "Civil Rights Movement",
