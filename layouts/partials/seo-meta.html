@@ -10,13 +10,13 @@
     {{- end }}
     <meta property="og:site_name" content="{{ site.Title }}" />
     <meta name="application-name" content="{{ site.Title }}" />
-    {{ with $.Site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
+    {{ with site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
 
     {{- $exclude := site.Params.taxonomy_exclude | default slice -}}
     {{- $is_structural_by_category := and .Params.categories (gt (len (intersect $exclude .Params.categories)) 0) -}}
     {{- $is_structural := or (.Params.hide_sitemap | default false) $is_structural_by_category -}}
     {{- $is_blog_post := and (not .Date.IsZero) (not $is_structural) -}}
-    {{- $author := .Param "author" | default $.Site.Params.biography.name }}
+    {{- $author := .Param "author" | default site.Params.biography.name }}
 
     <meta name="author" content="{{ $author }}" />
     {{- if $is_blog_post }}
@@ -34,44 +34,31 @@
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "{{ site.Title }}",
-        "url": {{ printf "%s" site.BaseURL }},
-        "description": "{{ site.Params.description }}"
+        "name": {{ site.Title | jsonify | safeJS }},
+        "url": {{ site.BaseURL | jsonify | safeJS }},
+        "description": {{ site.Params.description | jsonify | safeJS }}
     }
     </script>
     {{- end }}
 
+    {{- $sameAs := slice -}}
+    {{- range $key, $value := site.Params.social -}}
+        {{- with index hugo.Data.social $key -}}
+            {{- $sameAs = $sameAs | append (printf .url $value) -}}
+        {{- end -}}
+    {{- end }}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Person",
-        "name": "{{ $.Site.Params.biography.name }}",
-        "familyName": "{{ index (findRE "(\\w|[-])+$" $.Site.Params.biography.name) 0 }}",
-        "gender": "{{ $.Site.Params.biography.gender }}",
-        "image": {{ printf "%s" (index $.Site.Params.images 0) }},
-        "email": "mailto:{{ $.Site.Params.biography.email }}",
-        "url": {{ printf "%s" site.BaseURL }},
-        "sameAs": [
-            {{- $sameAs := slice -}}
-            {{- range $key, $value := $.Site.Params.social -}}
-                {{- with index hugo.Data.social $key -}}
-                    {{- $sameAs = $sameAs | append (printf .url $value) -}}
-                {{- end -}}
-            {{- end -}}
-            {{- range $index, $url := $sameAs }}
-            "{{ $url }}"{{ if ne (add $index 1) (len $sameAs) }},{{ end }}
-            {{- end }}
-        ],
-        "knowsAbout": [
-            {{- $len_knowsAbout := len $.Site.Params.biography.knows_about }}
-            {{- range $index, $knowsAbout := $.Site.Params.biography.knows_about }}
-                {{- if ne (add $index 1) $len_knowsAbout }}
-            {{ . }},
-                {{- else }}
-            {{ . }}
-                {{- end }}
-            {{- end }}
-        ]
+        "name": {{ site.Params.biography.name | jsonify | safeJS }},
+        "familyName": {{ index (findRE "(\\w|[-])+$" site.Params.biography.name) 0 | jsonify | safeJS }},
+        "gender": {{ site.Params.biography.gender | jsonify | safeJS }},
+        "image": {{ index site.Params.images 0 | jsonify | safeJS }},
+        "email": {{ printf "mailto:%s" site.Params.biography.email | jsonify | safeJS }},
+        "url": {{ site.BaseURL | jsonify | safeJS }},
+        "sameAs": {{ $sameAs | jsonify | safeJS }},
+        "knowsAbout": {{ site.Params.biography.knows_about | jsonify | safeJS }}
     }
     </script>
 
@@ -80,27 +67,28 @@
     {
         "@context": "https://schema.org",
         "@type": "Article",
-        "headline": "{{ .Title }}",
-        "datePublished": "{{ .Date.Format "2006-01-02T15:04:05-07:00" }}",
-        "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}",
+        "headline": {{ .Title | jsonify | safeJS }},
+        "datePublished": {{ .Date.Format "2006-01-02T15:04:05-07:00" | jsonify | safeJS }},
+        "dateModified": {{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | jsonify | safeJS }},
         "author": {
             "@type": "Person",
-            "name": "{{ $author }}",
-            "url": {{ printf "%s" site.BaseURL }}
+            "name": {{ $author | jsonify | safeJS }},
+            "url": {{ site.BaseURL | jsonify | safeJS }}
         },
         "publisher": {
             "@type": "Person",
-            "name": "{{ $.Site.Params.biography.name }}"
+            "name": {{ site.Params.biography.name | jsonify | safeJS }}
         },
         {{- with $description }}
-        "description": "{{ . }}",
+        "description": {{ . | jsonify | safeJS }},
         {{- end }}
         {{- with .Params.images }}
-        "image": "{{ index . 0 | absURL }}",
+        {{- $img := index . 0 }}
+        "image": {{ (cond (urls.Parse $img).IsAbs $img ($img | absURL)) | jsonify | safeJS }},
         {{- end }}
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "{{ .Permalink }}"
+            "@id": {{ .Permalink | jsonify | safeJS }}
         }
     }
     </script>
