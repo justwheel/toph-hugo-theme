@@ -1,5 +1,6 @@
 ---
 - 404_page:
+    back_home: Return to homepage
     body: The requested page could not be found.
     header: Page not found
 

@@ -1,5 +1,6 @@
 ---
 - 404_page:
+    back_home: Volver a la página principal
     body: No se encontró la página solicitada.
     header: "Página no encontrada"
 

@@ -58,7 +58,12 @@
         "email": {{ printf "mailto:%s" site.Params.biography.email | jsonify | safeJS }},
         "url": {{ site.BaseURL | jsonify | safeJS }},
         "sameAs": {{ $sameAs | jsonify | safeJS }},
-        "knowsAbout": {{ site.Params.biography.knows_about | jsonify | safeJS }}
+        "knowsAbout": {{ site.Params.biography.knows_about | jsonify | safeJS }}{{- with site.Params.biography.job_title }},
+        "jobTitle": {{ . | jsonify | safeJS }}{{- end }}{{- with site.Params.biography.employer }},
+        "worksFor": {
+            "@type": "Organization",
+            "name": {{ . | jsonify | safeJS }}
+        }{{- end }}
     }
     </script>
 
@@ -92,6 +97,41 @@
             "@type": "WebPage",
             "@id": {{ .Permalink | jsonify | safeJS }}
         }
+    }
+    </script>
+    {{- end }}
+
+    {{- if not .IsHome }}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": {{ site.Title | jsonify | safeJS }},
+                "item": {{ site.BaseURL | jsonify | safeJS }}
+            }{{- if and .Section (ne .Section "") }},
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": {{ .CurrentSection.Title | jsonify | safeJS }},
+                "item": {{ .CurrentSection.Permalink | jsonify | safeJS }}
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": {{ .Title | jsonify | safeJS }},
+                "item": {{ .Permalink | jsonify | safeJS }}
+            }{{- else }},
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": {{ .Title | jsonify | safeJS }},
+                "item": {{ .Permalink | jsonify | safeJS }}
+            }{{- end }}
+        ]
     }
     </script>
     {{- end }}

@@ -3,6 +3,7 @@
       <div class="container text-center">
           <h2>{{ i18n "404_page.header" | safeHTML }} :(</h2>
           <p>{{ i18n "404_page.body" | safeHTML }}</p>
+          <p><a href="{{ "/" | relLangURL }}">{{ i18n "404_page.back_home" }}</a></p>
       </div>
     </main>
 {{ end }}
