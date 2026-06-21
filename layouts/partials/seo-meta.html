@@ -11,20 +11,35 @@
     <meta property="og:site_name" content="{{ site.Title }}" />
     <meta name="application-name" content="{{ site.Title }}" />
     {{ with $.Site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
-        
-    {{ if (isset .Params "author") }}
-    <meta name="author" content="{{ .Param "author" }}" />
-    <meta property="article:author" content="{{ .Param "author" }}" />
-    {{ else }}
-    <meta name="author" content="{{ $.Site.Params.biography.name }}" />
-    <meta property="article:author" content="{{ $.Site.Params.biography.name }}" />
-    {{ end }}
 
-    {{ if (isset .Params "tags") }}
+    {{- $exclude := site.Params.taxonomy_exclude | default slice -}}
+    {{- $is_structural_by_category := and .Params.categories (gt (len (intersect $exclude .Params.categories)) 0) -}}
+    {{- $is_structural := or (.Params.hide_sitemap | default false) $is_structural_by_category -}}
+    {{- $is_blog_post := and (not .Date.IsZero) (not $is_structural) -}}
+    {{- $author := .Param "author" | default $.Site.Params.biography.name }}
+
+    <meta name="author" content="{{ $author }}" />
+    {{- if $is_blog_post }}
+    <meta property="article:author" content="{{ $author }}" />
+    {{- end }}
+
+    {{- if and $is_blog_post (isset .Params "tags") }}
         {{- range .Params.tags }}
-        <meta property="article:tag" content="{{ . }}" />
+    <meta property="article:tag" content="{{ . }}" />
         {{- end }}
-    {{ end}}
+    {{- end }}
+
+    {{- if .IsHome }}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{ site.Title }}",
+        "url": {{ printf "%s" site.BaseURL }},
+        "description": "{{ site.Params.description }}"
+    }
+    </script>
+    {{- end }}
 
     <script type="application/ld+json">
     {
@@ -59,3 +74,34 @@
         ]
     }
     </script>
+
+    {{- if $is_blog_post }}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{ .Title }}",
+        "datePublished": "{{ .Date.Format "2006-01-02T15:04:05-07:00" }}",
+        "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}",
+        "author": {
+            "@type": "Person",
+            "name": "{{ $author }}",
+            "url": {{ printf "%s" site.BaseURL }}
+        },
+        "publisher": {
+            "@type": "Person",
+            "name": "{{ $.Site.Params.biography.name }}"
+        },
+        {{- with $description }}
+        "description": "{{ . }}",
+        {{- end }}
+        {{- with .Params.images }}
+        "image": "{{ index . 0 | absURL }}",
+        {{- end }}
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ .Permalink }}"
+        }
+    }
+    </script>
+    {{- end }}

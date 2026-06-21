@@ -5,7 +5,7 @@
     {{ hugo.Generator }}
 
     {{ if .IsHome }}
-    <title>{{ .Site.Title }}</title>
+    <title>{{ .Site.Title }}{{ with .Site.Params.biography.tagline }} — {{ . }}{{ end }}</title>
     {{ else }}
     <title>{{ .Title }} | {{ .Site.Title }}</title>
     {{ end }}
