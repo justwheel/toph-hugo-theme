@@ -84,7 +84,9 @@
         {{- end }}
         {{- with .Params.images }}
         {{- $img := index . 0 }}
+        {{- if $img }}
         "image": {{ (cond (urls.Parse $img).IsAbs $img ($img | absURL)) | jsonify | safeJS }},
+        {{- end }}
         {{- end }}
         "mainEntityOfPage": {
             "@type": "WebPage",
