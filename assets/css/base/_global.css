@@ -51,7 +51,6 @@ h1 {
   overflow-wrap: break-word;
   padding-bottom: 3rem;
   padding-top: 7rem;
-  word-break: break-word;
 }
 
 h2, h4, #toctitle { color: var(--accent-color); }

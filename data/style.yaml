@@ -34,6 +34,7 @@ bg:
   hover: "#f5f4f0"
   card-hover: "#f5f0fa"
   card-active: "#ece4f4"
+  modal-overlay: "rgba(0, 0, 0, 0.95)"
 
 nav:
   hover-bg: royalblue

@@ -3,7 +3,6 @@
 /* Break long unbreakable strings (URLs, hashtags, etc.) on small viewports */
 main {
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 /* Darken main links further to guarantee 4.5:1 contrast */

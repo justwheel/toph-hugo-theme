@@ -17,3 +17,14 @@
 - nav:
     social: تواصل
     translations: لغات
+
+- tweet_archive:
+    archived: مؤرشف
+    archived_label: تم أرشفة هذا التغريدة
+    close_viewer: إغلاق عارض الصور
+    next_photo: الصورة التالية
+    photo_label: صورة
+    previous_photo: الصورة السابقة
+    view_archived_tweet: عرض التغريدة المؤرشفة
+    view_photo: "عرض الصورة %d من %d بملء الشاشة"
+    viewer_label: عارض صور التغريدة

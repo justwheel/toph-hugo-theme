@@ -1,7 +1,8 @@
 {{ define "main"}}
 {{- $author := .Params.author | default "unknown" -}}
 {{- $authorName := .Params.author_name | default site.Params.biography.name -}}
-{{- $avatar := .Params.avatar | default (index site.Params.images 0) -}}
+{{- $avatar := .Params.avatar -}}
+{{- if not $avatar }}{{ with site.Params.images }}{{ $avatar = index . 0 }}{{ end }}{{ end -}}
 {{- $images := .Resources.Match "*.{jpg,jpeg,png,gif,webp}" -}}
 {{- $imageCount := len $images -}}
 {{- $modalId := printf "tweet-modal-%s" .Params.tweet_id -}}
@@ -14,15 +15,15 @@
                 <span class="tweet-archive-name">{{ $authorName }}</span>
                 <span class="tweet-archive-handle">@{{ $author }}</span>
             </div>
-            <span class="tweet-archive-badge" aria-label="This tweet has been archived"><i class="bi bi-archive" aria-hidden="true"></i> Archived</span>
+            <span class="tweet-archive-badge" aria-label="{{ i18n "tweet_archive.archived_label" }}"><i class="bi bi-archive" aria-hidden="true"></i> {{ i18n "tweet_archive.archived" }}</span>
         </div>
         <blockquote class="tweet-archive-text" cite="{{ .Permalink }}">{{ .Content }}</blockquote>
         {{- if gt $imageCount 0 }}
         <div class="tweet-archive-images grid-{{ cond (gt $imageCount 4) "4" (printf "%d" $imageCount) }}">
             {{- range $i, $img := $images }}
             {{- if lt $i 4 }}
-            <button type="button" class="tweet-archive-image-btn" data-bs-toggle="modal" data-bs-target="#{{ $modalId }}" data-bs-slide-to="{{ $i }}" aria-label="View photo {{ add $i 1 }} of {{ $imageCount }} in full screen">
-                <img src="{{ $img.RelPermalink }}" alt="Photo {{ add $i 1 }} from archived tweet by @{{ $author }}" loading="lazy">
+            <button type="button" class="tweet-archive-image-btn" data-bs-toggle="modal" data-bs-target="#{{ $modalId }}" data-bs-slide-to="{{ $i }}" aria-label="{{ printf (i18n "tweet_archive.view_photo") (add $i 1) $imageCount }}">
+                <img src="{{ $img.RelPermalink }}" alt="{{ i18n "tweet_archive.photo_label" }} {{ add $i 1 }}" loading="lazy">
             </button>
             {{- end }}
             {{- end }}
@@ -35,33 +36,33 @@
 </figure>
 
 {{- if gt $imageCount 0 }}
-<div class="modal fade tweet-archive-modal" id="{{ $modalId }}" tabindex="-1" aria-label="Tweet photo viewer" aria-hidden="true">
+<div class="modal fade tweet-archive-modal" id="{{ $modalId }}" tabindex="-1" aria-label="{{ i18n "tweet_archive.viewer_label" }}" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close photo viewer"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ i18n "tweet_archive.close_viewer" }}"></button>
             </div>
             <div class="modal-body p-0">
                 <div id="{{ $modalId }}-carousel" class="carousel slide">
                     <div class="carousel-inner">
                         {{- range $i, $img := $images }}
                         <div class="carousel-item{{ if eq $i 0 }} active{{ end }}">
-                            <img src="{{ $img.RelPermalink }}" class="d-block mx-auto" alt="Photo {{ add $i 1 }} from archived tweet by @{{ $author }}">
+                            <img src="{{ $img.RelPermalink }}" class="d-block mx-auto" alt="{{ i18n "tweet_archive.photo_label" }} {{ add $i 1 }}">
                         </div>
                         {{- end }}
                     </div>
                     {{- if gt $imageCount 1 }}
                     <button class="carousel-control-prev" type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous photo</span>
+                        <span class="visually-hidden">{{ i18n "tweet_archive.previous_photo" }}</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next photo</span>
+                        <span class="visually-hidden">{{ i18n "tweet_archive.next_photo" }}</span>
                     </button>
                     <div class="carousel-indicators">
                         {{- range $i, $img := $images }}
-                        <button type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide-to="{{ $i }}"{{ if eq $i 0 }} class="active" aria-current="true"{{ end }} aria-label="Photo {{ add $i 1 }}"></button>
+                        <button type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide-to="{{ $i }}"{{ if eq $i 0 }} class="active" aria-current="true"{{ end }} aria-label="{{ i18n "tweet_archive.photo_label" }} {{ add $i 1 }}"></button>
                         {{- end }}
                     </div>
                     {{- end }}

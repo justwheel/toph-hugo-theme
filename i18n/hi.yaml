@@ -17,3 +17,14 @@
 - nav:
     social: सोशल मीडिया
     translations: भाषाएँ
+
+- tweet_archive:
+    archived: संग्रहीत
+    archived_label: यह ट्वीट संग्रहीत किया गया है
+    close_viewer: फ़ोटो दर्शक बंद करें
+    next_photo: अगली फ़ोटो
+    photo_label: फ़ोटो
+    previous_photo: पिछली फ़ोटो
+    view_archived_tweet: संग्रहीत ट्वीट देखें
+    view_photo: "फ़ोटो %d का %d पूर्ण स्क्रीन में देखें"
+    viewer_label: ट्वीट फ़ोटो दर्शक

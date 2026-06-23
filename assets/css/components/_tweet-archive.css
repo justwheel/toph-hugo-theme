@@ -1,7 +1,7 @@
 /* ===[ Archived tweet card ]=== */
 
 .tweet-archive {
-  background-color: #fff;
+  background-color: var(--bg-white);
   border: 1px solid var(--border-card);
   border-left: 4px solid var(--accent-color);
   border-radius: 0.5rem;
@@ -168,7 +168,7 @@
 
 /* Lightbox modal */
 .tweet-archive-modal .modal-content {
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--bg-modal-overlay);
   border: none;
 }
 

@@ -43,3 +43,14 @@
 - nav:
     social: redes sociales
     translations: idiomas
+
+- tweet_archive:
+    archived: Archivado
+    archived_label: Este tweet ha sido archivado
+    close_viewer: Cerrar visor de fotos
+    next_photo: Siguiente foto
+    photo_label: Foto
+    previous_photo: Foto anterior
+    view_archived_tweet: Ver tweet archivado
+    view_photo: "Ver foto %d de %d en pantalla completa"
+    viewer_label: Visor de fotos del tweet
