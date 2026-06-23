@@ -1,0 +1,82 @@
+{{ define "main"}}
+{{- $author := .Params.author | default "unknown" -}}
+{{- $authorName := .Params.author_name | default site.Params.biography.name -}}
+{{- $avatar := .Params.avatar | default (index site.Params.images 0) -}}
+{{- $images := .Resources.Match "*.{jpg,jpeg,png,gif,webp}" -}}
+{{- $imageCount := len $images -}}
+{{- $modalId := printf "tweet-modal-%s" .Params.tweet_id -}}
+
+<figure class="tweet-archive standalone" role="figure" aria-label="Archived tweet by @{{ $author }}">
+    <div class="tweet-archive-body">
+        <div class="tweet-archive-header">
+            <img class="tweet-archive-avatar" src="{{ $avatar }}" alt="" aria-hidden="true">
+            <div class="tweet-archive-author">
+                <span class="tweet-archive-name">{{ $authorName }}</span>
+                <span class="tweet-archive-handle">@{{ $author }}</span>
+            </div>
+            <span class="tweet-archive-badge" aria-label="This tweet has been archived"><i class="bi bi-archive" aria-hidden="true"></i> Archived</span>
+        </div>
+        <blockquote class="tweet-archive-text" cite="{{ .Permalink }}">{{ .Content }}</blockquote>
+        {{- if gt $imageCount 0 }}
+        <div class="tweet-archive-images grid-{{ cond (gt $imageCount 4) "4" (printf "%d" $imageCount) }}">
+            {{- range $i, $img := $images }}
+            {{- if lt $i 4 }}
+            <button type="button" class="tweet-archive-image-btn" data-bs-toggle="modal" data-bs-target="#{{ $modalId }}" data-bs-slide-to="{{ $i }}" aria-label="View photo {{ add $i 1 }} of {{ $imageCount }} in full screen">
+                <img src="{{ $img.RelPermalink }}" alt="Photo {{ add $i 1 }} from archived tweet by @{{ $author }}" loading="lazy">
+            </button>
+            {{- end }}
+            {{- end }}
+        </div>
+        {{- end }}
+    </div>
+    <figcaption class="tweet-archive-footer">
+        <time class="tweet-archive-date" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006 · 15:04 UTC" }}</time>
+    </figcaption>
+</figure>
+
+{{- if gt $imageCount 0 }}
+<div class="modal fade tweet-archive-modal" id="{{ $modalId }}" tabindex="-1" aria-label="Tweet photo viewer" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close photo viewer"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="{{ $modalId }}-carousel" class="carousel slide">
+                    <div class="carousel-inner">
+                        {{- range $i, $img := $images }}
+                        <div class="carousel-item{{ if eq $i 0 }} active{{ end }}">
+                            <img src="{{ $img.RelPermalink }}" class="d-block mx-auto" alt="Photo {{ add $i 1 }} from archived tweet by @{{ $author }}">
+                        </div>
+                        {{- end }}
+                    </div>
+                    {{- if gt $imageCount 1 }}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous photo</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next photo</span>
+                    </button>
+                    <div class="carousel-indicators">
+                        {{- range $i, $img := $images }}
+                        <button type="button" data-bs-target="#{{ $modalId }}-carousel" data-bs-slide-to="{{ $i }}"{{ if eq $i 0 }} class="active" aria-current="true"{{ end }} aria-label="Photo {{ add $i 1 }}"></button>
+                        {{- end }}
+                    </div>
+                    {{- end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.querySelector('#{{ $modalId }}').addEventListener('show.bs.modal', function(e) {
+    var trigger = e.relatedTarget;
+    var slide = trigger ? trigger.getAttribute('data-bs-slide-to') : '0';
+    var carousel = bootstrap.Carousel.getOrCreateInstance(document.querySelector('#{{ $modalId }}-carousel'));
+    carousel.to(parseInt(slide, 10));
+});
+</script>
+{{- end }}
+{{ end }}

@@ -24,7 +24,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
   - [Team profiles](#team-profiles)
   - [Dynamic footer badges](#dynamic-footer-badges)
   - [Blogging](#blogging)
-- [Shortcodes](#shortcodes) for rich content embeds
+- [Shortcodes](#shortcodes) for rich content embeds (PDF download, [tweet archive](#tweet-archive))
 - [Modular CSS architecture](#css-architecture) with customizable color palette
 - Navbar brand with site title (responsive, centered on mobile)
 - RSS feeds at `/rss/` with site name in titles and autodiscovery in `<head>`
@@ -373,6 +373,63 @@ File size is computed at build time from the file in `static/` and displayed in 
 - 1 MB to 999 MB: one decimal MB (e.g., "2.3 MB")
 - 1 GB and above: one decimal GB (e.g., "1.5 GB")
 
+#### Tweet archive
+
+The `tweet-archive` shortcode embeds a self-hosted archived tweet as a styled card.
+Each archived tweet is a Hugo page bundle with its own dedicated URL, images, and metadata — no external dependencies or JavaScript embeds from Twitter/X.
+
+This is designed for preserving tweets from deleted or inaccessible accounts while maintaining full control over the content and SEO.
+
+##### Features
+
+- **Styled card** with author avatar, display name, handle, and "Archived" badge
+- **Image grid** that adapts to the number of photos (1: full-width natural aspect ratio, 2: side-by-side, 3: one full-width + two side-by-side, 4: 2×2 grid)
+- **Lightbox carousel** — clicking any image opens a full-screen Bootstrap modal carousel starting on the clicked photo
+- **Linked @mentions and #hashtags** pointing to their canonical x.com URLs
+- **Standalone pages** — each tweet has its own URL at `/tweets/<tweet-id>/` for direct linking
+- **SEO-optimized** — tweet pages are indexed in sitemaps with titles containing "Archived Tweet" plus @mentions and #hashtags
+- **Accessible** — semantic `<figure>`/`<blockquote>`/`<figcaption>` markup, keyboard-navigable image buttons with `:focus-visible`, descriptive `aria-label` attributes, and `prefers-reduced-motion` support
+
+##### Content model
+
+Each archived tweet lives in `content/tweets/<tweet-id>/` as a Hugo page bundle:
+
+```
+content/tweets/1223242916988096512/
+  index.md      Front matter + tweet text as Markdown
+  photo1.jpg    Attached images (if any)
+  photo2.jpg
+```
+
+Front matter:
+
+```yaml
+---
+title: "Archived Tweet — @mbbroberg #metrics"
+date: 2020-01-31T13:53:32+00:00
+tweet_id: "1223242916988096512"
+author: "jflory7"
+author_name: "Justin Wheeler"
+categories: ["tweets"]
+---
+```
+
+Tweet body uses standard Markdown.
+@mentions are linked as `[@handle](https://x.com/handle)` and #hashtags as `[#tag](https://x.com/hashtag/tag)`.
+
+##### Usage
+
+```markdown
+{{< tweet-archive id="1223242916988096512" >}}
+```
+
+The `id` parameter must match a content page's `tweet_id` front matter field.
+
+##### Avatar fallback
+
+The card displays the author's profile photo from the `avatar` front matter field.
+If not set, it falls back to the site's default image (`params.images[0]`).
+
 ### CSS architecture
 
 Toph uses Hugo's `css.Build` function to bundle modular CSS files into a single stylesheet at build time.
@@ -382,7 +439,7 @@ The source CSS is organized under `assets/css/` in four directories:
 assets/css/
   main.css                 @import entrypoint (no rules, only imports)
   base/                    Variables, global styles, navbar, main content area
-  components/              Cover image, hero, PDF download, team card grid, post metadata, post nav, code blocks, footer
+  components/              Cover image, hero, PDF download, tweet archive, team card grid, post metadata, post nav, code blocks, footer
   taxonomy/                Sort controls, term excerpts, categories grid, tags word cloud
   blog/                    Recent posts, blog archive accordion
 ```

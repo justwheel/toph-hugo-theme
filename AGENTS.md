@@ -63,6 +63,8 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
     term.html        Fallback single term page with pagination
   team/
     list.html        Team section list page with card grid
+  tweets/
+    single.html      Standalone archived tweet page with full-width card
   blog/
     list.html        Blog archive with year/month Bootstrap accordion
   categories/
@@ -126,6 +128,7 @@ assets/css/
     _code.css                     Code block borders
     _pdf-download.css             PDF download shortcode card
     _team.css                     Team member card grid
+    _tweet-archive.css            Archived tweet card, image grid, lightbox modal
     _footer.css                   Footer badges and footer-box
   taxonomy/
     _terms-controls.css           Sort toggle controls
@@ -167,6 +170,69 @@ Blog features (post-meta, post-nav, ToC) only render for blog posts.
 ### Shortcodes
 
 - `pdf-download.html` — Styled download card for local PDF files with auto-computed file size via `os.Stat`. Parameters: `file` (path in `static/`), `title`, optional `description`. CSS in `assets/css/components/_pdf-download.css`.
+- `tweet-archive.html` — Embeds an archived tweet from the local content archive. Looks up a tweet content page by its `tweet_id` front matter param and renders a styled card with author info, tweet text, image grid, and a link to the standalone archived tweet page. Clicking any image opens a full-screen Bootstrap modal carousel that starts on the clicked image. CSS in `assets/css/components/_tweet-archive.css`.
+
+### Tweet archive
+
+Toph includes a self-hosted tweet archive system for preserving tweets from deleted or inaccessible accounts.
+Each archived tweet is a Hugo page bundle in the site's `content/tweets/<tweet-id>/` directory with images stored alongside the `index.md` file.
+
+#### Content model
+
+Tweet page bundles use the following front matter:
+
+```yaml
+title: "Archived Tweet — @mention1 #hashtag1"
+date: 2020-01-31T13:53:32+00:00
+tweet_id: "1223242916988096512"
+author: "username"
+author_name: "Display Name"
+categories: ["tweets"]
+```
+
+- `tweet_id` (required): The original tweet ID. The `tweet-archive` shortcode uses this to look up the content page.
+- `author`: The Twitter/X handle (without @).
+- `author_name`: Display name shown in the card header. Falls back to `site.Params.biography.name`.
+- `avatar`: Optional profile photo path. Falls back to `site.Params.images[0]` (the site logo).
+- `title`: Should include "Archived Tweet" plus @mentions and #hashtags from the tweet text, for SEO indexing. No `<a>` links — plain text only.
+- Tweet pages should NOT use `hide_sitemap: true` — they are designed to be indexed by search engines.
+
+Tweet body text goes after the front matter as standard Markdown content.
+@mentions should be linked as `[@handle](https://x.com/handle)` and #hashtags as `[#tag](https://x.com/hashtag/tag)`.
+Images are stored as `photo1.jpg`, `photo2.jpg`, etc. in the page bundle directory.
+
+#### Layout
+
+- `layouts/tweets/single.html` — Standalone tweet page using the full viewport width. Renders the same card component as the shortcode but without the "View archived tweet" link.
+- The shortcode renders a centered 550px-max card within blog post content.
+
+#### Image grid behavior
+
+The image grid adapts to the number of photos:
+- 1 photo: Full-width, natural aspect ratio
+- 2 photos: Side-by-side, equal width
+- 3 photos: First photo full-width on top, two smaller photos side-by-side below
+- 4 photos: 2×2 grid
+
+Clicking any image opens a Bootstrap modal carousel lightbox starting on the clicked photo.
+
+#### Shortcode usage
+
+```
+{{</* tweet-archive id="1223242916988096512" */>}}
+```
+
+The `id` parameter must match a content page's `tweet_id` front matter. If no matching page is found, Hugo will error at build time.
+
+#### Accessibility
+
+- Card uses `<figure>` with `role="figure"` and `aria-label`
+- Tweet text uses `<blockquote cite="">` for semantic accuracy
+- Footer uses `<figcaption>`
+- Each image button has a descriptive `aria-label` ("View photo 1 of 4 in full screen")
+- Modal has `aria-label` for screen readers, close button has descriptive label
+- Image buttons have `:focus-visible` outline for keyboard navigation
+- `prefers-reduced-motion` disables hover transitions
 
 ### i18n
 
