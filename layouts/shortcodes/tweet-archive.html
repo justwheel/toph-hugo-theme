@@ -10,13 +10,17 @@
 {{- $avatar := $tweet.Params.avatar -}}
 {{- if $avatar }}{{ $avatar = partial "resolve-image-path.html" (dict "src" $avatar "file" $tweet.File) }}{{ else }}{{ with site.Params.images }}{{ $avatar = index . 0 }}{{ end }}{{ end -}}
 {{- $date := $tweet.Date -}}
-{{- $images := $tweet.Resources.Match "*.{jpg,jpeg,png,gif,webp}" -}}
+{{- $allImages := $tweet.Resources.ByType "image" -}}
+{{- $images := slice -}}
+{{- range $allImages }}{{ if not (strings.HasPrefix .Name "avatar") }}{{ $images = $images | append . }}{{ end }}{{ end -}}
 {{- $imageCount := len $images -}}
 {{- $modalId := printf "tweet-modal-%s" $id -}}
 <figure class="tweet-archive" role="figure" aria-label="Archived tweet by @{{ $author }}">
     <div class="tweet-archive-body">
         <div class="tweet-archive-header">
-            <img class="tweet-archive-avatar" src="{{ $avatar }}" alt="" aria-hidden="true">
+            {{- with $avatar }}
+            <img class="tweet-archive-avatar" src="{{ . }}" alt="{{ $authorName }} avatar">
+            {{- end }}
             <div class="tweet-archive-author">
                 <span class="tweet-archive-name">{{ $authorName }}</span>
                 <span class="tweet-archive-handle">@{{ $author }}</span>
@@ -77,15 +81,19 @@
         </div>
     </div>
 </div>
+{{- if not (.Page.Store.Get "tweet-archive-script") }}{{ .Page.Store.Set "tweet-archive-script" true }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('#{{ $modalId }}').addEventListener('show.bs.modal', function(e) {
-        var trigger = e.relatedTarget;
-        var slide = trigger ? trigger.getAttribute('data-bs-slide-to') : '0';
-        var carousel = bootstrap.Carousel.getOrCreateInstance(document.querySelector('#{{ $modalId }}-carousel'));
+    document.addEventListener('show.bs.modal', function(e) {
+        if (!e.target.classList.contains('tweet-archive-modal')) return;
+        const trigger = e.relatedTarget;
+        const slide = trigger ? trigger.getAttribute('data-bs-slide-to') : '0';
+        const carouselEl = e.target.querySelector('.carousel');
+        const carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
         carousel.to(parseInt(slide, 10));
     });
 });
 </script>
+{{- end }}
 {{- end }}
 {{- end -}}
