@@ -8,7 +8,7 @@
 {{- $author := $tweet.Params.author | default "unknown" -}}
 {{- $authorName := $tweet.Params.author_name | default site.Params.biography.name -}}
 {{- $avatar := $tweet.Params.avatar -}}
-{{- if not $avatar }}{{ with site.Params.images }}{{ $avatar = index . 0 }}{{ end }}{{ end -}}
+{{- if $avatar }}{{ $avatar = partial "resolve-image-path.html" (dict "src" $avatar "file" $tweet.File) }}{{ else }}{{ with site.Params.images }}{{ $avatar = index . 0 }}{{ end }}{{ end -}}
 {{- $date := $tweet.Date -}}
 {{- $images := $tweet.Resources.Match "*.{jpg,jpeg,png,gif,webp}" -}}
 {{- $imageCount := len $images -}}
@@ -37,7 +37,7 @@
         {{- end }}
     </div>
     <figcaption class="tweet-archive-footer">
-        <time class="tweet-archive-date" datetime="{{ $date.Format "2006-01-02T15:04:05Z07:00" }}">{{ $date.Format "January 2, 2006 · 15:04 UTC" }}</time>
+        <time class="tweet-archive-date" datetime="{{ $date.Format "2006-01-02T15:04:05Z07:00" }}">{{ time.Format "January 2, 2006 · 15:04" $date }} UTC</time>
         <a href="{{ $tweet.RelPermalink }}" class="tweet-archive-link">{{ i18n "tweet_archive.view_archived_tweet" }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </figcaption>
 </figure>
@@ -78,11 +78,13 @@
     </div>
 </div>
 <script>
-document.querySelector('#{{ $modalId }}').addEventListener('show.bs.modal', function(e) {
-    var trigger = e.relatedTarget;
-    var slide = trigger ? trigger.getAttribute('data-bs-slide-to') : '0';
-    var carousel = bootstrap.Carousel.getOrCreateInstance(document.querySelector('#{{ $modalId }}-carousel'));
-    carousel.to(parseInt(slide, 10));
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('#{{ $modalId }}').addEventListener('show.bs.modal', function(e) {
+        var trigger = e.relatedTarget;
+        var slide = trigger ? trigger.getAttribute('data-bs-slide-to') : '0';
+        var carousel = bootstrap.Carousel.getOrCreateInstance(document.querySelector('#{{ $modalId }}-carousel'));
+        carousel.to(parseInt(slide, 10));
+    });
 });
 </script>
 {{- end }}
