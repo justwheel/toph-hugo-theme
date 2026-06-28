@@ -35,8 +35,8 @@
 
   /* Let tweet images display inline for print instead of as buttons */
   .tweet-archive-images img {
+    break-inside: avoid;
     max-height: none;
-    page-break-inside: avoid;
   }
 
   /* Hide footer badges, keep the copyright text */
@@ -77,11 +77,11 @@
 
   /* Prevent awkward page breaks */
   h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid;
+    break-after: avoid;
   }
 
   img, figure, blockquote, pre {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   /* Hide the hero social links and "for hire" banner */
