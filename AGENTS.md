@@ -120,6 +120,7 @@ assets/css/
     _global.css                   Body, headings, anchor links
     _nav.css                      Fixed navbar, dropdowns, hover states
     _content.css                  Main body: links, images, figures, ToC, profile
+    _print.css                    Print stylesheet: hides navbar/UI, page numbering
   components/
     _cover.css                    Cover image for blog posts
     _hero.css                     Homepage hero section

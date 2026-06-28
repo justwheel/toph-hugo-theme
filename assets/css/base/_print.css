@@ -1,0 +1,119 @@
+/* ===[ Print stylesheet ]=== */
+
+@media print {
+  /* Remove the fixed navbar entirely */
+  .navbar {
+    display: none !important;
+  }
+
+  /* Remove the large top padding that compensates for the fixed navbar */
+  h1 {
+    padding-top: 1rem;
+  }
+
+  /* Use print-friendly colors */
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+
+  /* Ensure content uses full page width */
+  .container {
+    max-width: 100%;
+  }
+
+  /* Hide interactive and navigational elements */
+  .post-nav,
+  .carousel-control-prev,
+  .carousel-control-next,
+  .carousel-indicators,
+  .tweet-archive-modal,
+  .tweet-archive-link,
+  .tweet-archive-image-btn {
+    display: none !important;
+  }
+
+  /* Let tweet images display inline for print instead of as buttons */
+  .tweet-archive-images img {
+    max-height: none;
+    page-break-inside: avoid;
+  }
+
+  /* Hide footer badges, keep the copyright text */
+  footer .container-fluid:first-child {
+    display: none;
+  }
+
+  /* Remove footer background color for print */
+  footer #footer-box {
+    background-color: transparent;
+    color: #000;
+  }
+
+  footer #footer-box a {
+    color: #000;
+  }
+
+  /* Hide heading anchor links */
+  .hanchor {
+    display: none !important;
+  }
+
+  /* Show link URLs after anchors in the main content area */
+  main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    font-weight: normal;
+    word-break: break-all;
+  }
+
+  /* Do not show URLs for navigation or UI links */
+  nav a::after,
+  footer a::after,
+  .tweet-archive a::after,
+  .pagination a::after {
+    content: none !important;
+  }
+
+  /* Prevent awkward page breaks */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  img, figure, blockquote, pre {
+    page-break-inside: avoid;
+  }
+
+  /* Hide the hero social links and "for hire" banner */
+  .hero-links,
+  .for-hire {
+    display: none !important;
+  }
+
+  /* Hide pagination */
+  .pagination {
+    display: none !important;
+  }
+
+  /* Hide the projects carousel */
+  #projects-carousel {
+    display: none !important;
+  }
+}
+
+/* Page numbering for printed output.
+ * Uses CSS @page margin boxes to render "Page X of Y" centered
+ * at the bottom of every printed page. Supported in Chromium-based
+ * browsers (Chrome, Edge). Firefox ignores @page margin boxes
+ * entirely — users can enable page numbers via the browser's
+ * print dialog (Headers and Footers checkbox). */
+@page {
+  margin: 2cm;
+
+  @bottom-center {
+    content: "Page " counter(page) " of " counter(pages);
+    font-family: var(--default-font), sans-serif;
+    font-size: 0.75rem;
+    color: #767676;
+  }
+}

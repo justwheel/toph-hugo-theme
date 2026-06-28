@@ -32,6 +32,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 - First-class support for both Markdown and AsciiDoc content
 - [Search engine optimization](#search-engine-optimization): meta description, canonical URL, hreflang, structured data (WebSite, Person, Article, BreadcrumbList JSON-LD)
 - 404 page with localized "Return to homepage" link
+- [Print-friendly output](#print-stylesheet) with page numbering
 - [Easy customization of colors and fonts in Hugo configuration](#custom-colors-and-fonts)
 
 
@@ -449,6 +450,19 @@ Brand colors (`--primary`, `--secondary`, `--accent-color`) and fonts are set fr
 Both sets of variables coexist on `:root` without conflict.
 
 To add new CSS for a new component, create a new `_component-name.css` file in the appropriate directory and add an `@import` line to `main.css`.
+
+### Print stylesheet
+
+Toph includes a print stylesheet that produces clean, readable output when a page is printed or saved as PDF.
+No configuration is needed — the styles apply automatically via `@media print`.
+
+When printing:
+- The fixed navbar is hidden
+- Interactive elements (carousels, lightbox modals, heading anchors, pagination, post navigation) are removed
+- External link URLs are shown in parentheses after the link text
+- Colors are simplified to black text on a white background
+- Images and headings avoid breaking across page boundaries
+- Page numbers ("Page X of Y") appear at the bottom of each page (Chromium-based browsers; Firefox users can enable page numbers via the print dialog)
 
 ### Custom colors and fonts
 
