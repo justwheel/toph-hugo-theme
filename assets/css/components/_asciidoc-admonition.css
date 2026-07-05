@@ -34,28 +34,27 @@ main .admonitionblock td.icon {
   padding-top: 0.15rem;
 }
 
-/* Hide the text label; keep it accessible to screen readers */
+/* Visually hide the text label; keep it accessible to screen readers */
 main .admonitionblock td.icon .title {
-  background: none;
-  border: none;
-  border-radius: 0;
-  color: inherit;
-  font-size: 0;
-  line-height: 0;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
   overflow: hidden;
   padding: 0;
-  text-align: left;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 /* Bootstrap Icon via ::before pseudo-element */
-main .admonitionblock td.icon .title::before {
+main .admonitionblock td.icon::before {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   display: block;
   font-family: "bootstrap-icons";
   font-size: 1.25rem;
   line-height: 1;
-  speak: none;
 }
 
 /* Content cell */
@@ -87,7 +86,7 @@ main .admonitionblock td.content .paragraph:last-child p {
 /* --- Per-type colors and icons --- */
 
 /* Note (default set on base above) */
-main .admonitionblock.note td.icon .title::before {
+main .admonitionblock.note td.icon::before {
   color: var(--admonition-icon-note);
   content: "\f431"; /* bi-info-circle */
 }
@@ -98,7 +97,7 @@ main .admonitionblock.tip table {
   border-left-color: var(--admonition-border-tip);
 }
 
-main .admonitionblock.tip td.icon .title::before {
+main .admonitionblock.tip td.icon::before {
   color: var(--admonition-icon-tip);
   content: "\f46b"; /* bi-lightbulb */
 }
@@ -109,7 +108,7 @@ main .admonitionblock.warning table {
   border-left-color: var(--admonition-border-warning);
 }
 
-main .admonitionblock.warning td.icon .title::before {
+main .admonitionblock.warning td.icon::before {
   color: var(--admonition-icon-warning);
   content: "\f33b"; /* bi-exclamation-triangle */
 }
@@ -120,7 +119,7 @@ main .admonitionblock.caution table {
   border-left-color: var(--admonition-border-caution);
 }
 
-main .admonitionblock.caution td.icon .title::before {
+main .admonitionblock.caution td.icon::before {
   color: var(--admonition-icon-caution);
   content: "\f335"; /* bi-exclamation-diamond */
 }
@@ -131,7 +130,7 @@ main .admonitionblock.important table {
   border-left-color: var(--admonition-border-important);
 }
 
-main .admonitionblock.important td.icon .title::before {
+main .admonitionblock.important td.icon::before {
   color: var(--admonition-icon-important);
   content: "\f337"; /* bi-exclamation-octagon */
 }
@@ -147,7 +146,7 @@ main .admonitionblock.important td.icon .title::before {
     border-left-color: #555 !important;
   }
 
-  main .admonitionblock td.icon .title::before {
+  main .admonitionblock td.icon::before {
     color: #000 !important;
   }
 }
