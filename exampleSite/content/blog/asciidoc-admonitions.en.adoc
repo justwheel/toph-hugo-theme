@@ -1,7 +1,6 @@
 ---
 title: "AsciiDoc Admonition Support"
 date: 2026-07-05
-draft: false
 categories:
   - "features"
 tags:

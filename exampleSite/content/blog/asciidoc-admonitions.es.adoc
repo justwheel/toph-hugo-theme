@@ -1,0 +1,93 @@
+---
+title: "Compatibilidad con las admoniciones de AsciiDoc"
+date: 2026-07-05
+categories:
+  - "features"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "hugo"
+author: "Justin Wheeler"
+description: "Toph da estilo a los cinco tipos de admoniciones de AsciiDoc como tarjetas de aviso editoriales con colores e iconos distintivos."
+---
+
+AsciiDoc ofrece cinco tipos de admoniciones integrados para llamar la atención sobre contenido específico.
+Toph da estilo a cada tipo como una tarjeta de aviso refinada con un borde izquierdo de color, un fondo con tono suave y un icono.
+
+== Tipos de admoniciones
+
+AsciiDoc define cinco tipos de admoniciones, cada una con un propósito diferente.
+
+NOTE: Usa las notas para proporcionar contexto adicional o información complementaria que respalde el texto principal.
+
+TIP: Usa los consejos para compartir buenas prácticas, atajos o recomendaciones que ayuden al lector.
+
+WARNING: Usa las advertencias para alertar al lector sobre posibles problemas o dificultades que debe tener en cuenta.
+
+CAUTION: Usa las precauciones para señalar acciones que podrían causar daño, pérdida de datos o consecuencias no deseadas si se realizan sin cuidado.
+
+IMPORTANT: Usa las admoniciones importantes para resaltar información crítica que el lector no debe pasar por alto.
+
+== Admoniciones en bloque
+
+Las admoniciones también pueden abarcar varios párrafos usando la sintaxis de bloque de AsciiDoc.
+Esto es útil cuando el mensaje necesita más de una oración.
+
+[NOTE]
+====
+Las admoniciones en bloque usan la sintaxis delimitadora con cuatro signos de igual.
+Pueden contener varios párrafos, listas y otros elementos de AsciiDoc.
+
+Este es un segundo párrafo dentro de la misma admonición.
+====
+
+[TIP]
+====
+Al escribir documentación, considera qué tipo de admonición se ajusta mejor a tu mensaje.
+
+* **NOTE** para contexto complementario
+* **TIP** para consejos prácticos
+* **WARNING** para posibles dificultades
+* **CAUTION** para riesgo de daño o pérdida de datos
+* **IMPORTANT** para información crítica
+====
+
+[WARNING]
+====
+Las admoniciones deben usarse con moderación.
+El uso excesivo diluye su impacto y dificulta la lectura rápida del contenido.
+====
+
+== Sintaxis
+
+Hay dos formas de escribir admoniciones en AsciiDoc.
+
+=== Sintaxis en línea
+
+La forma más simple coloca la etiqueta de la admonición al principio de un párrafo:
+
+[source,asciidoc]
+----
+NOTE: Esta es una nota en línea.
+
+TIP: Este es un consejo en línea.
+----
+
+=== Sintaxis en bloque
+
+Para admoniciones de varios párrafos, usa el delimitador de bloque:
+
+[source,asciidoc]
+----
+[NOTE]
+====
+Primer párrafo de la admonición.
+
+Segundo párrafo de la admonición.
+====
+----
+
+== Más información
+
+* https://docs.asciidoctor.org/asciidoc/latest/blocks/admonitions/[Documentación de admoniciones de AsciiDoc]
+* https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/#admonitions[Referencia rápida de admoniciones]

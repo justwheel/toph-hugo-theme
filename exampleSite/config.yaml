@@ -173,11 +173,11 @@ params:
 defaultContentLang: en
 languages:
   ar:
-    disabled: true
     direction: rtl
     label: عربي
   en:
     label: English
   es:
-    disabled: true
     label: español
+  hi:
+    label: हिन्दी
