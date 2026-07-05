@@ -80,20 +80,20 @@
 .recent-featured,
 .recent-card {
   position: relative;
-  border-left: 4px solid var(--accent-color);
-  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+  border-inline-start: 4px solid var(--accent-color);
+  transition: background-color 0.15s ease, border-inline-start-color 0.15s ease;
 }
 
 .recent-featured:hover,
 .recent-card:hover {
   background-color: var(--bg-card-hover);
-  border-left-color: var(--primary);
+  border-inline-start-color: var(--primary);
 }
 
 .recent-featured:active,
 .recent-card:active {
   background-color: var(--bg-card-active);
-  border-left-color: var(--secondary);
+  border-inline-start-color: var(--secondary);
 }
 
 .recent-card-title {

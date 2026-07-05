@@ -54,10 +54,10 @@
 
 /* Post entries within the archive */
 .archive-posts .list-group-item {
-  border-left: 3px solid transparent;
-  transition: border-left-color 0.15s ease;
+  border-inline-start: 3px solid transparent;
+  transition: border-inline-start-color 0.15s ease;
 }
 
 .archive-posts .list-group-item:hover {
-  border-left-color: var(--primary);
+  border-inline-start-color: var(--primary);
 }

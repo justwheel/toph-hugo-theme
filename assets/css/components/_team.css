@@ -21,7 +21,7 @@
 .team-card {
   background: var(--bg-white);
   border: 1px solid var(--border-light);
-  border-left: 4px solid var(--accent-color);
+  border-inline-start: 4px solid var(--accent-color);
   border-radius: 4px;
   padding: 1.25rem;
   display: flex;
@@ -29,18 +29,18 @@
   align-items: center;
   text-align: center;
   position: relative;
-  transition: background-color 0.15s ease, border-left-color 0.15s ease, box-shadow 0.2s ease;
+  transition: background-color 0.15s ease, border-inline-start-color 0.15s ease, box-shadow 0.2s ease;
 }
 
 .team-card:hover {
   background-color: var(--bg-card-hover);
-  border-left-color: var(--primary);
+  border-inline-start-color: var(--primary);
   box-shadow: 0 4px 12px var(--shadow-card);
 }
 
 .team-card:active {
   background-color: var(--bg-card-active);
-  border-left-color: var(--secondary);
+  border-inline-start-color: var(--secondary);
 }
 
 /* Circular profile photo with grayscale filter */

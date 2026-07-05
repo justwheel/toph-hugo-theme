@@ -10,7 +10,7 @@ main .admonitionblock {
 main .admonitionblock table {
   background: var(--admonition-bg-note);
   border: none;
-  border-left: 4px solid var(--admonition-border-note);
+  border-inline-start: 4px solid var(--admonition-border-note);
   border-radius: 4px;
   display: flex;
   padding: 1rem 1.25rem;
@@ -30,7 +30,7 @@ main .admonitionblock td.icon {
   display: flex;
   flex-shrink: 0;
   padding: 0;
-  padding-right: 1rem;
+  padding-inline-end: 1rem;
   padding-top: 0.15rem;
 }
 
@@ -95,7 +95,7 @@ main .admonitionblock.note td.icon::before {
 /* Tip */
 main .admonitionblock.tip table {
   background: var(--admonition-bg-tip);
-  border-left-color: var(--admonition-border-tip);
+  border-inline-start-color: var(--admonition-border-tip);
 }
 
 main .admonitionblock.tip td.icon::before {
@@ -106,7 +106,7 @@ main .admonitionblock.tip td.icon::before {
 /* Warning */
 main .admonitionblock.warning table {
   background: var(--admonition-bg-warning);
-  border-left-color: var(--admonition-border-warning);
+  border-inline-start-color: var(--admonition-border-warning);
 }
 
 main .admonitionblock.warning td.icon::before {
@@ -117,7 +117,7 @@ main .admonitionblock.warning td.icon::before {
 /* Caution */
 main .admonitionblock.caution table {
   background: var(--admonition-bg-caution);
-  border-left-color: var(--admonition-border-caution);
+  border-inline-start-color: var(--admonition-border-caution);
 }
 
 main .admonitionblock.caution td.icon::before {
@@ -128,7 +128,7 @@ main .admonitionblock.caution td.icon::before {
 /* Important */
 main .admonitionblock.important table {
   background: var(--admonition-bg-important);
-  border-left-color: var(--admonition-border-important);
+  border-inline-start-color: var(--admonition-border-important);
 }
 
 main .admonitionblock.important td.icon::before {
@@ -144,7 +144,7 @@ main .admonitionblock.important td.icon::before {
 
   main .admonitionblock table {
     background: #fff !important;
-    border-left-color: #555 !important;
+    border-inline-start-color: #555 !important;
   }
 
   main .admonitionblock td.icon::before {

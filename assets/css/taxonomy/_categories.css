@@ -41,7 +41,7 @@
   gap: 1rem;
   background: var(--bg-white);
   border: 1px solid var(--border-light);
-  border-left: 4px solid var(--accent-color);
+  border-inline-start: 4px solid var(--accent-color);
   border-radius: 4px;
   padding: 1rem;
   height: 100%;
@@ -50,7 +50,7 @@
 
 .category-card-inner:hover {
   box-shadow: 0 4px 12px var(--shadow-card);
-  border-left-color: var(--primary);
+  border-inline-start-color: var(--primary);
 }
 
 /*

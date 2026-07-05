@@ -98,7 +98,7 @@
   .nav-hover-dropdown > .dropdown-menu {
     border: none;
     display: block;
-    padding-left: 1rem;
+    padding-inline-start: 1rem;
     position: static;
   }
 }

@@ -3,7 +3,7 @@
 .tweet-archive {
   background-color: var(--bg-white);
   border: 1px solid var(--border-card);
-  border-left: 4px solid var(--accent-color);
+  border-inline-start: 4px solid var(--accent-color);
   border-radius: 0.5rem;
   margin: 1.5rem auto;
   max-width: 550px;
