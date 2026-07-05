@@ -43,3 +43,20 @@ nav:
 shadow:
   navbar: "rgba(0, 0, 0, 0.2)"
   card: "rgba(0, 0, 0, 0.08)"
+
+admonition:
+  bg-note: "#f0f4f8"
+  bg-tip: "#f0f6f0"
+  bg-warning: "#fef7ed"
+  bg-caution: "#fef2f0"
+  bg-important: "#f4f0f8"
+  border-note: "#8ba4b8"
+  border-tip: "#7da47d"
+  border-warning: "#c9a048"
+  border-caution: "#c07060"
+  border-important: "#8a70a8"
+  icon-note: "#5a7d99"
+  icon-tip: "#4a7a4a"
+  icon-warning: "#9a7830"
+  icon-caution: "#a05040"
+  icon-important: "#6a4a8a"

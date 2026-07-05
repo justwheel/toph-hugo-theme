@@ -1,0 +1,94 @@
+---
+title: "AsciiDoc Admonition Support"
+date: 2026-07-05
+draft: false
+categories:
+  - "features"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "hugo"
+author: "Justin Wheeler"
+description: "Toph styles all five AsciiDoc admonition types as editorial callout cards with distinct colors and icons."
+---
+
+AsciiDoc provides five built-in admonition types for drawing attention to specific content.
+Toph styles each type as a refined callout card with a color-coded left border, tinted background, and icon.
+
+== Admonition types
+
+AsciiDoc defines five admonition types, each for a different purpose.
+
+NOTE: Use notes to provide additional context or supplementary information that supports the main text.
+
+TIP: Use tips to share best practices, shortcuts, or recommendations that help the reader.
+
+WARNING: Use warnings to alert the reader about potential problems or pitfalls they should be aware of.
+
+CAUTION: Use cautions to flag actions that could cause harm, data loss, or unintended consequences if done carelessly.
+
+IMPORTANT: Use important admonitions to highlight critical information the reader must not overlook.
+
+== Block admonitions
+
+Admonitions can also span multiple paragraphs using AsciiDoc's block syntax.
+This is useful when the message needs more than a single sentence.
+
+[NOTE]
+====
+Block admonitions use the delimiter syntax with four equals signs.
+They can contain multiple paragraphs, lists, and other AsciiDoc elements.
+
+This is a second paragraph inside the same admonition block.
+====
+
+[TIP]
+====
+When writing documentation, consider which admonition type best fits your message.
+
+* **NOTE** for supplementary context
+* **TIP** for actionable advice
+* **WARNING** for potential pitfalls
+* **CAUTION** for risk of harm or data loss
+* **IMPORTANT** for critical information
+====
+
+[WARNING]
+====
+Admonitions should be used sparingly.
+Overusing them dilutes their impact and makes content harder to scan.
+====
+
+== Syntax
+
+There are two ways to write admonitions in AsciiDoc.
+
+=== Inline syntax
+
+The simplest form places the admonition label at the start of a paragraph:
+
+[source,asciidoc]
+----
+NOTE: This is an inline note admonition.
+
+TIP: This is an inline tip admonition.
+----
+
+=== Block syntax
+
+For multi-paragraph admonitions, use the block delimiter:
+
+[source,asciidoc]
+----
+[NOTE]
+====
+First paragraph of the admonition.
+
+Second paragraph of the admonition.
+====
+----
+
+== Learn more
+
+* https://docs.asciidoctor.org/asciidoc/latest/blocks/admonitions/[AsciiDoc Admonition Documentation]
+* https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/#admonitions[Admonition Quick Reference]
