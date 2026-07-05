@@ -11,8 +11,18 @@
       .Text    — the heading text content
       .Page    — the current page object
 
+    The whole <a> tag is built as a single pre-escaped string via
+    printf + safeHTML rather than a normal href="#{{ .Anchor }}"
+    attribute. Go's html/template treats href as a URL context and
+    percent-encodes non-ASCII bytes there, while id="{{ .Anchor }}"
+    is a plain attribute and stays literal UTF-8 — for non-Latin
+    heading text those diverge into two different encodings of the
+    same string, so the link and its target never match. Building
+    the tag as one already-escaped blob sidesteps that per-attribute
+    escaping entirely, keeping href and id byte-identical.
+
     This hook only applies to Markdown content. AsciiDoc headings are
     handled separately via replaceRE in single.html, using the same
     CSS class (hanchor) for a consistent visual result.
 */}}
-<h{{ .Level }} id="{{ .Anchor }}">{{ .Text | safeHTML }}&nbsp;<a class="hanchor" href="#{{ .Anchor }}" aria-label="Anchor link for: {{ .Text | plainify }}">🔗</a></h{{ .Level }}>
+<h{{ .Level }} id="{{ .Anchor }}">{{ .Text | safeHTML }}&nbsp;{{ printf `<a class="hanchor" href="#%s" aria-label="Anchor link for: %s">🔗</a>` (.Anchor | htmlEscape) (.Text | plainify | htmlEscape) | safeHTML }}</h{{ .Level }}>
