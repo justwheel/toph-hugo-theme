@@ -63,7 +63,7 @@ menu:
   nav:
     - identifier: home
       name: home
-      url: /
+      pageRef: /
       weight: 10
     - identifier: about
       name: about me
@@ -71,20 +71,20 @@ menu:
       weight: 20
     - identifier: team
       name: fellow leaders
-      url: /team/
+      pageRef: /team
       weight: 30
     - identifier: blog
       name: blog
-      url: /blog/
+      pageRef: /blog
       weight: 40
     - identifier: categories
       name: categories
-      url: /categories/
+      pageRef: /categories
       parent: blog
       weight: 10
     - identifier: tags
       name: tags
-      url: /tags/
+      pageRef: /tags
       parent: blog
       weight: 20
 
@@ -179,7 +179,7 @@ languages:
       nav:
         - identifier: home
           name: الرئيسية
-          url: /ar/
+          pageRef: /
           weight: 10
         - identifier: about
           name: نبذة عني
@@ -187,20 +187,20 @@ languages:
           weight: 20
         - identifier: team
           name: قادة رفاق
-          url: /ar/team/
+          pageRef: /team
           weight: 30
         - identifier: blog
           name: المدونة
-          url: /ar/blog/
+          pageRef: /blog
           weight: 40
         - identifier: categories
           name: الفئات
-          url: /ar/categories/
+          pageRef: /categories
           parent: blog
           weight: 10
         - identifier: tags
           name: الوسوم
-          url: /ar/tags/
+          pageRef: /tags
           parent: blog
           weight: 20
   en:
@@ -211,7 +211,7 @@ languages:
       nav:
         - identifier: home
           name: inicio
-          url: /es/
+          pageRef: /
           weight: 10
         - identifier: about
           name: sobre mí
@@ -219,20 +219,20 @@ languages:
           weight: 20
         - identifier: team
           name: compañeros líderes
-          url: /es/team/
+          pageRef: /team
           weight: 30
         - identifier: blog
           name: blog
-          url: /es/blog/
+          pageRef: /blog
           weight: 40
         - identifier: categories
           name: categorías
-          url: /es/categories/
+          pageRef: /categories
           parent: blog
           weight: 10
         - identifier: tags
           name: etiquetas
-          url: /es/tags/
+          pageRef: /tags
           parent: blog
           weight: 20
   hi:
@@ -241,7 +241,7 @@ languages:
       nav:
         - identifier: home
           name: होम
-          url: /hi/
+          pageRef: /
           weight: 10
         - identifier: about
           name: मेरे बारे में
@@ -249,19 +249,19 @@ languages:
           weight: 20
         - identifier: team
           name: साथी नेता
-          url: /hi/team/
+          pageRef: /team
           weight: 30
         - identifier: blog
           name: ब्लॉग
-          url: /hi/blog/
+          pageRef: /blog
           weight: 40
         - identifier: categories
           name: श्रेणियां
-          url: /hi/categories/
+          pageRef: /categories
           parent: blog
           weight: 10
         - identifier: tags
           name: टैग
-          url: /hi/tags/
+          pageRef: /tags
           parent: blog
           weight: 20
