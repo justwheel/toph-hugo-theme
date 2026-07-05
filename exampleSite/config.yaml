@@ -175,9 +175,93 @@ languages:
   ar:
     direction: rtl
     label: عربي
+    menu:
+      nav:
+        - identifier: home
+          name: الرئيسية
+          url: /ar/
+          weight: 10
+        - identifier: about
+          name: نبذة عني
+          url: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
+          weight: 20
+        - identifier: team
+          name: قادة رفاق
+          url: /ar/team/
+          weight: 30
+        - identifier: blog
+          name: المدونة
+          url: /ar/blog/
+          weight: 40
+        - identifier: categories
+          name: الفئات
+          url: /ar/categories/
+          parent: blog
+          weight: 10
+        - identifier: tags
+          name: الوسوم
+          url: /ar/tags/
+          parent: blog
+          weight: 20
   en:
     label: English
   es:
     label: español
+    menu:
+      nav:
+        - identifier: home
+          name: inicio
+          url: /es/
+          weight: 10
+        - identifier: about
+          name: sobre mí
+          url: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
+          weight: 20
+        - identifier: team
+          name: compañeros líderes
+          url: /es/team/
+          weight: 30
+        - identifier: blog
+          name: blog
+          url: /es/blog/
+          weight: 40
+        - identifier: categories
+          name: categorías
+          url: /es/categories/
+          parent: blog
+          weight: 10
+        - identifier: tags
+          name: etiquetas
+          url: /es/tags/
+          parent: blog
+          weight: 20
   hi:
     label: हिन्दी
+    menu:
+      nav:
+        - identifier: home
+          name: होम
+          url: /hi/
+          weight: 10
+        - identifier: about
+          name: मेरे बारे में
+          url: https://kinginstitute.stanford.edu/encyclopedia/clark-septima-poinsette
+          weight: 20
+        - identifier: team
+          name: साथी नेता
+          url: /hi/team/
+          weight: 30
+        - identifier: blog
+          name: ब्लॉग
+          url: /hi/blog/
+          weight: 40
+        - identifier: categories
+          name: श्रेणियां
+          url: /hi/categories/
+          parent: blog
+          weight: 10
+        - identifier: tags
+          name: टैग
+          url: /hi/tags/
+          parent: blog
+          weight: 20
