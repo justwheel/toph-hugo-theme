@@ -36,6 +36,9 @@
 .terms-sort-btn:last-child {
   border-start-end-radius: 4px;
   border-end-end-radius: 4px;
+}
+
+.terms-sort-btn:not(:first-child) {
   border-inline-start: none;
 }
 
