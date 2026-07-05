@@ -1,0 +1,87 @@
+---
+title: "التدوين باستخدام AsciiDoc في Toph"
+date: 2026-03-23
+draft: false
+categories:
+  - "announcements"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "hugo"
+author: "Toph Development Team"
+description: "يُعد AsciiDoc تنسيق محتوى من الدرجة الأولى في Toph. إليك كيفية استخدامه لمقالات المدونة."
+---
+
+يتعامل Toph مع AsciiDoc باعتباره تنسيق محتوى من الدرجة الأولى.
+كل ما يعمل مع Markdown يعمل أيضًا مع AsciiDoc — شارات التصنيف، وبيانات المقالة الوصفية، وصور الغلاف، ومراسي العناوين، والتنقل.
+
+== لماذا AsciiDoc؟
+
+يوفر AsciiDoc ميزات لا يوفرها Markdown:
+
+* جدول محتويات أصلي باستخدام خاصية المستند `:toc:`
+* كتل التنبيهات (NOTE، TIP، WARNING، IMPORTANT، CAUTION)
+* توجيهات التضمين لإعادة استخدام المحتوى عبر الصفحات
+* دعم مدمج للجداول المعقدة والقوائم المتداخلة
+
+إذا كنت مرتاحًا بالفعل للكتابة بلغة AsciiDoc، فإن Toph سيلبي احتياجاتك دون أي تنازلات.
+
+== إنشاء مقالة بصيغة AsciiDoc
+
+أنشئ ملفًا بامتداد `.adoc` في دليل مدونتك:
+
+[source,bash]
+----
+hugo new blog/my-post.adoc
+----
+
+أضف الواجهة الأمامية (front matter) بصيغة YAML في أعلى الملف، متبوعة بمحتوى AsciiDoc:
+
+[source,asciidoc]
+----
+---
+title: "عنوان مقالتي"
+date: 2026-01-15
+draft: false
+categories:
+  - "tech"
+tags:
+  - "hugo"
+  - "asciidoc"
+author: "اسم الكاتب"
+description: "ملخص قصير للمقالة."
+---
+
+يبدأ محتوى AsciiDoc الخاص بك من هنا.
+----
+
+== جدول المحتويات
+
+لتفعيل جدول المحتويات، أضف الخاصية `:toc:` بعد الواجهة الأمامية:
+
+[source,asciidoc]
+----
+---
+title: "عنوان مقالتي"
+toc: true
+---
+:toc:
+
+== القسم الأول
+----
+
+ينسّق CSS الخاص بـ Toph جدول المحتويات الذي ينشئه AsciiDoc بنفس طريقة خيار `toc: true` في الواجهة الأمامية لـ Markdown.
+ينتج كلا التنسيقين نفس النتيجة المرئية.
+
+== مراسي العناوين
+
+تظهر روابط مرساة قابلة للنقر (🔗) عند تمرير المؤشر فوق جميع عناوين الأقسام.
+بالنسبة لـ Markdown، يتم التعامل مع هذا عبر خطاف عرض (render hook).
+بالنسبة لـ AsciiDoc، يقوم Toph بحقن نفس ترميز المرساة عبر معالجة القوالب.
+ينتج كلا التنسيقين نتائج متطابقة.
+
+== لمعرفة المزيد
+
+* https://docs.asciidoctor.org/asciidoc/latest/[توثيق لغة AsciiDoc]
+* https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[مرجع سريع لصيغة AsciiDoc]
+* https://gohugo.io/content-management/formats/#asciidoc[دعم Hugo لـ AsciiDoc]

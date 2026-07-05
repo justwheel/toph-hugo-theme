@@ -1,0 +1,87 @@
+---
+title: "Blogging con AsciiDoc en Toph"
+date: 2026-03-23
+draft: false
+categories:
+  - "announcements"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "hugo"
+author: "Toph Development Team"
+description: "AsciiDoc es un formato de contenido de primera clase en Toph. Así es como usarlo para publicaciones de blog."
+---
+
+Toph trata a AsciiDoc como un formato de contenido de primera clase.
+Todo lo que funciona con Markdown también funciona con AsciiDoc: insignias de taxonomía, metadatos de publicaciones, imágenes de portada, anclas de encabezado y navegación.
+
+== ¿Por qué AsciiDoc?
+
+AsciiDoc ofrece funciones que Markdown no tiene:
+
+* Tabla de contenido nativa con el atributo de documento `:toc:`
+* Bloques de admonición (NOTE, TIP, WARNING, IMPORTANT, CAUTION)
+* Directivas de inclusión para reutilizar contenido entre páginas
+* Soporte integrado para tablas complejas y listas anidadas
+
+Si ya te sientes cómodo escribiendo en AsciiDoc, Toph atenderá tus necesidades sin compromisos.
+
+== Crear una publicación en AsciiDoc
+
+Crea un archivo con la extensión `.adoc` en tu directorio de blog:
+
+[source,bash]
+----
+hugo new blog/my-post.adoc
+----
+
+Añade el front matter en YAML al principio del archivo, seguido del contenido en AsciiDoc:
+
+[source,asciidoc]
+----
+---
+title: "Título de mi publicación"
+date: 2026-01-15
+draft: false
+categories:
+  - "tech"
+tags:
+  - "hugo"
+  - "asciidoc"
+author: "Nombre del autor"
+description: "Un breve resumen de la publicación."
+---
+
+Tu contenido en AsciiDoc comienza aquí.
+----
+
+== Tabla de contenido
+
+Para habilitar una tabla de contenido, añade el atributo `:toc:` después del front matter:
+
+[source,asciidoc]
+----
+---
+title: "Título de mi publicación"
+toc: true
+---
+:toc:
+
+== Primera sección
+----
+
+El CSS de Toph da estilo a la tabla de contenido generada por AsciiDoc de forma idéntica a la opción `toc: true` del front matter de Markdown.
+Ambos formatos producen el mismo resultado visual.
+
+== Anclas de encabezado
+
+Aparecen enlaces de anclaje en los que se puede hacer clic (🔗) al pasar el cursor sobre todos los encabezados de sección.
+Para Markdown, esto se gestiona mediante un render hook.
+Para AsciiDoc, Toph inyecta el mismo marcado de anclaje mediante el procesamiento de plantillas.
+Ambos formatos producen resultados idénticos.
+
+== Más información
+
+* https://docs.asciidoctor.org/asciidoc/latest/[Documentación del lenguaje AsciiDoc]
+* https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[Referencia rápida de sintaxis de AsciiDoc]
+* https://gohugo.io/content-management/formats/#asciidoc[Compatibilidad de Hugo con AsciiDoc]
