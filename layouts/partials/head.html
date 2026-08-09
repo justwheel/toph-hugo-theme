@@ -33,9 +33,11 @@
     {{- end }}
 
     {{ "<!-- colors and fonts from Hugo config -->" | safeHTML }}
-    {{- $color_primary := $.Param "colors.primary" -}}
-    {{- $color_secondary := $.Param "colors.secondary" -}}
-    {{- $color_accent := $.Param "colors.accent" -}}
+    {{- $mode := site.Params.color_mode | default "auto" -}}
+    {{- $color_primary := $.Param "colors.light.primary" -}}
+    {{- $color_secondary := $.Param "colors.light.secondary" -}}
+    {{- $color_accent := $.Param "colors.light.accent" -}}
+    {{- $color_background := $.Param "colors.light.background" -}}
     {{- $font_default := $.Param "fonts.default" -}}
     {{- $font_default_weight := $.Param "fonts.default_weight" -}}
     {{- $font_title := $.Param "fonts.title" | default "Arial" -}}
@@ -48,13 +50,16 @@
         "primary" $color_primary
         "secondary" $color_secondary
         "accent-color" $color_accent
+        "background" $color_background
+        "primary-text" $color_primary
+        "accent-text" $color_accent
         "default-font" (css.Quoted $font_default)
         "title-font" (css.Quoted $font_title)
         "header-font" (css.Quoted $font_header)
     -}}
     {{- $neutral := dict -}}
     {{- range $group, $entries := hugo.Data.style -}}
-        {{- range $key, $val := $entries -}}
+        {{- range $key, $val := (index $entries "light") -}}
             {{- $neutral = merge $neutral (dict (printf "%s-%s" $group $key) $val) -}}
         {{- end -}}
     {{- end -}}

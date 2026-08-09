@@ -1,9 +1,16 @@
 # Neutral/utility CSS custom properties for the Toph theme.
 #
-# Each top-level key is a group. Keys are flattened to CSS variable
-# names by joining group and key with a hyphen:
-#   text.body → --text-body
-#   bg.card-hover → --bg-card-hover
+# Each top-level key is a group; each group has a `light:` and `dark:`
+# tree of the same keys. Keys are flattened to CSS variable names by
+# joining group and key with a hyphen:
+#   text.light.body → --text-body (in the base :root block)
+#   text.dark.body  → --text-body (in the :root[data-bs-theme="dark"] block)
+#
+# Dark values are derived from light values via color-mix(), computed
+# once and stored as literal hex here (not as live color-mix() strings)
+# to keep this file's format uniform — these are fixed theme values,
+# not per-site config, so there's no runtime-adjustability benefit to
+# live computation the way there is for brand colors in head.html.
 #
 # Brand colors and fonts are set per-site via Hugo config
 # (params.colors, params.fonts). Hugo injects all values into the
@@ -14,49 +21,97 @@
 # site data files, with the site taking precedence.
 
 text:
-  body: "#330000"
-  muted: "#555"
-  secondary: "#767676"
-  link: "#003366"
-  link-hover: "#003d82"
-  anchor: "#959083"
+  light:
+    body: "#330000"
+    muted: "#555"
+    secondary: "#767676"
+    link: "#003366"
+    link-hover: "#003d82"
+    anchor: "#959083"
+  dark:
+    body: "#998080"
+    muted: "#858585"
+    secondary: "#848484"
+    link: "#6987A5"
+    link-hover: "#6187B2"
+    anchor: "#959083"
 
 border:
-  light: "#e0ddd5"
-  medium: "#d0cdc5"
-  lighter: "#e8e5dd"
-  toc: "#a2a9b1"
+  light:
+    light: "#e0ddd5"
+    medium: "#d0cdc5"
+    lighter: "#e8e5dd"
+    toc: "#a2a9b1"
+  dark:
+    light: "#706E6A"
+    medium: "#686662"
+    lighter: "#74726E"
+    toc: "#515458"
 
 bg:
-  white: "#fff"
-  toc: "#f8f9fa"
-  caption: "#faf9f6"
-  hover: "#f5f4f0"
-  card-hover: "#f5f0fa"
-  card-active: "#ece4f4"
-  modal-overlay: "rgba(0, 0, 0, 0.95)"
+  light:
+    white: "#fff"
+    toc: "#f8f9fa"
+    caption: "#faf9f6"
+    hover: "#f5f4f0"
+    card-hover: "#f5f0fa"
+    card-active: "#ece4f4"
+    modal-overlay: "rgba(0, 0, 0, 0.95)"
+  dark:
+    white: "#1F1F1F"
+    toc: "#1E1E1E"
+    caption: "#1E1E1E"
+    hover: "#2C2C2B"
+    card-hover: "#2C2B2D"
+    card-active: "#2A292C"
+    modal-overlay: "rgba(0, 0, 0, 0.95)"
 
 nav:
-  hover-bg: royalblue
-  hover-decoration: skyblue
+  light:
+    hover-bg: royalblue
+    hover-decoration: skyblue
+  dark:
+    hover-bg: royalblue
+    hover-decoration: skyblue
 
 shadow:
-  navbar: "rgba(0, 0, 0, 0.2)"
-  card: "rgba(0, 0, 0, 0.08)"
+  light:
+    navbar: "rgba(0, 0, 0, 0.2)"
+    card: "rgba(0, 0, 0, 0.08)"
+  dark:
+    navbar: "rgba(0, 0, 0, 0.5)"
+    card: "rgba(0, 0, 0, 0.3)"
 
 admonition:
-  bg-note: "#f0f4f8"
-  bg-tip: "#f0f6f0"
-  bg-warning: "#fef7ed"
-  bg-caution: "#fef2f0"
-  bg-important: "#f4f0f8"
-  border-note: "#8ba4b8"
-  border-tip: "#7da47d"
-  border-warning: "#c9a048"
-  border-caution: "#c07060"
-  border-important: "#8a70a8"
-  icon-note: "#5a7d99"
-  icon-tip: "#4a7a4a"
-  icon-warning: "#9a7830"
-  icon-caution: "#a05040"
-  icon-important: "#6a4a8a"
+  light:
+    bg-note: "#f0f4f8"
+    bg-tip: "#f0f6f0"
+    bg-warning: "#fef7ed"
+    bg-caution: "#fef2f0"
+    bg-important: "#f4f0f8"
+    border-note: "#8ba4b8"
+    border-tip: "#7da47d"
+    border-warning: "#c9a048"
+    border-caution: "#c07060"
+    border-important: "#8a70a8"
+    icon-note: "#5a7d99"
+    icon-tip: "#4a7a4a"
+    icon-warning: "#9a7830"
+    icon-caution: "#a05040"
+    icon-important: "#6a4a8a"
+  dark:
+    bg-note: "#1a2530"
+    bg-tip: "#1a2419"
+    bg-warning: "#2e2415"
+    bg-caution: "#2e1b17"
+    bg-important: "#241f2e"
+    border-note: "#AEBFCD"
+    border-tip: "#A4BFA4"
+    border-warning: "#D9BC7F"
+    border-caution: "#D39B90"
+    border-important: "#AD9BC2"
+    icon-note: "#8CA4B8"
+    icon-tip: "#80A280"
+    icon-warning: "#B8A06E"
+    icon-caution: "#BC8479"
+    icon-important: "#9780AD"

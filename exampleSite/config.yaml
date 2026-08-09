@@ -108,9 +108,11 @@ params:
       "United States"
     ]
   colors:
-    primary: "#8c1515"
-    secondary: "#ffffff"
-    accent: "#696349"
+    light:
+      primary: "#8c1515"
+      secondary: "#ffffff"
+      accent: "#696349"
+      background: "#ffffff"
   description: Honorary biography page of Septima Clark, a Civil Rights Movement pioneer and activist.
   fonts:
     default: Lato
