@@ -2,7 +2,7 @@
 
 .tweet-archive {
   background-color: var(--bg-white);
-  border: 1px solid var(--border-card);
+  border: 1px solid var(--border-light);
   border-inline-start: 4px solid var(--accent-color);
   border-radius: 0.5rem;
   margin: 1.5rem auto;
@@ -135,7 +135,7 @@
 .tweet-archive-footer {
   align-items: center;
   border: none;
-  border-top: 1px solid var(--border-card);
+  border-top: 1px solid var(--border-light);
   display: flex;
   font-style: normal;
   justify-content: space-between;
@@ -148,7 +148,7 @@
 }
 
 .tweet-archive-link {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-size: 0.8rem;
   text-decoration: none;
 }

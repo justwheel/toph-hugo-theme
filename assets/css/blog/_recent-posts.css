@@ -21,7 +21,7 @@
 
 .recent-featured-label {
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 0.25rem;
@@ -31,14 +31,14 @@
   display: block;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.15em;
 }
 
 .recent-featured-title:hover {
-  color: var(--accent-color);
+  color: var(--accent-text);
   text-decoration-thickness: 3px;
 }
 
@@ -99,12 +99,12 @@
 .recent-card-title {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: none;
 }
 
 .recent-card-title:hover {
-  color: var(--accent-color);
+  color: var(--accent-text);
   text-decoration: underline;
 }
 
@@ -145,14 +145,14 @@
 }
 
 .recent-view-all a {
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-size: 0.9rem;
   text-decoration: none;
   border-bottom: 1px dashed var(--accent-color);
 }
 
 .recent-view-all a:hover {
-  color: var(--primary);
+  color: var(--primary-text);
   border-bottom-color: var(--primary);
 }
 

@@ -99,14 +99,14 @@
 }
 
 .category-card-header h2 a {
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.15em;
 }
 
 .category-card-header h2 a:hover {
-  color: var(--accent-color);
+  color: var(--accent-text);
   text-decoration-thickness: 3px;
 }
 
@@ -152,7 +152,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent-color);
+  color: var(--accent-text);
   margin-bottom: 0.5rem;
 }
 
@@ -173,7 +173,7 @@
 }
 
 .category-card-recent li a:hover {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .category-card-recent time {

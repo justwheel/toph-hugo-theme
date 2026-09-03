@@ -96,7 +96,7 @@
 .tag-cloud-item {
   display: inline-block;
   text-decoration: none;
-  color: var(--primary);
+  color: var(--primary-text);
   opacity: var(--tag-opacity, 1);
   padding: 0.2rem 0.6rem;
   border: 1px solid var(--primary);

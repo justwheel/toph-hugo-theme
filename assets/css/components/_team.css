@@ -66,14 +66,14 @@
 }
 
 main .team-card-name a {
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.15em;
 }
 
 main .team-card-name a:hover {
-  color: var(--accent-color);
+  color: var(--accent-text);
   text-decoration-thickness: 3px;
 }
 
@@ -90,7 +90,7 @@ main .team-card-name a::after {
 /* Role descriptor */
 .team-card-role {
   font-size: 0.85rem;
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;

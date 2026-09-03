@@ -35,13 +35,13 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent-color);
+  color: var(--accent-text);
   margin-bottom: 0.25rem;
 }
 
 /* Post title in the nav link */
 .post-nav-title {
-  color: var(--primary);
+  color: var(--primary-text);
   font-family: var(--header-font), serif;
   font-size: 1rem;
 }
