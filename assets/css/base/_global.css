@@ -1,7 +1,7 @@
 /* ===[ Global styling ]=== */
 
 body {
-  background-color: var(--secondary);
+  background-color: var(--background);
   color: var(--text-body);
   font-family: var(--default-font), sans-serif;
 }
@@ -41,19 +41,19 @@ h6:hover .hanchor {
 }
 
 .hanchor:hover {
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 h2, h3, h4, #toctitle { font-family: var(--header-font), serif; }
 
 h1 {
-  color: var(--primary);
+  color: var(--primary-text);
   overflow-wrap: break-word;
   padding-bottom: 3rem;
   padding-top: 7rem;
 }
 
-h2, h4, #toctitle { color: var(--accent-color); }
+h2, h4, #toctitle { color: var(--accent-text); }
 
 /* Fluid heading sizes — scales smoothly across all viewport widths.
  * clamp(min, preferred, max) avoids the hard jump at 600px that the
