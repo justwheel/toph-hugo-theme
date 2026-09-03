@@ -136,6 +136,53 @@ main .admonitionblock.important td.icon::before {
   content: "\f337"; /* bi-exclamation-octagon */
 }
 
+/* --- Dark mode --- */
+
+[data-bs-theme="dark"] main .admonitionblock table {
+  background: var(--admonition-bg-note);
+  border-inline-start-color: var(--admonition-border-note);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.note td.icon::before {
+  color: var(--admonition-icon-note);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.tip table {
+  background: var(--admonition-bg-tip);
+  border-inline-start-color: var(--admonition-border-tip);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.tip td.icon::before {
+  color: var(--admonition-icon-tip);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.warning table {
+  background: var(--admonition-bg-warning);
+  border-inline-start-color: var(--admonition-border-warning);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.warning td.icon::before {
+  color: var(--admonition-icon-warning);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.caution table {
+  background: var(--admonition-bg-caution);
+  border-inline-start-color: var(--admonition-border-caution);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.caution td.icon::before {
+  color: var(--admonition-icon-caution);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.important table {
+  background: var(--admonition-bg-important);
+  border-inline-start-color: var(--admonition-border-important);
+}
+
+[data-bs-theme="dark"] main .admonitionblock.important td.icon::before {
+  color: var(--admonition-icon-important);
+}
+
 /* --- Print --- */
 @media print {
   main .admonitionblock {
