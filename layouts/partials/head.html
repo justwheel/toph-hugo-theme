@@ -33,7 +33,6 @@
     {{- end }}
 
     {{ "<!-- colors and fonts from Hugo config -->" | safeHTML }}
-    {{- $mode := site.Params.color_mode | default "auto" -}}
     {{- $color_primary := $.Param "colors.light.primary" -}}
     {{- $color_secondary := $.Param "colors.light.secondary" -}}
     {{- $color_accent := $.Param "colors.light.accent" -}}

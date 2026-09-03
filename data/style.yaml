@@ -6,11 +6,14 @@
 #   text.light.body → --text-body (in the base :root block)
 #   text.dark.body  → --text-body (in the :root[data-bs-theme="dark"] block)
 #
-# Dark values are derived from light values via color-mix(), computed
-# once and stored as literal hex here (not as live color-mix() strings)
-# to keep this file's format uniform — these are fixed theme values,
-# not per-site config, so there's no runtime-adjustability benefit to
-# live computation the way there is for brand colors in head.html.
+# Most dark values are derived from their light peers via color-mix(),
+# computed once and stored as literal hex here (not as live color-mix()
+# strings) to keep this file's format uniform — these are fixed theme
+# values, not per-site config, so there's no runtime-adjustability
+# benefit to live computation the way there is for brand colors in
+# head.html. A few values are intentionally shared unchanged between
+# light and dark (text.anchor, nav.*, bg.modal-overlay) because they
+# already meet contrast on both backgrounds.
 #
 # Brand colors and fonts are set per-site via Hugo config
 # (params.colors, params.fonts). Hugo injects all values into the
@@ -18,7 +21,10 @@
 #
 # To override a value for your site, create a matching
 # data/style.yaml in your site root — Hugo merges theme and
-# site data files, with the site taking precedence.
+# site data files, with the site taking precedence. Overrides must
+# use the same light:/dark: nesting (e.g. text.light.body), not a
+# flat text.body key — the stylesheet only reads values under each
+# group's light:/dark: subtree, so a flat override is silently ignored.
 
 text:
   light:
