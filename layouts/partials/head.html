@@ -36,7 +36,7 @@
     {{- $color_primary := $.Param "colors.light.primary" -}}
     {{- $color_secondary := $.Param "colors.light.secondary" -}}
     {{- $color_accent := $.Param "colors.light.accent" -}}
-    {{- $color_background := $.Param "colors.light.background" -}}
+    {{- $color_background := $.Param "colors.light.background" | default $color_secondary -}}
     {{- $font_default := $.Param "fonts.default" -}}
     {{- $font_default_weight := $.Param "fonts.default_weight" -}}
     {{- $font_title := $.Param "fonts.title" | default "Arial" -}}
