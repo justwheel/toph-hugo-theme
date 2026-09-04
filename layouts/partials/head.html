@@ -4,6 +4,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     {{ hugo.Generator }}
 
+    {{- $color_mode := site.Params.color_mode | default "auto" -}}
+    {{- if eq $color_mode "auto" }}
+    {{ "<!-- dark-mode: set data-bs-theme before first paint to prevent FOUC -->" | safeHTML }}
+    <script>
+    (function() {
+        try {
+            var stored = localStorage.getItem('theme');
+            var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        } catch (e) {}
+    })();
+    </script>
+    {{- end }}
+
     {{ if .IsHome }}
     <title>{{ site.Title }}{{ with site.Params.biography.tagline }} — {{ . }}{{ end }}</title>
     {{ else }}
@@ -67,6 +81,48 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}">
+
+    {{- if ne $color_mode "light" }}
+    {{ "<!-- dark mode overrides -->" | safeHTML }}
+    {{- $color_primary_dark := $.Param "colors.dark.primary" | default $color_primary -}}
+    {{- $color_secondary_dark := $.Param "colors.dark.secondary" | default $color_secondary -}}
+    {{- $color_accent_dark := $.Param "colors.dark.accent" | default $color_accent -}}
+    {{- $color_background_dark := $.Param "colors.dark.background" | default "#121212" -}}
+    {{/* -text roles reference var(--primary)/var(--accent-color) so they track the
+         dark brand color at runtime (color-mix is resolved by the browser, not Hugo). */}}
+    {{- $brand_dark := dict
+        "primary" $color_primary_dark
+        "secondary" $color_secondary_dark
+        "accent-color" $color_accent_dark
+        "background" $color_background_dark
+        "primary-text" "color-mix(in srgb, var(--primary) 60%, white)"
+        "accent-text" "color-mix(in srgb, var(--accent-color) 60%, white)"
+    -}}
+    {{- $neutral_dark := dict -}}
+    {{- range $group, $entries := hugo.Data.style -}}
+        {{- range $key, $val := (index $entries "dark") -}}
+            {{- $neutral_dark = merge $neutral_dark (dict (printf "%s-%s" $group $key) $val) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $vars_dark := merge $brand_dark $neutral_dark -}}
+    {{/* Flatten the dark vars once so both the attribute block and the no-JS
+         media-query fallback below emit an identical declaration list. */}}
+    {{- $decls := "" -}}
+    {{- range $key, $val := $vars_dark -}}
+        {{- $decls = printf "%s\n      --%s: %s;" $decls $key $val -}}
+    {{- end -}}
+    <style>:root[data-bs-theme="dark"] {
+{{- $decls | safeCSS }}
+    }</style>
+    {{- if eq $color_mode "auto" }}
+    {{ "<!-- no-JS fallback: honor OS dark preference when the FOUC script never set data-bs-theme -->" | safeHTML }}
+    <style>@media (prefers-color-scheme: dark) {
+      :root:not([data-bs-theme]) {
+{{- $decls | safeCSS }}
+      }
+    }</style>
+    {{- end }}
+    {{- end }}
 
     {{ "<!-- font stylesheets -->" | safeHTML }}
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_default }}{{ $font_default_weight }}&display=swap">
