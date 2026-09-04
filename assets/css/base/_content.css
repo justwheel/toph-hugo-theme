@@ -79,6 +79,19 @@ main .imageblock .title {
 
 main #projects-carousel .pc-fixed-height { height: 10vh; }
 
+/*
+ * The markup uses Bootstrap's .carousel-dark, which darkens the indicators and
+ * control arrows for a LIGHT page background. In dark mode both .carousel-dark
+ * and [data-bs-theme="dark"] force those elements to #000/inverted, so they
+ * vanish against the dark background. Revert the three carousel variables to
+ * Bootstrap's default (light) values, which are the ones meant for dark backgrounds.
+ */
+[data-bs-theme="dark"] #projects-carousel {
+  --bs-carousel-indicator-active-bg: #fff;
+  --bs-carousel-caption-color: #fff;
+  --bs-carousel-control-icon-filter: none;
+}
+
 main #projects h3 {
   background-color: var(--primary);
   color: var(--secondary);

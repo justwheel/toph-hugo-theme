@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ .Page.Language | default "en" }}"{{ if .Site.Language.Direction }} dir="{{ .Site.Language.Direction }}"{{ end }}>
+{{- $color_mode := site.Params.color_mode | default "auto" -}}
+<html lang="{{ .Page.Language | default "en" }}"{{ if .Site.Language.Direction }} dir="{{ .Site.Language.Direction }}"{{ end }}{{ if ne $color_mode "auto" }} data-bs-theme="{{ $color_mode }}"{{ end }}>
     {{- partial "head.html" . -}}
     <body>
         {{- partial "nav.html" . -}}
