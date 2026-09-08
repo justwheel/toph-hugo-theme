@@ -42,6 +42,7 @@
 
 - nav:
     social: redes sociales
+    toggle_theme: modo oscuro
     translations: idiomas
 
 - tweet_archive:

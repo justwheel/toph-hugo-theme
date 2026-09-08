@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ site.Home.RelPermalink }}">{{ site.Title }}</a>
-        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -48,7 +48,38 @@
                     </li>
                     {{ "<!-- /language selector -->" | safeHTML }}
                 {{ end }}
+                {{- $color_mode := site.Params.color_mode | default "auto" -}}
+                {{- if eq $color_mode "auto" }}
+                {{ "<!-- theme toggle -->" | safeHTML }}
+                <li class="nav-item">
+                    <button id="theme-toggle" class="btn nav-link" type="button" aria-label="{{ i18n "nav.toggle_theme" }}">
+                        <i class="bi bi-moon-stars-fill" aria-hidden="true"></i>
+                    </button>
+                </li>
+                {{- end }}
             </ul>
         </div>
     </div>
 </nav>
+{{- $color_mode := site.Params.color_mode | default "auto" -}}
+{{- if eq $color_mode "auto" }}
+<script>
+(function() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var icon = btn.querySelector('i');
+    function syncIcon() {
+        var isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+    }
+    syncIcon();
+    btn.addEventListener('click', function() {
+        var isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        var next = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-bs-theme', next);
+        localStorage.setItem('theme', next);
+        syncIcon();
+    });
+})();
+</script>
+{{- end }}

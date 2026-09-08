@@ -71,6 +71,51 @@
   text-decoration-style: dotted;
 }
 
+/*
+ * Hamburger toggler. The navbar bar is always --primary with near-white
+ * --secondary text/links in both light and dark modes, so the hamburger
+ * should match. Bootstrap's default toggler icon flips its stroke to a light
+ * color under [data-bs-theme=dark], which vanished against the old white
+ * bg-light button; masking the icon and filling it with --secondary makes it
+ * track the same color the nav links use, independent of color mode.
+ */
+.navbar-toggler {
+  border-color: var(--secondary);
+}
+
+.navbar-toggler-icon {
+  background-color: var(--secondary);
+  background-image: none;
+  -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") center / 100% no-repeat;
+  mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") center / 100% no-repeat;
+}
+
+/* Give the theme toggle the brand --accent-color so it reads as a distinct
+   button against the --primary navbar bar (a plain .nav-link would share the
+   bar's background and disappear). Matches the accent chip used by the brand
+   and active links; the id selector outranks .navbar .nav-link, so on hover
+   it switches to --nav-hover-bg (the same hover color the other nav links
+   use) — a clear color change rather than blending back into the bar. Uses
+   :focus-visible, not :focus, so a mouse click doesn't leave the hover color
+   stuck until blur while still signaling keyboard focus. */
+.navbar #theme-toggle {
+  background-color: var(--accent-color);
+}
+
+.navbar #theme-toggle:hover,
+.navbar #theme-toggle:focus-visible {
+  background-color: var(--nav-hover-bg);
+}
+
+/* Full-width, centered theme toggle when the navbar is collapsed on mobile —
+   the .btn is inline-block, so without this it won't fill the row like the
+   stacked block nav-links beside it. */
+@media (max-width: 991.98px) {
+  .navbar #theme-toggle {
+    width: 100%;
+  }
+}
+
 /* Dropdown menus */
 .dropdown-menu {
   background-color: var(--accent-color);

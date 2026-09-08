@@ -42,6 +42,7 @@
 
 - nav:
     social: social
+    toggle_theme: toggle dark mode
     translations: translations
 
 - tweet_archive:
