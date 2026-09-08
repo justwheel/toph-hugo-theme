@@ -78,6 +78,12 @@
  * color under [data-bs-theme=dark], which vanished against the old white
  * bg-light button; masking the icon and filling it with --secondary makes it
  * track the same color the nav links use, independent of color mode.
+ *
+ * The stroke='black' inside the mask data-URI is not a rendered color and is
+ * exempt from the "no hardcoded colors" rule (AGENTS.md): a mask uses only the
+ * alpha of its source, so the stroke hue is discarded — the visible color is
+ * --secondary above. A mask requires some paint, and var() cannot be used
+ * inside a data-URI, so no custom-property form is possible here.
  */
 .navbar-toggler {
   border-color: var(--secondary);
@@ -97,14 +103,19 @@
    it switches to --nav-hover-bg (the same hover color the other nav links
    use) — a clear color change rather than blending back into the bar. Uses
    :focus-visible, not :focus, so a mouse click doesn't leave the hover color
-   stuck until blur while still signaling keyboard focus. */
+   stuck until blur while still signaling keyboard focus. It carries .nav-link
+   for layout, so text-decoration: none suppresses the dotted underline that
+   .navbar .nav-link:hover would otherwise draw under the icon — a link
+   affordance that doesn't belong on a button. */
 .navbar #theme-toggle {
   background-color: var(--accent-color);
+  text-decoration: none;
 }
 
 .navbar #theme-toggle:hover,
 .navbar #theme-toggle:focus-visible {
   background-color: var(--nav-hover-bg);
+  text-decoration: none;
 }
 
 /* Full-width, centered theme toggle when the navbar is collapsed on mobile —

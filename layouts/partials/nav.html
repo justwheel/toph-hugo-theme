@@ -1,3 +1,4 @@
+{{- $color_mode := site.Params.color_mode | default "auto" -}}
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ site.Home.RelPermalink }}">{{ site.Title }}</a>
@@ -48,11 +49,15 @@
                     </li>
                     {{ "<!-- /language selector -->" | safeHTML }}
                 {{ end }}
-                {{- $color_mode := site.Params.color_mode | default "auto" -}}
                 {{- if eq $color_mode "auto" }}
                 {{ "<!-- theme toggle -->" | safeHTML }}
                 <li class="nav-item">
-                    <button id="theme-toggle" class="btn nav-link" type="button" aria-label="{{ i18n "nav.toggle_theme" }}">
+                    {{/* Rendered hidden: the toggle only works with JS, and the
+                         no-JS @media fallback already honors the OS preference,
+                         so an inert button would only mislead. The script below
+                         unhides it. aria-pressed reflects the active theme and is
+                         kept in sync by syncIcon(), since the icon is aria-hidden. */}}
+                    <button id="theme-toggle" class="btn nav-link" type="button" hidden aria-pressed="false" aria-label="{{ i18n "nav.toggle_theme" }}">
                         <i class="bi bi-moon-stars-fill" aria-hidden="true"></i>
                     </button>
                 </li>
@@ -61,24 +66,29 @@
         </div>
     </div>
 </nav>
-{{- $color_mode := site.Params.color_mode | default "auto" -}}
 {{- if eq $color_mode "auto" }}
 <script>
 (function() {
     var btn = document.getElementById('theme-toggle');
     if (!btn) return;
     var icon = btn.querySelector('i');
-    function syncIcon() {
+    function syncState() {
         var isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
         icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+        btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
     }
-    syncIcon();
+    // JS is present, so the toggle is now functional — reveal it.
+    btn.hidden = false;
+    syncState();
     btn.addEventListener('click', function() {
         var isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
         var next = isDark ? 'light' : 'dark';
         document.documentElement.setAttribute('data-bs-theme', next);
-        localStorage.setItem('theme', next);
-        syncIcon();
+        syncState();
+        // Persist last, guarded like the FOUC script in head.html: a storage
+        // failure (private mode, quota, sandbox) must not leave the icon or
+        // aria-pressed stale, so the visual toggle already happened above.
+        try { localStorage.setItem('theme', next); } catch (e) {}
     });
 })();
 </script>
