@@ -12,8 +12,14 @@
 # values, not per-site config, so there's no runtime-adjustability
 # benefit to live computation the way there is for brand colors in
 # head.html. A few values are intentionally shared unchanged between
-# light and dark (text.anchor, nav.*, bg.modal-overlay) because they
-# already meet contrast on both backgrounds.
+# light and dark (nav.*, bg.modal-overlay) because they already meet
+# contrast on both backgrounds.
+#
+# The `bs:` group is dark-only: it re-points Bootstrap's own surface
+# variables (--bs-body-bg and friends) at the theme's dark card palette,
+# so Bootstrap-native components (.card, .list-group-item, .accordion)
+# render on our controlled surfaces instead of Bootstrap's lighter,
+# bluer defaults (#212529+). Light mode keeps Bootstrap's defaults.
 #
 # Brand colors and fonts are set per-site via Hugo config
 # (params.colors, params.fonts). Hugo injects all values into the
@@ -35,12 +41,12 @@ text:
     link-hover: "#003d82"
     anchor: "#959083"
   dark:
-    body: "#998080"
-    muted: "#858585"
-    secondary: "#848484"
-    link: "#6987A5"
-    link-hover: "#6187B2"
-    anchor: "#959083"
+    body: "#B7A5A5"
+    muted: "#A9A9A9"
+    secondary: "#A9A9A9"
+    link: "#97ACC1"
+    link-hover: "#A4BAD2"
+    anchor: "#ADA99F"
 
 border:
   light:
@@ -121,3 +127,17 @@ admonition:
     icon-warning: "#B8A06E"
     icon-caution: "#BC8479"
     icon-important: "#9780AD"
+
+# Bootstrap surface overrides (dark-only — no light: subtree). Bootstrap
+# 5.3's dark theme paints .card, .list-group-item and .accordion from
+# --bs-body-bg (#212529) with --bs-tertiary/secondary-bg for hover/active
+# states — all lighter and bluer than the theme's #121212 page. Re-point
+# them at the theme's dark card palette so native and bespoke components
+# share one surface family. Values mirror bg.dark (white/card-active/
+# card-hover); keeping the lightest at #2C2B2D is what the brightened
+# text.dark ramp is calibrated against.
+bs:
+  dark:
+    body-bg: "#1F1F1F"
+    tertiary-bg: "#2A292C"
+    secondary-bg: "#2C2B2D"
