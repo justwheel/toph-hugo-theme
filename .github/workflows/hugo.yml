@@ -24,7 +24,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: "0.161.1"
+      HUGO_VERSION: "0.165.0"
       DART_SASS_VERSION: "1.101.0"
     steps:
       - name: Checkout
