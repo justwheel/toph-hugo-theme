@@ -129,15 +129,27 @@ admonition:
     icon-important: "#9780AD"
 
 # Bootstrap surface overrides (dark-only — no light: subtree). Bootstrap
-# 5.3's dark theme paints .card, .list-group-item and .accordion from
-# --bs-body-bg (#212529) with --bs-tertiary/secondary-bg for hover/active
-# states — all lighter and bluer than the theme's #121212 page. Re-point
-# them at the theme's dark card palette so native and bespoke components
-# share one surface family. Values mirror bg.dark (white/card-active/
-# card-hover); keeping the lightest at #2C2B2D is what the brightened
-# text.dark ramp is calibrated against.
+# 5.3's dark component styles (.card, .list-group-item, .accordion) are
+# gated on the [data-bs-theme=dark] attribute, which only the toggle's
+# JS sets. On the no-JS prefers-color-scheme fallback that attribute is
+# absent, so those components fall back to Bootstrap's *light* rules,
+# which read the same --bs-* tokens redefined here. Redefine the full
+# surface token set — background AND foreground — so both the attribute
+# scope and the no-JS scope render these components on the theme's dark
+# card palette with readable text. Overriding only the backgrounds left
+# light --bs-body-color text on a dark surface (~1:1) when JS was off.
+#
+# Values reference the theme's own dark palette so the two stay in sync.
+# tertiary-bg is Bootstrap's hover surface and secondary-bg its active
+# surface; they map to card-hover/card-active to match the bespoke
+# components' "hover lighter, active darker" convention.
 bs:
   dark:
-    body-bg: "#1F1F1F"
-    tertiary-bg: "#2A292C"
-    secondary-bg: "#2C2B2D"
+    body-bg: "var(--bg-white)"
+    tertiary-bg: "var(--bg-card-hover)"
+    secondary-bg: "var(--bg-card-active)"
+    body-color: "var(--text-body)"
+    secondary-color: "var(--text-secondary)"
+    tertiary-color: "var(--text-muted)"
+    emphasis-color: "var(--text-body)"
+    border-color: "var(--border-light)"
