@@ -1,36 +1,25 @@
 # Neutral/utility CSS custom properties for the Toph theme.
 #
-# Each top-level key is a group; each group has a `light:` and `dark:`
-# tree of the same keys. Keys are flattened to CSS variable names by
-# joining group and key with a hyphen:
-#   text.light.body → --text-body (in the base :root block)
-#   text.dark.body  → --text-body (in the :root[data-bs-theme="dark"] block)
+# Group and key are joined with a hyphen to form the variable name; the
+# light: and dark: subtrees emit the same names into different scopes:
+#   text.light.body → --text-body in :root
+#   text.dark.body  → --text-body in :root[data-bs-theme="dark"]
+#
+# Light neutrals are injected into the stylesheet at build time via
+# css.Build vars (@import 'hugo:vars'). Dark values are emitted as an
+# inline <style> block in head.html.
 #
 # Most dark values are derived from their light peers via color-mix(),
 # computed once and stored as literal hex here (not as live color-mix()
-# strings) to keep this file's format uniform — these are fixed theme
-# values, not per-site config, so there's no runtime-adjustability
-# benefit to live computation the way there is for brand colors in
-# head.html. A few values are intentionally shared unchanged between
-# light and dark (nav.*, bg.modal-overlay) because they already meet
-# contrast on both backgrounds.
+# strings) to keep this format uniform. A few (nav.*, bg.modal-overlay)
+# are shared unchanged between modes because they already meet contrast.
 #
-# The `bs:` group is dark-only: it re-points Bootstrap's own surface
-# variables (--bs-body-bg and friends) at the theme's dark card palette,
-# so Bootstrap-native components (.card, .list-group-item, .accordion)
-# render on our controlled surfaces instead of Bootstrap's lighter,
-# bluer defaults (#212529+). Light mode keeps Bootstrap's defaults.
+# Brand colors and fonts are per-site config (params.colors,
+# params.fonts), injected separately in head.html.
 #
-# Brand colors and fonts are set per-site via Hugo config
-# (params.colors, params.fonts). Hugo injects all values into the
-# stylesheet at build time via css.Build vars.
-#
-# To override a value for your site, create a matching
-# data/style.yaml in your site root — Hugo merges theme and
-# site data files, with the site taking precedence. Overrides must
-# use the same light:/dark: nesting (e.g. text.light.body), not a
-# flat text.body key — the stylesheet only reads values under each
-# group's light:/dark: subtree, so a flat override is silently ignored.
+# To override a value, add a data/style.yaml to your site root; Hugo
+# merges it over this one. Keep the light:/dark: nesting — a flat
+# text.body key is silently ignored.
 
 text:
   light:
@@ -128,22 +117,30 @@ admonition:
     icon-caution: "#BC8479"
     icon-important: "#9780AD"
 
-# Bootstrap surface overrides (dark-only — no light: subtree). Bootstrap
-# 5.3's dark component styles (.card, .list-group-item, .accordion) are
-# gated on the [data-bs-theme=dark] attribute, which only the toggle's
-# JS sets. On the no-JS prefers-color-scheme fallback that attribute is
-# absent, so those components fall back to Bootstrap's *light* rules,
-# which read the same --bs-* tokens redefined here. Redefine the full
-# surface token set — background AND foreground — so both the attribute
-# scope and the no-JS scope render these components on the theme's dark
-# card palette with readable text. Overriding only the backgrounds left
-# light --bs-body-color text on a dark surface (~1:1) when JS was off.
+# Bootstrap's own --bs-* variables, re-pointed at the theme palette so
+# Bootstrap-native components (.card, .list-group-item, .accordion)
+# render on our surfaces instead of Bootstrap's lighter, bluer defaults.
 #
-# Values reference the theme's own dark palette so the two stay in sync.
-# tertiary-bg is Bootstrap's hover surface and secondary-bg its active
-# surface; they map to card-hover/card-active to match the bespoke
-# components' "hover lighter, active darker" convention.
+# INVARIANT: every key under light: must also appear under dark:.
+# main.css (:root) loads after bootstrap.min.css ([data-bs-theme=dark]).
+# Both selectors share specificity (0,1,0), so an unpaired light token
+# in :root outranks Bootstrap's dark rule in every dark mode — not only
+# on the no-JS path where [data-bs-theme=dark] is absent.
+#
+# Surface variables are dark-only (Bootstrap's light defaults suit our
+# light palette). Both background AND foreground tokens are redefined
+# so components render with readable text; overriding only backgrounds
+# previously left light text on dark surfaces (~1:1) when JS was off.
+# tertiary-bg (hover) and secondary-bg (active) map to card-hover/card-active.
+#
+# code-color is overridden in both modes: Bootstrap's #d63384 clears
+# 4.5:1 only on pure white, falling to 4.00:1 on linen and 4.27:1 on
+# --bg-toc. Darkened to #a52a63 to hold 6.00:1 on linen and 5.45:1 on
+# our darkest light neutral surface. The dark value (#e685b5) is
+# Bootstrap 5.3.8's own default, restated to satisfy the invariant above.
 bs:
+  light:
+    code-color: "#a52a63"
   dark:
     body-bg: "var(--bg-white)"
     tertiary-bg: "var(--bg-card-hover)"
@@ -153,3 +150,4 @@ bs:
     tertiary-color: "var(--text-muted)"
     emphasis-color: "var(--text-body)"
     border-color: "var(--border-light)"
+    code-color: "#e685b5"

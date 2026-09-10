@@ -13,6 +13,12 @@ footer #footer-box {
   font-size: 0.8rem;
 }
 
+/* Prevent Bootstrap's element rule code { color: var(--bs-code-color) } from
+   overriding inherited --secondary text color on the --primary background */
+footer #footer-box code {
+  color: inherit;
+}
+
 footer #footer-box a {
   color: var(--secondary);
   text-decoration-style: dotted;

@@ -172,7 +172,14 @@ Toph ships a switchable light/dark theme driven by the `color_mode` site param: 
 
 Every neutral group in `data/style.yaml` has parallel `light:` and `dark:` subtrees with the same keys. `head.html` flattens each into a CSS variable by joining group and key with a hyphen, so `text.light.body` and `text.dark.body` both become `--text-body` — in different scopes.
 
-A group may be dark-only by omitting its `light:` subtree; the light range then finds nothing and emits nothing. The `bs:` group uses this to override Bootstrap's own tokens in dark mode only.
+A group may be dark-only by omitting its `light:` subtree; the light range then finds nothing and emits nothing.
+The `bs:` group overrides Bootstrap's own tokens: surface variables are dark-only, while `--bs-code-color` is configured across both modes.
+
+**Invariant for `bs:` tokens:** Every key under `light:` must also appear under `dark:`.
+The theme's `:root` block from `main.css` loads after `bootstrap.min.css`.
+Because `:root` and `[data-bs-theme=dark]` share specificity `(0,1,0)`, an unpaired light token outranks Bootstrap's dark default whenever `data-bs-theme="dark"` is set.
+Without JS, Bootstrap falls back to light rules that read the same variable.
+An unpaired light token therefore lands on a dark surface in every mode.
 
 #### How the two modes are emitted
 
