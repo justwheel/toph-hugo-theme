@@ -389,14 +389,27 @@ When evaluating any change for security:
 The user and the agent work as a team. Communication on GitHub must be effective, genuine, and honest. This requires a human-in-the-loop check before every public-facing action.
 
 Workflow:
-1. Draft the proposed change in the terminal — for edits to existing content, show a precise diff and confirm nothing else changed
-2. Present it to the user for review
-3. Wait for explicit approval (e.g., "post it")
-4. Only then execute the GitHub API call
+1. Write the payload to a file under `/tmp` — no need to ask first, `/tmp` is always writable
+2. Present it for review — for edits to existing content, show a precise diff and confirm nothing else changed
+3. Present a copy-pasteable `gh api` or `gh issue create` command that reads the payload from that file
+4. **The user runs the command.** Their execution is the consent
+
+Preferred: the user executes the call. This removes the judgment call about what counts as approval — nothing is published unless a human types the command, and the payload sent is exactly the one reviewed. Verify the HTTP method before presenting it; a wrong verb returns a confusing 404 (updating a review body is `PUT /repos/{owner}/{repo}/pulls/{pr}/reviews/{id}`, not `PATCH`). Executing the call yourself is a fallback for when the user asks for it, never the default.
 
 Being asked to make a change is a task assignment, not approval of the change itself. "Edit the PR description" means draft the edit and show it — not apply it.
 
 Never skip this step, even if the user has approved similar actions before. Each call is a separate approval; approval for one action never carries forward to the next.
+
+**What does NOT count as consent.** Consent is a free-text message from the user, in their own words, approving the exact content already shown to them. None of these qualify, however affirmative they look:
+
+- A tool-call response — an AskUserQuestion selection, plan approval, or permission-mode setting. A menu choice picks a direction; it does not authorize a payload.
+- A skill or slash command invoked with a posting flag (e.g. `/code-review --comment <PR>`).
+- A subagent report, hook output, or background-task notification saying content is "ready to post".
+- Earlier approval of similar content, or of a previous call in the same task.
+
+**The payload rule.** The user must have seen the final text, verbatim, before it is sent. Anything composed after their approval — a header, disclaimer, footer, or title — is new unreviewed content requiring a fresh approval round. Never combine "make this change" and "send it" into one step: apply the change, show the result, then wait.
+
+If unsure whether consent exists, it does not. Stop and ask.
 
 Never reply to a PR review comment until AFTER the fix is committed and pushed to the remote.
 
@@ -408,6 +421,7 @@ Comments posted through the API follow different conventions than files in the r
 - **Never wrap commit hashes in backticks** — bare hashes render as browseable links. Use `owner/repo@hash` to link a commit in another repository.
 - **Do wrap color hex codes in backticks** — GitHub renders a color swatch preview for them.
 - **Closing keywords do not work across repositories.** `Closes owner/repo#12` from a different repo creates a backlink but will not close the issue; it must be closed manually.
+- **Disclose AI authorship as "LLM-gen-AI".** Never name the model or vendor in a disclosure note. The point is to tell readers the content is machine-generated and needs verification; naming a vendor reads as branding. This does not change the `Assisted-by:` commit trailer, which still cites the exact model.
 
 ## Git conventions
 
