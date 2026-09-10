@@ -26,6 +26,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
   - [Blogging](#blogging)
 - [Shortcodes](#shortcodes) for rich content embeds (PDF download, [tweet archive](#tweet-archive))
 - [Modular CSS architecture](#css-architecture) with customizable color palette
+- [Light and dark mode](#light-and-dark-mode) following the OS preference, with a navbar toggle
 - Navbar brand with site title (responsive, centered on mobile)
 - RSS feeds at `/rss/` with site name in titles and autodiscovery in `<head>`
 - [Multilingual support](#internationalization) (English, Spanish, Arabic with RTL, Hindi)
@@ -445,9 +446,12 @@ assets/css/
   blog/                    Recent posts, blog archive accordion
 ```
 
-All neutral/utility colors (text, borders, backgrounds, shadows) are defined as CSS custom properties in `base/_variables.css`.
-Brand colors (`--primary`, `--secondary`, `--accent-color`) and fonts are set from Hugo config via an inline `<style>` block in `head.html`.
-Both sets of variables coexist on `:root` without conflict.
+All neutral/utility colors (text, borders, backgrounds, shadows) are defined in `data/style.yaml`, which holds a parallel `light:` and `dark:` value for every key.
+Brand colors (`--primary`, `--secondary`, `--accent-color`) and fonts come from Hugo config.
+Both sets are injected as CSS custom properties at build time, so no CSS file contains a literal color.
+
+To override a neutral value for your site, create a matching `data/style.yaml` in your site root — Hugo merges it over the theme's.
+Keep the `light:`/`dark:` nesting; a flat key is silently ignored.
 
 To add new CSS for a new component, create a new `_component-name.css` file in the appropriate directory and add an `@import` line to `main.css`.
 
@@ -467,7 +471,7 @@ When printing:
 ### Custom colors and fonts
 
 Toph supports quick and easy customization of colors and fonts in the Hugo config file.
-The site features three colors and three fonts used across all layouts:
+The site features four colors and three fonts used across all layouts:
 
 * **Colors**:
   * Primary:
@@ -477,6 +481,9 @@ The site features three colors and three fonts used across all layouts:
     Most notable use in background color of all pages.
   * Accent:
     Color to accent or emphasize content in contrast to the primary color.
+  * Background:
+    Page background.
+    Defaults to the secondary color in light mode and `#121212` in dark mode.
 * **Fonts**:
   * Default:
     Used as typeface for almost all content across the site.
@@ -494,9 +501,16 @@ Include the following in your Hugo configuration file:
 ```yaml
 params:
   colors:
-    primary: darkorchid
-    secondary: linen
-    accent: darkslateblue
+    light:
+      primary: darkorchid
+      secondary: linen
+      accent: darkslateblue
+      background: linen
+    dark:
+      primary: "#9932CC"
+      secondary: "#f5f0fa"
+      accent: "#6D64A2"
+      background: "#121212"
   fonts:
     default: Open Sans
     title: Bungee Shade
@@ -506,10 +520,17 @@ params:
 **TOML**:
 
 ```toml
-[params.colors]
+[params.colors.light]
 primary = "darkorchid"
 secondary = "linen"
 accent = "darkslateblue"
+background = "linen"
+
+[params.colors.dark]
+primary = "#9932CC"
+secondary = "#f5f0fa"
+accent = "#6D64A2"
+background = "#121212"
 
 [params.fonts]
 default = "Open Sans"
@@ -517,6 +538,30 @@ title = "Bungee Shade"
 header = "Roboto Slab"
 ```
 
+The `colors.dark` block is optional: `primary`, `secondary`, and `accent` fall back to their `colors.light` counterparts, and `background` falls back to `#121212`.
+Keep the `light:`/`dark:` nesting — a flat `colors.primary` key is silently ignored.
+
+### Light and dark mode
+
+Toph ships both modes.
+Set `params.color_mode` to choose the site's behavior:
+
+| Value | Behavior |
+|-------|----------|
+| `auto` (default) | Follow the visitor's operating system preference, with a navbar toggle to override it |
+| `light` | Light mode only; no toggle, no dark CSS emitted |
+| `dark` | Dark mode only |
+
+```yaml
+params:
+  color_mode: auto
+```
+
+The toggle stores its choice in `localStorage`, so a visitor's override persists across pages and visits.
+When JavaScript is unavailable, `auto` still honors the OS preference through a `prefers-color-scheme` fallback.
+
+Neutral colors — text, borders, and surfaces — are not configurable per site.
+They live in the theme's `data/style.yaml`, tuned to meet WCAG AA contrast in both modes.
 
 ### Internationalization
 

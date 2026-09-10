@@ -13,6 +13,14 @@ Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, 
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
 - **Example site**: `exampleSite/` — deployed to GitHub Pages as a live demo
 
+### AsciiDoc parity (non-negotiable)
+
+AsciiDoc is a first-class content format. **Any feature built for Markdown MUST also work for AsciiDoc.** A change that ships for one format only is incomplete.
+
+Asciidoctor bypasses Hugo's render hooks, so AsciiDoc often needs a separate implementation reaching the same result — heading anchors, for example, use a render hook for Markdown and `replaceRE` on `.Content` for AsciiDoc, producing identical markup and sharing one stylesheet.
+
+To detect AsciiDoc, use `.File.Ext == "adoc"`. Do **not** use `.Markup` — it returns an object, not a string, in Hugo 0.157+, so string comparison silently fails.
+
 
 ## Build commands
 
@@ -104,11 +112,13 @@ The LinkedIn URL template is generic (`.../%s`) to support both personal (`in/us
 
 ### CSS architecture
 
-Styles are processed by Hugo's `css.Build` function (requires Hugo 0.158.0+), which resolves `@import` statements into a single output file at build time. The template in `head.html` uses:
+Styles are processed by Hugo's `css.Build` function, which resolves `@import` statements into a single output file at build time and injects the light-mode custom properties as build vars. The template in `head.html` uses:
 
 ```go-html-template
-{{- $css := resources.Get "css/main.css" | css.Build | fingerprint }}
+{{- $css := resources.Get "css/main.css" | css.Build (dict "vars" $vars) | fingerprint }}
 ```
+
+`$vars` merges brand colors and fonts from site config with the flattened `light:` half of `data/style.yaml`. `main.css` exposes them through `@import 'hugo:vars'`.
 
 #### File structure
 
@@ -116,7 +126,6 @@ Styles are processed by Hugo's `css.Build` function (requires Hugo 0.158.0+), wh
 assets/css/
   main.css                        @import entrypoint (no CSS rules)
   base/
-    _variables.css                :root custom properties (neutral palette)
     _global.css                   Body, headings, anchor links
     _nav.css                      Fixed navbar, dropdowns, hover states
     _content.css                  Main body: links, images, figures, ToC, profile
@@ -126,6 +135,7 @@ assets/css/
     _hero.css                     Homepage hero section
     _post-meta.css                Blog post metadata bar
     _post-nav.css                 Prev/next post navigation
+    _asciidoc-admonition.css      AsciiDoc admonition blocks (note, tip, warning…)
     _code.css                     Code block borders
     _pdf-download.css             PDF download shortcode card
     _team.css                     Team member card grid
@@ -146,13 +156,41 @@ assets/css/
 1. **Never add CSS rules to `main.css`** — it is an import-only entrypoint.
 2. **Edit the appropriate partial** for the component you are changing. Each file corresponds to a specific layout partial or page template, noted in its section comment header.
 3. **To add a new component**, create a new `_component-name.css` file in the appropriate directory (`base/`, `components/`, `taxonomy/`, or `blog/`) and add an `@import` line to `main.css` in the matching group.
-4. **All color values must use CSS custom properties** — never hardcode hex values, `rgba()`, or named colors outside of `base/_variables.css`. Define new variables in `_variables.css` and reference them with `var()`.
-5. **Brand colors** (`--primary`, `--secondary`, `--accent-color`) and font variables are injected via inline `<style>` in `head.html` from Hugo site config. These cannot be defined in CSS files. The neutral palette in `_variables.css` coexists on `:root` without conflict.
+4. **All color values must use CSS custom properties** — never hardcode hex values, `rgba()`, or named colors anywhere under `assets/css/`. There is no `_variables.css`; the neutral palette lives in `data/style.yaml`. Add new neutral values there under **both** the `light:` and `dark:` subtrees, then reference them with `var()`.
+5. **Colors reach CSS from two places, neither of them a CSS file.** Light-mode values (brand from site config, neutral from `data/style.yaml`) are baked into the compiled stylesheet by `css.Build` vars, which `main.css` pulls in via `@import 'hugo:vars'`. Dark-mode values are emitted as an inline `<style>` block in `head.html`. See "Dark mode" below.
 6. **Underscore prefix convention**: partial filenames start with `_` to signal they are not standalone stylesheets.
 
 #### Key specificity pattern
 
 `main a { color: var(--text-link) }` (specificity 0,0,1,1) overrides bare class selectors on `<a>` elements inside `<main>`. Badge and link classes that need their own color must be prefixed with `main a.classname` (specificity 0,0,2,1) to win.
+
+### Dark mode
+
+Toph ships a switchable light/dark theme driven by the `color_mode` site param: `auto` (default — follow the OS, with a navbar toggle), `light`, or `dark`.
+
+#### The palette: `data/style.yaml`
+
+Every neutral group in `data/style.yaml` has parallel `light:` and `dark:` subtrees with the same keys. `head.html` flattens each into a CSS variable by joining group and key with a hyphen, so `text.light.body` and `text.dark.body` both become `--text-body` — in different scopes.
+
+A group may be dark-only by omitting its `light:` subtree; the light range then finds nothing and emits nothing. The `bs:` group uses this to override Bootstrap's own tokens in dark mode only.
+
+#### How the two modes are emitted
+
+Light and dark travel by deliberately different routes, and the distinction matters when debugging:
+
+- **Light** is baked into the compiled, fingerprinted stylesheet through `css.Build` vars. It is the default state of `:root`.
+- **Dark** is emitted as an inline `<style>` block in `head.html`, because it must be able to change without rebuilding the stylesheet.
+
+The dark declarations are flattened **once** into a `$decls` string, then emitted in two scopes:
+
+1. `:root[data-bs-theme="dark"]` — set by the toggle's JavaScript.
+2. `@media (prefers-color-scheme: dark) { :root:not([data-bs-theme]) { … } }` — the no-JS fallback, emitted only in `auto` mode.
+
+Never let those two lists drift apart. Emitting `$decls` twice is what guarantees they cannot.
+
+#### Brand colors in dark mode
+
+`colors.dark.*` supplies primary, secondary, accent, and background, each falling back to its light counterpart. The `-text` roles are **not** Hugo-interpolated: they are literal `color-mix(in srgb, var(--primary) 60%, white)` strings resolved by the browser, so text tracks whatever the dark brand color actually is. `safeCSS` is required on the emitted declarations — `color-mix()` contains a `%`, which Go's contextual auto-escaping inside `<style>` would otherwise corrupt.
 
 ### Structural vs. blog content
 
@@ -277,12 +315,33 @@ For arrays and slices (e.g., `sameAs`, `knowsAbout`), pass the entire slice to `
 ## WCAG AA accessibility
 
 This project enforces WCAG AA contrast ratios via Pa11y CI:
-- **4.5:1** for normal text, **3:1** for large text
+- **4.5:1** for normal text, **3:1** for large text and non-text UI
 - Minimum accessible gray on white background: `#767676` (4.54:1)
-- All muted text uses `#767676`; never use `#888` or lighter grays
+- All muted text uses `#767676` in light mode; never use `#888` or lighter grays
 - Chroma syntax highlighting theme is `github` (passes WCAG AA; `monokai` does not)
 - Navbar dropdowns are hover-triggered (no `data-bs-toggle="dropdown"`) using the `.nav-hover-dropdown` class — all dropdowns must use this pattern
 - Bootstrap `.dropdown-item` defaults to dark text — must override `color: var(--secondary)` for colored dropdown backgrounds
+
+### Verify contrast against the lightest surface, not the background
+
+A dark text color that clears AA against the page background can still fail on cards, list-group items, accordions, and hover states, which sit several steps lighter. **Check every text role against the lightest surface it can land on**, then walk back down. Calibrating the dark ramp against the page background alone once failed 355 of 495 audited URLs while the page itself looked fine.
+
+The dark text ramp deliberately targets roughly **6:1** on that lightest surface rather than the 4.5:1 floor. The compliant-but-dim alternative was genuinely hard to read, and the headroom costs nothing.
+
+### Bootstrap dark mode is attribute-gated
+
+Bootstrap 5.3's dark component styles are gated **exclusively** on `[data-bs-theme=dark]`. Bootstrap ships **no** `prefers-color-scheme` rules of its own. Two consequences:
+
+1. On the no-JS fallback that attribute is absent, so `.card`, `.list-group-item`, and `.accordion` fall back to Bootstrap's **light** rules — while still reading whatever `--bs-*` variables the theme has redefined.
+2. Therefore, **never override Bootstrap's background tokens without the matching foreground tokens.** Overriding `--bs-body-bg` alone left Bootstrap's light `--bs-body-color` painted on a dark surface at 1.07:1 — invisible text for anyone whose JavaScript was disabled or failed to load.
+
+Override the surface set as a unit (`--bs-body-bg`, `--bs-tertiary-bg`, `--bs-secondary-bg`, `--bs-body-color`, `--bs-secondary-color`, `--bs-tertiary-color`, `--bs-emphasis-color`, `--bs-border-color`) and point them at the theme's own `var(--…)` values so both scopes resolve identically.
+
+Bootstrap's hover surface is `--bs-tertiary-bg` and its active surface is `--bs-secondary-bg`. Map them to match the bespoke components' convention: hover lighter, active darker.
+
+### Testing dark mode
+
+Headless Chrome defaults to `prefers-color-scheme: dark`, so a default Pa11y run exercises **dark mode**, not light. To test a specific mode, emulate it explicitly. To reproduce the no-JS path, disable JavaScript *and* emulate dark — the bug class above is invisible with JavaScript on.
 
 
 ## Security
@@ -323,11 +382,48 @@ When evaluating any change for security:
 5. **Review Hugo function usage** — `safeHTML`, `safeJS`, `safeURL`, `safeCSS`, and `htmlUnescape` all bypass Hugo's built-in escaping. Grep for these before any release or merge to `main`.
 
 
+## GitHub API access (CRITICAL)
+
+**ALWAYS** get explicit user consent before **any** mutating GitHub API call under their account. "Mutating" means any POST, PATCH, PUT, or DELETE — not only publishing new content. This includes comments, replies, and issue or PR creation; edits to an existing title, description, or comment; labels, assignees, milestones, and review requests; state changes such as closing, reopening, merging, or submitting a review; and branch, tag, or release operations. Read-only GET calls need no approval.
+
+The user and the agent work as a team. Communication on GitHub must be effective, genuine, and honest. This requires a human-in-the-loop check before every public-facing action.
+
+Workflow:
+1. Draft the proposed change in the terminal — for edits to existing content, show a precise diff and confirm nothing else changed
+2. Present it to the user for review
+3. Wait for explicit approval (e.g., "post it")
+4. Only then execute the GitHub API call
+
+Being asked to make a change is a task assignment, not approval of the change itself. "Edit the PR description" means draft the edit and show it — not apply it.
+
+Never skip this step, even if the user has approved similar actions before. Each call is a separate approval; approval for one action never carries forward to the next.
+
+Never reply to a PR review comment until AFTER the fix is committed and pushed to the remote.
+
+### Formatting GitHub comments
+
+Comments posted through the API follow different conventions than files in the repo:
+
+- **Wrap paragraphs normally.** The one-sentence-per-line convention used for `.md` and `.adoc` files does not apply here.
+- **Never wrap commit hashes in backticks** — bare hashes render as browseable links. Use `owner/repo@hash` to link a commit in another repository.
+- **Do wrap color hex codes in backticks** — GitHub renders a color swatch preview for them.
+- **Closing keywords do not work across repositories.** `Closes owner/repo#12` from a different repo creates a backlink but will not close the issue; it must be closed manually.
+
 ## Git conventions
 
-- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body
-- **Commit trailer**: `Assisted-by: <model name>` per Fedora AI-Assisted Contributions Policy
-- **Branching**: Feature branches off `main` with descriptive names (e.g., `a11y/navbar-contrast`, `blog/taxonomy-templates`)
+- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics.
+- **Commit trailer**: `Assisted-by: <model name> (<context window>)`. Verify the model from the current session environment before writing it — never assume it from earlier in the conversation, since the user may switch models mid-session.
+- **Commit messages go in a file**: write to `/tmp/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it.
+- **Branching**: Feature branches off `main` with descriptive names (e.g., `a11y/navbar-contrast`, `blog/taxonomy-templates`). The user creates branches.
 - **GPG signing**: All commits must be GPG-signed (`commit.gpgsign = true`)
 - **DCO**: Use `--signoff` flag (never write `Signed-off-by` manually in message text)
+- **NEVER** run `git push`, `git commit`, or create PRs — the user does these manually
+- **NEVER** use `--no-gpg-sign` or skip hooks
+- Always use fully-expanded flag forms in suggested commands (`--signoff`, not `-s`)
 - **License**: MPL-2.0
+
+## Writing conventions
+
+Use **one sentence per line** (ventilated prose) in Markdown and AsciiDoc files. Each sentence starts on its own line; do not wrap at a fixed column. Consecutive lines render as one paragraph. This produces cleaner diffs and makes sentences easy to reorder or review individually.
+
+This applies to files in the repository. It does **not** apply to GitHub comments posted via the API — see above.
