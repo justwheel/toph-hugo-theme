@@ -436,6 +436,17 @@ Comments posted through the API follow different conventions than files in the r
 - Always use fully-expanded flag forms in suggested commands (`--signoff`, not `-s`)
 - **License**: MPL-2.0
 
+### Version tags
+
+Annotated tag messages are written as GitHub-flavored Markdown and become the basis for release notes.
+
+- **Use setext headings** — the heading text on one line, a matching-length run of `-` beneath it — never `##`. `git tag` defaults to `--cleanup=strip`, which silently deletes every line beginning with `#`. Setext renders as the same `<h2>` on GitHub and no cleanup mode can strip it
+- Draft to `/tmp/tag-toph-<version>.txt` and confirm `grep -c '^#'` returns 0 before tagging
+- Create with `git tag --cleanup=verbatim --file=/tmp/tag-toph-<version>.txt --sign <version> <commit>`. `tag.gpgsign` is not set (unlike `commit.gpgsign`), so `--sign` must be explicit or the tag is unsigned
+- Verify with `git tag --verify <version>` and `git tag -l --format='%(contents)' <version>` before pushing, to confirm every heading survived
+- One sentence per line does **not** apply to tag messages — that convention governs repository `.md` and `.adoc` files
+- A GitHub release body is stored separately and is never re-read from the tag. Editing or force-pushing a tag does not update an existing release; check and fix both
+
 ## Writing conventions
 
 Use **one sentence per line** (ventilated prose) in Markdown and AsciiDoc files. Each sentence starts on its own line; do not wrap at a fixed column. Consecutive lines render as one paragraph. This produces cleaner diffs and makes sentences easy to reorder or review individually.
