@@ -1,9 +1,38 @@
+{{/*
+    projects.html — Detailed project profiles section
+
+    Renders full project descriptions with title, logo icon, and content
+    for pages categorized under "projects".
+
+    Reads from:
+      - site.RegularPages (categories = "projects") — project pages
+      - .Title                                     — project title
+      - .Slug                                      — container anchor id
+      - .Param "icon"                              — project logo or icon
+      - .Content                                   — body content (Markdown or AsciiDoc)
+
+    Icon rendering:
+      - Asset path (e.g., pages/projects/logo.png) — processed to WebP (height 160px)
+      - Remote URL (https://) or SVG              — rendered as-is (remote URLs bypass
+        asset processing to avoid build-time network dependencies)
+*/}}
+
 <div class="container-fluid" id="projects">
-    {{ range where .Site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{ range where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{- $page := . -}}
     <div class="container" id="{{ .Slug }}">
         <h3 class="p-3 rounded border text-center">{{ .Title }}</h3>
-        {{ if .Param "icon" -}}
-            <img class="img-fluid mx-auto d-block" style="max-height: 10vh;" src="{{ .Param "icon" }}" alt="{{ i18n "misc.logo" . }}" title="{{ i18n "misc.logo" . }}">
+        {{/* Project icon: process raster assets to WebP; render SVGs/remote as-is */}}
+        {{ with .Param "icon" -}}
+            {{- $src := printf "%s" . -}}
+            {{- $resource := resources.Get $src -}}
+            {{- $altText := (i18n "misc.logo" $page) | default $page.Title -}}
+            {{- if and $resource (reflect.IsImageResourceProcessable $resource) -}}
+              {{- $processed := $resource.Resize "x160 webp" -}}
+              <img class="img-fluid mx-auto d-block" style="max-height: 10vh;" src="{{ $processed.RelPermalink }}" width="{{ $processed.Width }}" height="{{ $processed.Height }}" alt="{{ $altText }}" title="{{ $altText }}" loading="lazy">
+            {{- else -}}
+              <img class="img-fluid mx-auto d-block" style="max-height: 10vh;" src="{{ $src }}" alt="{{ $altText }}" title="{{ $altText }}" loading="lazy">
+            {{- end -}}
         {{- end }}
         <div class="p-3">
         {{ .Content }}

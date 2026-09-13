@@ -1,15 +1,44 @@
+{{/*
+    projects-carousel.html — Image carousel header for project profiles
+
+    Displays a Bootstrap fade carousel highlighting project logos or titles
+    above the project profiles section. Each slide links to the matching
+    project section anchor on the page.
+
+    Reads from:
+      - site.RegularPages (categories = "projects") — project pages
+      - .Param "icon"                              — project logo or icon
+      - .Param "title"                             — text fallback if no icon
+      - .Slug                                      — target section anchor
+
+    Icon rendering:
+      - Asset path (e.g., pages/projects/logo.png) — processed to WebP (height 160px)
+      - Remote URL (https://) or SVG              — rendered as-is (remote URLs bypass
+        asset processing to avoid build-time network dependencies)
+*/}}
+
 <div id="projects-carousel" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
   <div class="carousel-indicators">
-    {{ range $index, $value := where .Site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{ range $index, $value := where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
     <button type="button" data-bs-target="#projects-carousel" data-bs-slide-to="{{ $index }}"{{ if eq $index 0 }} class="active" aria-current="true"{{ end }} aria-label="{{ $value.Title }}"></button>
     {{ end }}
   </div>
   <div class="carousel-inner">
-      {{ range $index, $value := where .Site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+      {{ range $index, $value := where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
       <div class="carousel-item{{ if eq $index 0 }} active{{ end }}">
         <a href="#{{ .Slug }}">
-          {{ if .Param "icon" }}
-            <img src="{{ $value.Param "icon" }}" class="img-fluid d-block my-5 mx-auto pc-fixed-height" alt="{{ i18n "misc.logo" . }}" title="{{ i18n "misc.logo" . }}">
+          {{/* Render optimized logo if icon provided, otherwise show title heading */}}
+          {{ with .Param "icon" }}
+            {{- $src := printf "%s" . -}}
+            {{- $resource := resources.Get $src -}}
+            {{- $loading := cond (eq $index 0) "eager" "lazy" -}}
+            {{- $altText := (i18n "misc.logo" $value) | default $value.Title -}}
+            {{- if and $resource (reflect.IsImageResourceProcessable $resource) -}}
+              {{- $processed := $resource.Resize "x160 webp" -}}
+              <img src="{{ $processed.RelPermalink }}" width="{{ $processed.Width }}" height="{{ $processed.Height }}" class="img-fluid d-block my-5 mx-auto pc-fixed-height" alt="{{ $altText }}" title="{{ $altText }}" loading="{{ $loading }}">
+            {{- else -}}
+              <img src="{{ $src }}" class="img-fluid d-block my-5 mx-auto pc-fixed-height" alt="{{ $altText }}" title="{{ $altText }}" loading="{{ $loading }}">
+            {{- end -}}
           {{ else }}
             <h3 class="d-flex align-items-center justify-content-center my-5 pc-fixed-height">{{ $value.Param "title" }}</h3>
           {{ end }}

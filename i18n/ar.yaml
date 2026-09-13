@@ -12,6 +12,7 @@
     photo: صورة
 
 - misc:
+    logo: "شعار {{ .Title }}"
     page_navigation: التنقل بين الصفحات
 
 - nav:

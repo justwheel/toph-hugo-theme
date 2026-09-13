@@ -27,6 +27,16 @@ pagination:
   pagerSize: 10
 
 
+# --- module mounts ---
+module:
+  mounts:
+    - source: static
+      target: static
+    # Serve page assets statically
+    - source: assets/pages
+      target: static/pages
+
+
 # --- security settings ---
 
 security:
@@ -119,7 +129,7 @@ params:
     title: Lobster Two
     header: Patua One
   images:
-    - /toph-hugo-theme/img/septima.jpg
+    - pages/septima.jpg
   favicon: /toph-hugo-theme/favicon.ico
   git_repo: https://github.com/justwheel/toph-hugo-theme
   team:

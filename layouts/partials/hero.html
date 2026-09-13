@@ -3,31 +3,44 @@
     social media icons, and about link.
 
     Reads from:
-      - $.Site.Params.images[0]        — profile photo
-      - $.Site.Params.biography.tagline — one-line tagline
-      - $.Site.Params.social            — social media profiles (key: username)
-      - hugo.Data.social                — platform registry (name, url template, icon)
-      - $.Site.Menus.nav                — about page link
+      - site.Params.images[0]        — profile photo
+      - site.Params.biography.tagline — one-line tagline
+      - site.Params.social            — social media profiles (key: username)
+      - hugo.Data.social              — platform registry (name, url template, icon)
+      - site.Menus.nav                — about page link
+
+    Image rendering:
+      - Asset path (e.g., pages/logo.jpg) — processed to responsive WebP
+        (280w mobile, 500w desktop) with explicit dimensions and LCP priority
+      - Remote URL, SVG, or static path   — rendered as-is with fallback attributes
 */}}
 
 <div class="hero">
-  {{ with index $.Site.Params.images 0 }}
-  <img class="hero-photo" src="{{ . }}" alt="{{ i18n "hero.photo" }} {{ $.Site.Params.biography.name }}" title="{{ $.Site.Params.biography.name }}">
+  {{ with index site.Params.images 0 }}
+    {{- $src := printf "%s" . -}}
+    {{- $resource := resources.Get $src -}}
+    {{- if and $resource (reflect.IsImageResourceProcessable $resource) -}}
+      {{- $heroDesktop := $resource.Fill "500x500 webp" -}}
+      {{- $heroMobile := $resource.Fill "280x280 webp" -}}
+      <img class="hero-photo" src="{{ $heroDesktop.RelPermalink }}" srcset="{{ $heroMobile.RelPermalink }} 280w, {{ $heroDesktop.RelPermalink }} 500w" sizes="(max-width: 600px) 140px, 250px" width="250" height="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+    {{- else -}}
+      <img class="hero-photo" src="{{ $src }}" width="250" height="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+    {{- end -}}
   {{ end }}
 
-  {{ with $.Site.Params.biography.tagline }}
+  {{ with site.Params.biography.tagline }}
   <p class="hero-tagline">{{ . }}</p>
   {{ end }}
 
   <div class="hero-links">
-    {{- range $key, $value := $.Site.Params.social }}
+    {{- range $key, $value := site.Params.social }}
       {{- with index hugo.Data.social $key }}
         {{- $url := printf .url $value }}
         <a class="hero-social" href="{{ $url }}" aria-label="{{ .name }}"><i class="bi {{ .icon }}"></i></a>
       {{- end }}
     {{- end }}
 
-    {{- range $.Site.Menus.nav }}
+    {{- range site.Menus.nav }}
       {{- if eq .Identifier "about" }}
         <span class="hero-separator" aria-hidden="true">&middot;</span>
         <a class="hero-about" href="{{ .URL }}">{{ i18n "hero.about" | default .Name }}</a>

@@ -12,6 +12,7 @@
     photo: फ़ोटो
 
 - misc:
+    logo: "{{ .Title }} का लोगो"
     page_navigation: पृष्ठ नेविगेशन
 
 - nav:

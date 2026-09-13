@@ -77,7 +77,14 @@ main .imageblock .title {
   background: var(--bg-caption);
 }
 
-main #projects-carousel .pc-fixed-height { height: 10vh; }
+main #projects-carousel .pc-fixed-height {
+  height: 10vh;
+  width: auto;
+}
+
+main #projects img {
+  width: auto;
+}
 
 /*
  * The markup uses Bootstrap's .carousel-dark, which darkens the indicators and
