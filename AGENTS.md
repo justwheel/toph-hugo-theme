@@ -318,6 +318,15 @@ The `safeJS` filter prevents Hugo from HTML-escaping the JSON output inside `<sc
 
 For arrays and slices (e.g., `sameAs`, `knowsAbout`), pass the entire slice to `jsonify` rather than manually iterating with comma tracking.
 
+### Image processing: .Fill vs .Resize and Smart crop behavior
+
+Hugo's `.Fill` method is specifically a crop-and-resize operator whose default anchor is `Smart` (entropy and edge detection).
+On square or near-square portrait images (such as profile photos, hero avatars, or logos), `Smart` crop shifts the bounding box toward the detected focal point, cutting off edges (such as the bottom ~10% of a portrait).
+When combined with CSS circular clipping (`border-radius: 50%`), this compounding effect can noticeably alter the composition by cropping into the subject (chin, collar, or shoulders).
+To scale an image proportionally without cropping any pixels, use `.Resize` (e.g., `.Resize "500x webp"` or `.Resize "280x webp"`).
+If `.Fill` is required to conform non-square source images to a square aspect ratio, specify an explicit anchor such as `Center` (e.g., `.Fill "500x500 webp Center"`) rather than relying on `Smart` crop defaults.
+Always guard image processing operations with `reflect.IsImageResourceProcessable $resource` to ensure the file is a valid, processable raster format before invoking `.Fill` or `.Resize`.
+
 
 ## WCAG AA accessibility
 
