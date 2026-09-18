@@ -56,7 +56,17 @@
     {{- $font_title := $.Param "fonts.title" | default "Arial" -}}
     {{- $font_title_weight := $.Param "fonts.title_weight" -}}
     {{- $font_header := $.Param "fonts.header" -}}
-    {{- $font_header_weight := $.Param "fonts.header_weight" }}
+    {{- $font_header_weight := $.Param "fonts.header_weight" -}}
+    {{- $title_weight := "inherit" -}}
+    {{- with $font_title_weight -}}
+        {{- $digits := replaceRE `[^0-9]` "" (index (split (printf "%v" .) ";") 0) -}}
+        {{- if $digits }}{{ $title_weight = $digits }}{{ end -}}
+    {{- end -}}
+    {{- $header_weight := "inherit" -}}
+    {{- with $font_header_weight -}}
+        {{- $digits := replaceRE `[^0-9]` "" (index (split (printf "%v" .) ";") 0) -}}
+        {{- if $digits }}{{ $header_weight = $digits }}{{ end -}}
+    {{- end }}
 
     {{ "<!-- stylesheets -->" | safeHTML }}
     {{- $brand := dict
@@ -68,7 +78,9 @@
         "accent-text" $color_accent
         "default-font" (css.Quoted $font_default)
         "title-font" (css.Quoted $font_title)
+        "title-font-weight" $title_weight
         "header-font" (css.Quoted $font_header)
+        "header-font-weight" $header_weight
     -}}
     {{- $neutral := dict -}}
     {{- range $group, $entries := hugo.Data.style -}}

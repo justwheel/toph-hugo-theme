@@ -6,7 +6,10 @@ body {
   font-family: var(--default-font), sans-serif;
 }
 
-h1 { font-family: var(--title-font), serif; }
+h1 {
+  font-family: var(--title-font), serif;
+  font-weight: var(--title-font-weight, inherit);
+}
 
 /* Offset anchor scroll targets so they clear the fixed navbar */
 h1[id], h2[id], h3[id], h4[id], h5[id], h6[id] {
@@ -44,7 +47,10 @@ h6:hover .hanchor {
   color: var(--primary-text);
 }
 
-h2, h3, h4, #toctitle { font-family: var(--header-font), serif; }
+h2, h3, h4, #toctitle {
+  font-family: var(--header-font), serif;
+  font-weight: var(--header-font-weight, inherit);
+}
 
 h1 {
   color: var(--primary-text);

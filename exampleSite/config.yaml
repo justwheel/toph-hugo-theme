@@ -130,6 +130,8 @@ params:
     header: Patua One
   images:
     - pages/septima.jpg
+  hero:
+    shape: circle
   favicon: /toph-hugo-theme/favicon.ico
   git_repo: https://github.com/justwheel/toph-hugo-theme
   team:
