@@ -62,8 +62,8 @@ CI tools live in `.github/package.json` (pa11y-ci, serve). Install with `npm ci 
 
 ```
 baseof.html          HTML skeleton: head, nav, header, <main>, footer
-  index.html         Homepage: hero, for-hire, content, recent-posts, projects, team
   _default/
+    biography.html   Biography layout: hero, for-hire, content, recent-posts, projects, team
     list.html        Paginated content list with excerpts
     single.html      Single page with blog guards ($is_structural, $is_blog_post)
     rss.xml          RSS 2.0 feed with full content, cover images, and <enclosure>

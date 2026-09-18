@@ -1,3 +1,7 @@
+---
+layout: biography
+---
+
 == Who am I
 
 My name is Septima Poinsette Clark (May 3, 1898 – December 15, 1987).

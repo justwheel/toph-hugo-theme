@@ -1,3 +1,7 @@
+---
+layout: biography
+---
+
 == Quién soy
 
 Mi nombre es Septima Poinsette Clark (3 de mayo de 1898 – 15 de diciembre de 1987).

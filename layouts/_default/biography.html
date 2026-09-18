@@ -1,0 +1,22 @@
+{{/*
+    biography.html — Dedicated layout for personal biography and portfolio pages.
+    Can be used on homepage (_index.md / _index.adoc) or standalone pages (/about)
+    by declaring `layout: biography` in front matter.
+*/}}
+{{ define "main" }}
+  {{ partial "hero.html" . }}
+  {{ if .Param "hire_me" }}
+    {{ partial "for-hire.html" . }}
+  {{ end }}
+  {{ with .Content }}
+    {{ . }}
+  {{ end }}
+  {{ partial "recent-posts.html" . }}
+  {{ with where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{ partial "projects-carousel.html" $ }}
+    {{ partial "projects.html" $ }}
+  {{ end }}
+  {{ with where site.RegularPages ".Params.categories" "intersect" (slice "team") }}
+    {{ partial "team.html" . }}
+  {{ end }}
+{{ end }}
