@@ -4,6 +4,7 @@ body {
   background-color: var(--background);
   color: var(--text-body);
   font-family: var(--default-font), sans-serif;
+  font-weight: var(--default-font-weight, normal);
 }
 
 h1 {
@@ -47,7 +48,7 @@ h6:hover .hanchor {
   color: var(--primary-text);
 }
 
-h2, h3, h4, #toctitle {
+h2, h3, h4, h5, h6, #toctitle {
   font-family: var(--header-font), serif;
   font-weight: var(--header-font-weight, inherit);
 }

@@ -513,9 +513,15 @@ params:
       background: "#121212"
   fonts:
     default: Open Sans
+    default_weight: 500
     title: Bungee Shade
+    title_weight: 700
     header: Roboto Slab
+    header_weight: 500
 ```
+
+Font weights can be specified as numbers (e.g., `700`, `500`) or Google Fonts query syntax (e.g., `":wght@500"`).
+Configured weights are applied directly to headings and body text via CSS custom properties.
 
 **TOML**:
 
@@ -540,6 +546,19 @@ header = "Roboto Slab"
 
 The `colors.dark` block is optional: `primary`, `secondary`, and `accent` fall back to their `colors.light` counterparts, and `background` falls back to `#121212`.
 Keep the `light:`/`dark:` nesting — a flat `colors.primary` key is silently ignored.
+
+### Hero section
+
+The hero section displays a profile photo or brand logo, tagline, social media links, and an optional about link.
+Configure the image shape via `params.hero.shape`:
+
+```yaml
+params:
+  hero:
+    shape: circle  # "circle" (default), "square", or "none"
+```
+
+Use `"circle"` for personal portrait headshots and `"square"` (or `"none"`) for uncropped organizational logos, brand marks, and rectangular vector artwork.
 
 ### Light and dark mode
 

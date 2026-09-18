@@ -4,7 +4,7 @@
 
     Reads from:
       - site.Params.images[0]        — profile photo
-      - site.Params.hero.shape       — image shape: "circle" (default) or "square"
+      - site.Params.hero.shape       — image shape: "circle" (default), "square", or "none"
       - site.Params.biography.tagline — one-line tagline
       - site.Params.social            — social media profiles (key: username)
       - hugo.Data.social              — platform registry (name, url template, icon)
@@ -12,25 +12,33 @@
 
     Image rendering:
       - Asset path (e.g., pages/logo.jpg) — processed to responsive WebP
-        (280w mobile, 500w desktop) with explicit dimensions and LCP priority
+        (280w mobile, 500w desktop) via .Resize with explicit dimensions and LCP priority
       - Remote URL, SVG, or static path   — rendered as-is with fallback attributes
 */}}
 
 <div class="hero">
   {{ with index site.Params.images 0 }}
     {{- $src := printf "%s" . -}}
-    {{- $shape := site.Params.hero.shape | default "circle" -}}
+    {{- $shape := lower (site.Params.hero.shape | default "circle") -}}
+    {{- if and (ne $shape "") (not (in (slice "circle" "square" "none") $shape)) -}}
+      {{- warnf "site.Params.hero.shape %q is invalid; expected 'circle', 'square', or 'none'" $shape -}}
+    {{- end -}}
+    {{- $isSquare := in (slice "square" "none") $shape -}}
     {{- $photoClass := "hero-photo" -}}
-    {{- if eq $shape "square" -}}
+    {{- if $isSquare -}}
       {{- $photoClass = "hero-photo hero-photo-square" -}}
     {{- end -}}
     {{- $resource := resources.Get $src -}}
     {{- if and $resource (reflect.IsImageResourceProcessable $resource) -}}
-      {{- $heroDesktop := $resource.Fill "500x500 webp" -}}
-      {{- $heroMobile := $resource.Fill "280x280 webp" -}}
-      <img class="{{ $photoClass }}" src="{{ $heroDesktop.RelPermalink }}" srcset="{{ $heroMobile.RelPermalink }} 280w, {{ $heroDesktop.RelPermalink }} 500w" sizes="(max-width: 600px) 140px, 250px" width="250" height="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+      {{- $heroDesktop := $resource.Resize "500x webp" -}}
+      {{- $heroMobile := $resource.Resize "280x webp" -}}
+      <img class="{{ $photoClass }}" src="{{ $heroDesktop.RelPermalink }}" srcset="{{ $heroMobile.RelPermalink }} 280w, {{ $heroDesktop.RelPermalink }} 500w" sizes="(max-width: 600px) 140px, 250px" width="{{ $heroDesktop.Width }}" height="{{ $heroDesktop.Height }}" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
     {{- else -}}
-      <img class="{{ $photoClass }}" src="{{ $src }}" width="250" height="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+      {{- if $isSquare -}}
+        <img class="{{ $photoClass }}" src="{{ $src }}" width="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+      {{- else -}}
+        <img class="{{ $photoClass }}" src="{{ $src }}" width="250" height="250" alt="{{ i18n "hero.photo" }} {{ site.Params.biography.name }}" title="{{ site.Params.biography.name }}" loading="eager" fetchpriority="high">
+      {{- end -}}
     {{- end -}}
   {{ end }}
 

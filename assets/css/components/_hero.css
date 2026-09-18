@@ -13,7 +13,7 @@
   max-width: 250px;
 }
 
-/* Hero photo is circular by default. When params.hero.shape: "square" is set
+/* Hero photo is circular by default. When params.hero.shape is "square" or "none"
    in site config (config.yaml), hero.html applies .hero-photo-square to remove
    the circular border-radius mask for brand logos and rectangular marks. */
 .hero-photo-square {

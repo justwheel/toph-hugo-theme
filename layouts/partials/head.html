@@ -57,16 +57,11 @@
     {{- $font_title_weight := $.Param "fonts.title_weight" -}}
     {{- $font_header := $.Param "fonts.header" -}}
     {{- $font_header_weight := $.Param "fonts.header_weight" -}}
-    {{- $title_weight := "inherit" -}}
-    {{- with $font_title_weight -}}
-        {{- $digits := replaceRE `[^0-9]` "" (index (split (printf "%v" .) ";") 0) -}}
-        {{- if $digits }}{{ $title_weight = $digits }}{{ end -}}
-    {{- end -}}
-    {{- $header_weight := "inherit" -}}
-    {{- with $font_header_weight -}}
-        {{- $digits := replaceRE `[^0-9]` "" (index (split (printf "%v" .) ";") 0) -}}
-        {{- if $digits }}{{ $header_weight = $digits }}{{ end -}}
-    {{- end }}
+
+    {{/* Normalize font weights for CSS binding and Google Fonts CDN queries */}}
+    {{- $default_weight_info := partial "font-weight.html" (dict "weight" $font_default_weight "default" "normal") -}}
+    {{- $title_weight_info := partial "font-weight.html" (dict "weight" $font_title_weight "default" "500") -}}
+    {{- $header_weight_info := partial "font-weight.html" (dict "weight" $font_header_weight "default" "500") }}
 
     {{ "<!-- stylesheets -->" | safeHTML }}
     {{- $brand := dict
@@ -77,10 +72,11 @@
         "primary-text" $color_primary
         "accent-text" $color_accent
         "default-font" (css.Quoted $font_default)
+        "default-font-weight" $default_weight_info.css
         "title-font" (css.Quoted $font_title)
-        "title-font-weight" $title_weight
+        "title-font-weight" $title_weight_info.css
         "header-font" (css.Quoted $font_header)
-        "header-font-weight" $header_weight
+        "header-font-weight" $header_weight_info.css
     -}}
     {{- $neutral := dict -}}
     {{- range $group, $entries := hugo.Data.style -}}
@@ -137,7 +133,7 @@
     {{- end }}
 
     {{ "<!-- font stylesheets -->" | safeHTML }}
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_default }}{{ $font_default_weight }}&display=swap">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_title }}{{ $font_title_weight }}&display=swap">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_header }}{{ $font_header_weight }}&display=swap">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_default }}{{ $default_weight_info.cdn }}&display=swap">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_title }}{{ $title_weight_info.cdn }}&display=swap">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_header }}{{ $header_weight_info.cdn }}&display=swap">
 </head>

@@ -1,0 +1,32 @@
+{{/*
+    font-weight.html — Normalizes font weight configuration.
+
+    Accepts a dict:
+      - "weight": Value from site.Params.fonts.*_weight (e.g. 700, "700", or ":wght@500")
+      - "default": Default CSS weight when unspecified (e.g., "500" for headings, "normal" for body)
+
+    Returns a dict:
+      - "css": CSS font-weight value for css.Build vars
+      - "cdn": URL fragment to append to Google Fonts family query
+*/}}
+{{- $raw := .weight -}}
+{{- $default := .default | default "inherit" -}}
+{{- $css := $default -}}
+{{- $cdn := "" -}}
+{{- with $raw -}}
+  {{- $str := strings.TrimSpace (printf "%v" .) -}}
+  {{- if hasPrefix $str ":" -}}
+    {{- $cdn = $str -}}
+    {{/* Legacy Google Fonts query syntax: extract the target weight.
+         Google Fonts axis tuples are ascending, so select the last weight. */}}
+    {{- $allWeights := findRE `(?:wght@|;|,)([1-9][0-9]{2})` $str -}}
+    {{- if $allWeights -}}
+      {{- $lastMatch := index $allWeights (sub (len $allWeights) 1) -}}
+      {{- $css = replaceRE `[^0-9]` "" $lastMatch -}}
+    {{- end -}}
+  {{- else if ne $str "" -}}
+    {{- $css = $str -}}
+    {{- $cdn = printf ":wght@%s" $str -}}
+  {{- end -}}
+{{- end -}}
+{{- return (dict "css" $css "cdn" $cdn) -}}
