@@ -81,10 +81,11 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
     terms.html       Word cloud with scaled sizing + sort toggle
 ```
 
-### Homepage architecture
+### Homepage architecture & fallback trap
 
 The theme intentionally does not provide a default `layouts/index.html` template.
 Downstream sites must explicitly declare their desired homepage layout (such as `layout: biography`) in their `_index.md` or `_index.adoc` front matter, or provide a site-level `layouts/index.html`.
+If an index page lacks a layout declaration, Hugo silently falls back to `_default/list.html` without warnings, rendering a paginated list of all regular pages (including `projects/`, `team/`, and `footer/` because `list.html` does not filter `hide_sitemap: true`).
 
 ### Key partials
 
@@ -101,8 +102,8 @@ Downstream sites must explicitly declare their desired homepage layout (such as 
 | `post-nav.html` | Prev/next post navigation within section |
 | `recent-posts.html` | Homepage: 1 featured + 4 secondary cards with stretched links |
 | `resolve-image-path.html` | Shared image path resolution: handles remote URLs (https://), protocol-relative (//), absolute (/path), and relative (filename) paths |
-| `projects.html` | Project profiles with icons |
-| `projects-carousel.html` | Image carousel above projects |
+| `projects.html` | Project profiles with icons; receives filtered collection from caller |
+| `projects-carousel.html` | Image carousel above projects; receives filtered collection from caller |
 | `team.html` | Homepage team card grid; receives filtered collection from caller |
 | `team-card-photo.html` | Team member photo: local assets (Hugo `.Fill` + WebP) or remote URLs |
 | `for-hire.html` | Optional hire-me banner |
@@ -332,6 +333,26 @@ To scale an image proportionally without cropping any pixels, use `.Resize` (e.g
 If `.Fill` is required to conform non-square source images to a square aspect ratio, specify an explicit anchor such as `Center` (e.g., `.Fill "500x500 webp Center"`) rather than relying on `Smart` crop defaults.
 Always guard image processing operations with `reflect.IsImageResourceProcessable $resource` to ensure the file is a valid, processable raster format before invoking `.Fill` or `.Resize`.
 
+### Hero image processing and CLS avoidance
+
+The hero section (`hero.html`) standardizes consistently on `.Resize "500x webp"` and `.Resize "280x webp"` for all hero images, avoiding `.Fill` so rectangular logos, wordmarks, and portrait photos scale without pixel cropping.
+When `params.hero.shape` is `"circle"` (default), CSS `border-radius: 50%` masks the image.
+When `params.hero.shape` is `"square"` (or `"none"`), `.hero-photo-square` leaves all corners unmasked.
+For processable raster images, `width="{{ $heroDesktop.Width }}" height="{{ $heroDesktop.Height }}"` provides the browser with the exact intrinsic aspect ratio to guarantee zero Cumulative Layout Shift (`CLS = 0`).
+For non-processable fallback assets (such as SVGs), the `height="250"` attribute is omitted when shape is square so that `.hero-photo { height: auto }` scales the image naturally without reserving a false 1:1 square box.
+
+### Heading and body font-weight binding
+
+Theme typography binds configured Google Fonts weights (`fonts.title_weight`, `fonts.header_weight`, and `fonts.default_weight`) directly into CSS custom properties (`--title-font-weight`, `--header-font-weight`, `--default-font-weight`).
+In `head.html`, the `partials/font-weight.html` helper normalizes clean numeric weights (e.g., `700`, `500`) into both CSS variables and `:wght@...` Google Fonts query strings, while safely handling legacy query syntax without concatenating italic flags or variable ranges.
+Unconfigured heading weights default to `"500"` in `head.html` to preserve Bootstrap typography parity rather than inheriting body weight (`400`).
+All headings (`h1` and `h2`–`h6`, `#toctitle`, `.navbar-brand`) and `body` are bound in `_global.css` and `_nav.css` to ensure a consistent sitewide typographic hierarchy.
+
+### Deterministic multilingual builds
+
+Site configurations defining multiple languages must provide explicit `weight:` values for each language under `languages:` (e.g., `en: 1`, `ar: 2`, `hi: 3`, `es: 4`).
+Without explicit weights, Hugo's `range .AllTranslations` emits `hreflang` tags and navigation dropdown items in an unstable, non-deterministic order across builds.
+
 
 ## WCAG AA accessibility
 
@@ -446,7 +467,7 @@ Comments posted through the API follow different conventions than files in the r
 
 ## Git conventions
 
-- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics.
+- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics. Follow the 50/72 rule: subject line ≤ 50 characters, body lines wrapped at ≤ 72 characters. Wrap technical identifiers, file paths, layout names, and code entities in backticks (`` ` ``). Backticks must never be split across line breaks (must open and close on the same line).
 - **Commit trailer**: `Assisted-by: <model name> (<context window>)`. Verify the model from the current session environment before writing it — never assume it from earlier in the conversation, since the user may switch models mid-session.
 - **Commit messages go in a file**: write to `/tmp/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it.
 - **Branching**: Feature branches off `main` with descriptive names (e.g., `a11y/navbar-contrast`, `blog/taxonomy-templates`). The user creates branches.
