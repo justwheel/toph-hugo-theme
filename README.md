@@ -70,7 +70,7 @@ git submodule update --remote --rebase
 ### Project profiles
 
 Toph includes a project profile feature.
-Project profiles are shown on the main index page along with an image or logo.
+Project profiles are shown on pages using the biography layout along with an image or logo.
 Use these project profiles to showcase the primary content about the person, organization, or whoever/whatever the biography site is for.
 The name is projects, but it can cover any type of content you wish, but you must use the correct metadata.
 
@@ -101,7 +101,7 @@ The name is projects, but it can cover any type of content you wish, but you mus
      Required to set all project profiles to the "projects" category for the template to work.
      If the category is unset or incorrect, project profiles will not display.
 1. Rebuild the site.
-   The site index page now shows the project profiles.
+   Pages using the biography layout now show the project profiles.
 
 Example of a project profile, found in `content/projects/`:
 
@@ -166,7 +166,7 @@ Photos are rendered as circular, grayscale images using Hugo image processing.
 1. Add `"team"` to `params.taxonomy_exclude` in your Hugo config.
 1. Optionally set `params.team.page_title` to customize the section heading (default: "Team").
 1. Rebuild the site.
-   The homepage now shows the team grid, and `/team/` shows the full section page.
+   Pages using the biography layout now show the team grid, and `/team/` shows the full section page.
 
 Example of a team member file, found in `content/team/`:
 
@@ -467,6 +467,22 @@ When printing:
 - Colors are simplified to black text on a white background
 - Images and headings avoid breaking across page boundaries
 - Page numbers ("Page X of Y") appear at the bottom of each page (Chromium-based browsers; Firefox users can enable page numbers via the print dialog)
+
+### Homepage and layout setup
+
+Toph provides modular layouts and intentionally does not ship a hardcoded homepage template (`layouts/index.html`).
+This gives downstream site authors complete architectural freedom to design their own homepage experience.
+
+To use the personal biography and portfolio layout for your homepage, declare `layout: biography` in your `_index.md` or `_index.adoc` front matter:
+
+```yaml
+---
+layout: biography
+---
+```
+
+The `biography` layout includes the hero section, optional hire-me banner, body content, recent blog posts, project profiles, and the team member grid.
+This layout can also be applied to standalone pages (such as an `/about` page) by setting `layout: biography` in the page front matter.
 
 ### Custom colors and fonts
 

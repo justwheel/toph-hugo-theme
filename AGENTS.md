@@ -81,6 +81,11 @@ baseof.html          HTML skeleton: head, nav, header, <main>, footer
     terms.html       Word cloud with scaled sizing + sort toggle
 ```
 
+### Homepage architecture
+
+The theme intentionally does not provide a default `layouts/index.html` template.
+Downstream sites must explicitly declare their desired homepage layout (such as `layout: biography`) in their `_index.md` or `_index.adoc` front matter, or provide a site-level `layouts/index.html`.
+
 ### Key partials
 
 | Partial | Purpose |

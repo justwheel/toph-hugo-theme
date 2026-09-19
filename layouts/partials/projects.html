@@ -4,8 +4,8 @@
     Renders full project descriptions with title, logo icon, and content
     for pages categorized under "projects".
 
-    Reads from:
-      - site.RegularPages (categories = "projects") — project pages
+    Receives the filtered project page collection from the caller (e.g., biography.html).
+    Each page exposes:
       - .Title                                     — project title
       - .Slug                                      — container anchor id
       - .Param "icon"                              — project logo or icon
@@ -18,7 +18,7 @@
 */}}
 
 <div class="container-fluid" id="projects">
-    {{ range where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
+    {{ range . }}
     {{- $page := . -}}
     <div class="container" id="{{ .Slug }}">
         <h3 class="p-3 rounded border text-center">{{ .Title }}</h3>

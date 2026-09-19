@@ -187,6 +187,7 @@ params:
 defaultContentLang: en
 languages:
   ar:
+    weight: 2
     direction: rtl
     label: عربي
     menu:
@@ -218,8 +219,10 @@ languages:
           parent: blog
           weight: 20
   en:
+    weight: 1
     label: English
   es:
+    weight: 4
     label: español
     menu:
       nav:
@@ -250,6 +253,7 @@ languages:
           parent: blog
           weight: 20
   hi:
+    weight: 3
     label: हिन्दी
     menu:
       nav:
