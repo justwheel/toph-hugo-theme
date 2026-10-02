@@ -4,6 +4,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     {{ hugo.Generator }}
 
+    {{/* Bootstrap Icons is the only third-party origin left on the critical
+         path; warm the connection before the parser reaches its stylesheet.
+         Google Fonts needs no hint — fonts.html self-hosts it, and a preconnect
+         to an origin we never contact just wastes a connection slot. */}}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
     {{- $color_mode := site.Params.color_mode | default "auto" -}}
     {{- if eq $color_mode "auto" }}
     {{ "<!-- dark-mode: set data-bs-theme before first paint to prevent FOUC -->" | safeHTML }}
@@ -53,7 +59,11 @@
     {{- $color_background := $.Param "colors.light.background" | default $color_secondary -}}
     {{- $font_default := $.Param "fonts.default" -}}
     {{- $font_default_weight := $.Param "fonts.default_weight" -}}
-    {{- $font_title := $.Param "fonts.title" | default "Arial" -}}
+    {{/* Keep the raw param separate from the CSS fallback: "Arial" is a sane
+         local default for --title-font, but it is not a Google Fonts family and
+         requesting it returns HTTP 400. Only the raw value reaches fonts.html. */}}
+    {{- $font_title_param := $.Param "fonts.title" -}}
+    {{- $font_title := $font_title_param | default "Arial" -}}
     {{- $font_title_weight := $.Param "fonts.title_weight" -}}
     {{- $font_header := $.Param "fonts.header" -}}
     {{- $font_header_weight := $.Param "fonts.header_weight" -}}
@@ -144,8 +154,16 @@
     {{- end }}
     {{- end }}
 
-    {{ "<!-- font stylesheets -->" | safeHTML }}
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_default }}{{ $default_weight_info.cdn }}&display=swap">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_title }}{{ $title_weight_info.cdn }}&display=swap">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family={{ $font_header }}{{ $header_weight_info.cdn }}&display=swap">
+    {{ "<!-- fonts: self-hosted at build time, see partials/fonts.html -->" | safeHTML }}
+    {{/* partialCached: the output depends only on the font specs, but the
+         partial walks the fetched stylesheet and rewrites every URL in it,
+         which is wasted work on all but the first of a site's pages. Keyed on
+         the specs so a site whose fonts vary by page still renders correctly,
+         and on the language because resource permalinks may be localized. */}}
+    {{- $font_specs := slice
+        (dict "family" $font_default "cdn" $default_weight_info.cdn)
+        (dict "family" $font_title_param "cdn" $title_weight_info.cdn)
+        (dict "family" $font_header "cdn" $header_weight_info.cdn)
+    -}}
+    {{- partialCached "fonts.html" $font_specs (print $font_specs site.Language.Lang) }}
 </head>

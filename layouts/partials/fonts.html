@@ -1,0 +1,90 @@
+{{/*
+    fonts.html — Self-hosts Google Fonts at build time.
+
+    Why: loading fonts from fonts.googleapis.com puts a three-hop chain on the
+    critical render path — document, then the stylesheet, then the woff2 from
+    fonts.gstatic.com — across two cold connections. The stylesheets are only a
+    few KB, so the cost is connection setup and chain depth, not bytes. Fetching
+    everything at build time and republishing it locally collapses that to a
+    single same-origin request on the already-warm connection, and removes both
+    Google origins from the page. See toph#79.
+
+    Accepts a slice of dicts, one per configured family:
+      - "family": Name from site.Params.fonts.* (may be empty — empty entries
+                  are skipped, because `family=` returns HTTP 400 and would
+                  cost a render-blocking round trip to fetch an error)
+      - "cdn":    Weight fragment from partials/font-weight.html (":wght@500")
+
+    Emits an inline <style> block of @font-face rules whose src: URLs point at
+    locally published copies. Inline rather than a linked stylesheet so there is
+    no round trip at all before the browser can start fetching the woff2 files.
+
+    Falls back to the upstream CDN link if the build-time fetch fails. A Google
+    outage should cost performance, not break the build.
+*/}}
+
+{{/* Dedupe on the full spec so two params naming the same family at the same
+     weight collapse. Differing weights stay separate; the css2 API accepts
+     repeated family parameters. */}}
+{{- $specs := slice -}}
+{{- range . -}}
+  {{- $family := strings.TrimSpace (printf "%v" (.family | default "")) -}}
+  {{- if ne $family "" -}}
+    {{- $spec := printf "%s%s" (replace $family " " "+") (.cdn | default "") -}}
+    {{- if not (in $specs $spec) -}}
+      {{- $specs = $specs | append $spec -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $specs -}}
+  {{- $params := slice -}}
+  {{- range $specs -}}
+    {{- $params = $params | append (printf "family=%s" .) -}}
+  {{- end -}}
+  {{- $url := printf "https://fonts.googleapis.com/css2?%s&display=swap" (delimit $params "&") -}}
+
+  {{/* Google serves .ttf to unrecognized clients and .woff2 only to browsers,
+       so the User-Agent is load-bearing — without it we would self-host fonts
+       several times larger than what the CDN was delivering. */}}
+  {{- $ua := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -}}
+  {{- $attempt := try (resources.GetRemote $url (dict "headers" (dict "User-Agent" $ua))) -}}
+  {{- $remote := $attempt.Value -}}
+
+  {{- if or $attempt.Err (not $remote) -}}
+    {{- warnf "fonts.html: could not fetch %q at build time (%v); falling back to the Google Fonts CDN, which will slow first render" $url ($attempt.Err | default "no resource returned") -}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" type="text/css" href="{{ $url | safeURL }}">
+  {{- else -}}
+    {{/* Republish every woff2 the stylesheet references and rewrite its URL.
+         Fetch all of them: the response carries one @font-face per unicode-range
+         subset (latin, cyrillic, greek, ...), and the browser still downloads
+         only the subsets it needs. Filtering to latin would silently drop glyph
+         coverage on non-Latin translations. */}}
+    {{- $css := $remote.Content -}}
+    {{- $failed := 0 -}}
+    {{/* uniq because the loop rewrites every occurrence of a URL at once: a
+         repeat would re-fetch a string no longer present in $css and could
+         double-count $failed. Google does not currently emit duplicates, so
+         this guards their response format rather than an observed bug. */}}
+    {{- range $src := (findRE `https://fonts\.gstatic\.com/[^)"'\s]+` $css | uniq) -}}
+      {{- $got := try (resources.GetRemote $src) -}}
+      {{- $font := $got.Value -}}
+      {{- if or $got.Err (not $font) -}}
+        {{- $failed = add $failed 1 -}}
+      {{- else -}}
+        {{- $local := resources.Copy (printf "/fonts/%s" (path.Base $src)) $font -}}
+        {{- $css = replace $css $src $local.RelPermalink -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if gt $failed 0 -}}
+      {{- warnf "fonts.html: %d font file(s) could not be fetched; those @font-face rules still point at fonts.gstatic.com" $failed -}}
+      {{/* Some @font-face rules still resolve to Google, so warm that
+           connection after all — the reason we omit this hint on the success
+           path (nothing contacts gstatic) no longer holds. */}}
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{- end -}}
+    <style>{{ $css | safeCSS }}</style>
+  {{- end -}}
+{{- end -}}
