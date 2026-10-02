@@ -15,5 +15,9 @@
         </ul>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    {{/* defer so the parser is never blocked. Every page needs this bundle —
+         navbar collapse, the blog accordion, and the tweet lightbox use
+         data-bs-toggle, while the projects carousel uses data-bs-ride and
+         data-bs-slide — so it cannot be loaded conditionally. */}}
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </footer>

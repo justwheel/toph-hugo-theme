@@ -9,7 +9,7 @@ Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, 
 
 - **Hugo minimum version**: 0.161.0 Extended (required for `css.Build` with nested `vars`)
 - **Bootstrap CSS**: 5.3.8, vendored at `assets/vendor/bootstrap/bootstrap.min.css` — bumping it is a manual chore (see "External resources")
-- **Bootstrap JS**: 5.3.8 via CDN
+- **Bootstrap JS**: 5.3.8 via CDN, loaded with `defer` at end of body by `partials/footer.html`
 - **Bootstrap Icons**: 1.11.3 via CDN
 - **Google Fonts**: fetched and republished locally at build time by `partials/fonts.html`
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
@@ -98,7 +98,7 @@ If an index page lacks a layout declaration, Hugo silently falls back to `_defau
 | `nav.html` | Fixed navbar with hover-triggered dropdowns, social links from data registry, translation selector |
 | `hero.html` | Compact centered hero: profile photo, tagline, social icons, about link |
 | `header.html` | Page title (`biography.name` on home, `.Title` elsewhere) |
-| `footer.html` | Footer badges + footer-box (configurable license, repo link) |
+| `footer.html` | Footer badges + footer-box (configurable license, repo link); also loads the deferred Bootstrap JS bundle, which every page needs for Bootstrap's declarative `data-bs-*` attributes |
 | `seo-meta.html` | Schema.org Person JSON-LD, OpenGraph, Twitter cards |
 | `pagination.html` | Bootstrap 5 pagination with i18n and ARIA labels |
 | `post-meta.html` | Date, updated, author, reading time, word count, taxonomy badges |
@@ -412,7 +412,7 @@ Hugo auto-escapes template output by default. Preserve this behavior:
 
 ### External resources
 
-Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79). What remains on a CDN is either non-blocking (Bootstrap JS) or still pending migration (Bootstrap Icons).
+Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79). What remains on a CDN is either kept off the critical path entirely (Bootstrap JS, deferred at end of body) or still pending migration (Bootstrap Icons).
 
 **Vendored assets** (`assets/vendor/`) are checked in, reviewed at commit time, and fingerprinted by Hugo, which emits the `integrity` attribute itself. This is a *smaller* trust surface than a CDN — the bytes cannot change without a commit. The honest cost is that nobody bumps the version for us: upstream tracking is manual.
 
