@@ -389,6 +389,23 @@ Bootstrap's hover surface is `--bs-tertiary-bg` and its active surface is `--bs-
 Headless Chrome defaults to `prefers-color-scheme: dark`, so a default Pa11y run exercises **dark mode**, not light. To test a specific mode, emulate it explicitly. To reproduce the no-JS path, disable JavaScript *and* emulate dark — the bug class above is invisible with JavaScript on.
 
 
+## Performance
+
+### Measure before optimizing, and attribute the metric
+
+Never assume which element is the Largest Contentful Paint. Read it from `lcp-breakdown-insight` — `.details.items[1]` names the actual DOM node, and `.details.items[0]` splits the metric into time-to-first-byte, load delay, load time, and element render delay. Two rounds of image optimization were spent on jwheel.org before anyone checked, and the LCP element turned out to be a text paragraph with no image on the critical path at all. A text LCP is gated by render-blocking stylesheets, not by bytes, so the whole optimization strategy differs.
+
+**Lighthouse 13 renamed the diagnostic audits to `*-insight`.** `render-blocking-resources` no longer exists; it is `render-blocking-insight`. The same applies to `cache-insight`, `lcp-breakdown-insight`, `third-parties-insight`, `font-display-insight`, and others. Enumerate what is actually present with `jq -r '.audits | keys[] | select(test("insight"))'` before querying. A `jq` lookup of a stale audit name with a `// []` fallback returns empty and reads as "no problems found" — that exact mistake sent an investigation down a wrong path for several rounds.
+
+**Isolate a suspected culprit by blocking it, rather than reasoning from the waterfall.** `--blocked-url-patterns` is repeatable:
+
+```bash
+npx lighthouse@latest <url> --form-factor=mobile --screenEmulation.mobile \
+  --blocked-url-patterns='*googletagmanager.com*' --blocked-url-patterns='*bootstrap-icons*'
+```
+
+Run four to six times per condition and compare distributions. Single runs are not trustworthy — production runs on one build varied from Performance 66 to 94, and that spread was analytics contention rather than anything about the page. Analytics moves Total Blocking Time, not LCP; do not let the two be conflated.
+
 ## Security
 
 ### Secrets and credentials
@@ -413,6 +430,8 @@ Hugo auto-escapes template output by default. Preserve this behavior:
 ### External resources
 
 Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79). What remains on a CDN is either kept off the critical path entirely (Bootstrap JS, deferred at end of body) or still pending migration (Bootstrap Icons).
+
+That remaining icon stylesheet is not a loose end — measured against jwheel.org on 2026-10-02 it is **780 ms of render-blocking delay**, more than the vendored Bootstrap CSS (312 ms) and `main.css` (156 ms) combined. The cost is the cold cross-origin connection, not its 14 KB payload, so self-hosting it would recover most of that without waiting on the larger inline-SVG migration. Treat it as the highest-value performance work outstanding.
 
 **Vendored assets** (`assets/vendor/`) are checked in, reviewed at commit time, and fingerprinted by Hugo, which emits the `integrity` attribute itself. This is a *smaller* trust surface than a CDN — the bytes cannot change without a commit. The honest cost is that nobody bumps the version for us: upstream tracking is manual.
 
