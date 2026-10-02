@@ -5,11 +5,13 @@ This file provides guidance to AI agents (including Claude Code) when working wi
 
 ## Project overview
 
-Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 (CDN) and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
+Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
 
 - **Hugo minimum version**: 0.161.0 Extended (required for `css.Build` with nested `vars`)
-- **Bootstrap**: 5.3.8 via CDN (not vendored)
+- **Bootstrap CSS**: 5.3.8, vendored at `assets/vendor/bootstrap/bootstrap.min.css` — bumping it is a manual chore (see "External resources")
+- **Bootstrap JS**: 5.3.8 via CDN
 - **Bootstrap Icons**: 1.11.3 via CDN
+- **Google Fonts**: fetched and republished locally at build time by `partials/fonts.html`
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
 - **Example site**: `exampleSite/` — deployed to GitHub Pages as a live demo
 
@@ -91,7 +93,8 @@ If an index page lacks a layout declaration, Hugo silently falls back to `_defau
 
 | Partial | Purpose |
 |---------|---------|
-| `head.html` | Meta, CSS variables from config, CDN links (Bootstrap, Icons, Google Fonts) |
+| `head.html` | Meta, CSS variables from config, stylesheet links (vendored Bootstrap, Icons CDN, `main.css`) |
+| `fonts.html` | Fetches the Google Fonts stylesheet at build time, republishes each woff2 locally, and inlines the rewritten `@font-face` rules |
 | `nav.html` | Fixed navbar with hover-triggered dropdowns, social links from data registry, translation selector |
 | `hero.html` | Compact centered hero: profile photo, tagline, social icons, about link |
 | `header.html` | Page title (`biography.name` on home, `.Title` elsewhere) |
@@ -409,17 +412,30 @@ Hugo auto-escapes template output by default. Preserve this behavior:
 
 ### External resources
 
-Bootstrap and Bootstrap Icons are loaded via CDN. When updating CDN URLs:
+Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79). What remains on a CDN is either non-blocking (Bootstrap JS) or still pending migration (Bootstrap Icons).
+
+**Vendored assets** (`assets/vendor/`) are checked in, reviewed at commit time, and fingerprinted by Hugo, which emits the `integrity` attribute itself. This is a *smaller* trust surface than a CDN — the bytes cannot change without a commit. The honest cost is that nobody bumps the version for us: upstream tracking is manual.
+
+When vendoring or bumping a vendored asset:
+- Download from the official distribution, then verify its SHA384 against the publisher's own published SRI hash before committing
+- Keep the file pristine — do not reformat or strip trailing comments, or the hash check stops working on the next bump
+- Bump any companion file in the same commit. Bootstrap's pristine CSS retains its `sourceMappingURL`, so `bootstrap.min.css.map` must move with it or DevTools 404s against a stale map
+- Hugo publishes an asset only when a template touches it, so a companion file that no template references needs an explicit `.Publish`
+- Record the version in the "Project overview" list above
+
+When loading anything from a CDN:
 - Verify the resource hash matches the official release (check against the Bootstrap docs or CDN provider's published hashes)
 - Use `integrity` and `crossorigin="anonymous"` attributes on all `<link>` and `<script>` tags loading external resources
 - Never load JavaScript or CSS from unofficial mirrors or unverified sources
+
+**Google Fonts** are fetched at build time by `partials/fonts.html` and republished from our own origin, so no font request reaches Google at page load. The fetch is build-time only: it needs network access during `hugo`, and falls back to the upstream CDN link (with a `warnf`) if the fetch fails.
 
 ### General assessment approach
 
 When evaluating any change for security:
 1. **Identify trust boundaries** — what data comes from site config (theme operator), front matter (content author), or rendered Markdown/AsciiDoc (content author)? Each may have different trust levels in a multi-author setup.
 2. **Assume public exposure** — this is an open-source theme deployed to public sites. Anything in the repo, the built output, or the HTML source is visible to everyone.
-3. **Minimize attack surface** — avoid adding JavaScript unless strictly necessary. Static HTML with CDN resources has a small attack surface; keep it that way.
+3. **Minimize attack surface** — avoid adding JavaScript unless strictly necessary. Prefer vendored or build-time-localized assets over CDN ones: both shrink the number of third parties that can change what a visitor executes.
 4. **Check `.gitignore` coverage** — if a new feature introduces files that could contain secrets (environment configs, local overrides), ensure the relevant patterns are in `.gitignore` before any code is written.
 5. **Review Hugo function usage** — `safeHTML`, `safeJS`, `safeURL`, `safeCSS`, and `htmlUnescape` all bypass Hugo's built-in escaping. Grep for these before any release or merge to `main`.
 

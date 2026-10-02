@@ -563,6 +563,12 @@ header = "Roboto Slab"
 The `colors.dark` block is optional: `primary`, `secondary`, and `accent` fall back to their `colors.light` counterparts, and `background` falls back to `#121212`.
 Keep the `light:`/`dark:` nesting — a flat `colors.primary` key is silently ignored.
 
+Each `fonts.*` family must be a [Google Fonts](https://fonts.google.com/) family name.
+Toph downloads it **at build time** and republishes the font files from your own site, so visitors never contact Google — this keeps third-party connections off the critical render path.
+Two consequences are worth knowing: your build machine (and CI) needs network access, and an unrecognized family name yields no web font at all.
+If the fetch fails, Toph falls back to the Google Fonts CDN and prints a warning rather than failing the build.
+Omit a `fonts.*` key entirely to use the browser's default for that role.
+
 ### Hero section
 
 The hero section displays a profile photo or brand logo, tagline, social media links, and an optional about link.
