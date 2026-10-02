@@ -86,7 +86,19 @@
     {{- end -}}
     {{- $vars := merge $brand $neutral -}}
     {{- $css := resources.Get "css/main.css" | css.Build (dict "vars" $vars) | fingerprint }}
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    {{/* Bootstrap is vendored and served from our own origin so it is not a
+         cross-origin connection on the critical render path (toph#79). Load
+         order is load-bearing: main.css must come after Bootstrap so the
+         theme's :root block outranks [data-bs-theme=dark] at equal
+         specificity — see the dark-mode notes in AGENTS.md. */}}
+    {{- $bootstrap := resources.Get "vendor/bootstrap/bootstrap.min.css" | fingerprint }}
+    {{/* The vendored CSS is kept byte-for-byte pristine so its SHA384 can be
+         re-checked against upstream on the next bump, which means it still
+         carries Bootstrap's sourceMappingURL comment. Hugo only publishes an
+         asset that a template touches, so publish the map explicitly or
+         DevTools 404s resolving it. */}}
+    {{- with resources.Get "vendor/bootstrap/bootstrap.min.css.map" }}{{ .Publish }}{{ end -}}
+    <link rel="stylesheet" type="text/css" href="{{ $bootstrap.Permalink }}" integrity="{{ $bootstrap.Data.Integrity }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}">
 
