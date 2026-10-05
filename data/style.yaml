@@ -69,11 +69,21 @@ bg:
 
 nav:
   light:
-    hover-bg: royalblue
-    hover-decoration: skyblue
+    bg: "var(--primary)"
+    text: "var(--secondary)"
+    hover-bg: "rgba(255, 255, 255, 0.15)"
+    hover-decoration: "var(--accent-color)"
+    dropdown-bg: "#ffffff"
+    dropdown-text: "#151515"
+    dropdown-border: "rgba(0, 0, 0, 0.15)"
   dark:
-    hover-bg: royalblue
-    hover-decoration: skyblue
+    bg: "var(--primary)"
+    text: "var(--secondary)"
+    hover-bg: "rgba(255, 255, 255, 0.15)"
+    hover-decoration: "var(--accent-color)"
+    dropdown-bg: "#1F1F1F"
+    dropdown-text: "#ffffff"
+    dropdown-border: "rgba(255, 255, 255, 0.15)"
 
 shadow:
   light:
