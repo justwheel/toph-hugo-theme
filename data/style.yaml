@@ -28,7 +28,7 @@ text:
     secondary: "#767676"
     link: "#003366"
     link-hover: "#003d82"
-    anchor: "#959083"
+    anchor: "#767676"
   dark:
     body: "#B7A5A5"
     muted: "#A9A9A9"
