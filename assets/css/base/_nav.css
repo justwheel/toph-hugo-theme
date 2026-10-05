@@ -4,9 +4,9 @@
   --bs-navbar-active-color: var(--secondary);
   --bs-navbar-brand-color: var(--secondary);
   --bs-navbar-brand-hover-color: var(--secondary);
-  --bs-navbar-color: var(--secondary);
-  --bs-navbar-hover-color: var(--secondary);
-  background-color: var(--primary);
+  --bs-navbar-color: var(--nav-text, var(--secondary));
+  --bs-navbar-hover-color: var(--nav-text, var(--secondary));
+  background-color: var(--nav-bg, var(--primary));
   border-bottom: 2px solid var(--accent-color);
   box-shadow: 0 2px 4px var(--shadow-navbar);
   left: 0;
@@ -51,71 +51,72 @@
   opacity: 0.85;
 }
 
+/* Desktop layout */
+@media (min-width: 992px) {
+  .navbar-nav {
+    align-items: center;
+    width: 100%;
+  }
+}
+
 /* Nav links */
-.navbar .nav-link,
-.navbar .nav-link:hover,
-.navbar .nav-link:focus {
-  background-color: var(--primary);
-  color: var(--secondary);
+.navbar .nav-link {
+  border-radius: var(--bs-border-radius, 0.375rem);
+  color: var(--nav-text, var(--secondary));
+  margin-inline: 0.15rem;
+  padding-inline: 0.75rem;
   text-align: center;
 }
 
-.navbar .nav-link.active {
-  background-color: var(--accent-color);
-  color: var(--secondary);
-}
-
-.navbar .nav-link:hover {
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
   background-color: var(--nav-hover-bg);
+  color: var(--nav-text, var(--secondary));
   text-decoration: underline;
   text-decoration-color: var(--nav-hover-decoration);
   text-decoration-style: dotted;
 }
 
+.navbar .nav-link.active {
+  background-color: var(--accent-color);
+  color: var(--secondary);
+  text-decoration: none;
+}
+
 /*
- * Hamburger toggler. The navbar bar is always --primary with near-white
- * --secondary text/links in both light and dark modes, so the hamburger
- * should match. Bootstrap's default toggler icon flips its stroke to a light
- * color under [data-bs-theme=dark], which vanished against the old white
- * bg-light button; masking the icon and filling it with --secondary makes it
- * track the same color the nav links use, independent of color mode.
+ * Hamburger toggler. Masks the icon and fills it with --nav-text (falling back
+ * to --secondary) so it tracks the navbar's text color across light and dark
+ * navbar palettes without vanishing.
  *
  * The stroke='black' inside the mask data-URI is not a rendered color and is
  * exempt from the "no hardcoded colors" rule (AGENTS.md): a mask uses only the
- * alpha of its source, so the stroke hue is discarded — the visible color is
- * --secondary above. A mask requires some paint, and var() cannot be used
- * inside a data-URI, so no custom-property form is possible here.
+ * alpha of its source, so the stroke hue is discarded.
  */
 .navbar-toggler {
-  border-color: var(--secondary);
+  border-color: var(--nav-text, var(--secondary));
 }
 
 .navbar-toggler-icon {
-  background-color: var(--secondary);
+  background-color: var(--nav-text, var(--secondary));
   background-image: none;
   -webkit-mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") center / 100% no-repeat;
   mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") center / 100% no-repeat;
 }
 
 /* Give the theme toggle the brand --accent-color so it reads as a distinct
-   button against the --primary navbar bar (a plain .nav-link would share the
-   bar's background and disappear). Matches the accent chip used by the brand
-   and active links; the id selector outranks .navbar .nav-link, so on hover
-   it switches to --nav-hover-bg (the same hover color the other nav links
-   use) — a clear color change rather than blending back into the bar. Uses
-   :focus-visible, not :focus, so a mouse click doesn't leave the hover color
-   stuck until blur while still signaling keyboard focus. It carries .nav-link
-   for layout, so text-decoration: none suppresses the dotted underline that
-   .navbar .nav-link:hover would otherwise draw under the icon — a link
-   affordance that doesn't belong on a button. */
+   button against the navbar bar. Matches the accent chip used by the brand
+   and active links. */
 .navbar #theme-toggle {
   background-color: var(--accent-color);
+  border-radius: var(--bs-border-radius, 0.375rem);
+  color: var(--secondary);
   text-decoration: none;
 }
 
 .navbar #theme-toggle:hover,
 .navbar #theme-toggle:focus-visible {
-  background-color: var(--nav-hover-bg);
+  background-color: var(--accent-color);
+  opacity: 0.85;
   text-decoration: none;
 }
 
@@ -130,16 +131,22 @@
 
 /* Dropdown menus */
 .dropdown-menu {
-  background-color: var(--accent-color);
+  background-color: var(--nav-dropdown-bg, var(--bg-white, #fff));
+  border: 1px solid var(--nav-dropdown-border, var(--border-light, rgba(0, 0, 0, 0.15)));
+  border-radius: var(--bs-border-radius, 0.375rem);
+  box-shadow: 0 4px 12px var(--shadow-navbar);
+  padding: 0.35rem;
 }
 
 .dropdown-menu .dropdown-item {
-  color: var(--secondary);
+  border-radius: 0.25rem;
+  color: var(--nav-dropdown-text, var(--text-body));
+  padding: 0.4rem 0.8rem;
 }
 
 .dropdown-menu .dropdown-item:hover,
 .dropdown-menu .dropdown-item:focus {
-  background-color: var(--primary);
+  background-color: var(--accent-color);
   color: var(--secondary);
 }
 
@@ -148,14 +155,29 @@
   .nav-hover-dropdown:hover > .dropdown-menu {
     display: block;
   }
+
+  /* Right-aligned dropdown menus open inward from the right margin */
+  .dropdown-menu-end,
+  .dropdown-menu-lg-end,
+  .ms-lg-auto > .dropdown-menu,
+  .navbar-nav .nav-item:last-child > .dropdown-menu {
+    left: auto;
+    right: 0;
+  }
 }
 
 /* On mobile (collapsed navbar), show children inline on tap */
 @media (max-width: 991.98px) {
   .nav-hover-dropdown > .dropdown-menu {
+    background-color: transparent;
     border: none;
+    box-shadow: none;
     display: block;
     padding-inline-start: 1rem;
     position: static;
+  }
+
+  .nav-hover-dropdown > .dropdown-menu .dropdown-item {
+    color: var(--nav-text, var(--secondary));
   }
 }

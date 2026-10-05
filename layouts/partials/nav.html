@@ -39,9 +39,9 @@
                 {{- end }}
                 {{- if .IsTranslated }}
                     {{ "<!-- language selector -->" | safeHTML }}
-                    <li class="nav-item dropdown nav-hover-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">{{ i18n "nav.translations" }}</a>
-                        <ul class="dropdown-menu">
+                    <li class="nav-item dropdown nav-hover-dropdown ms-lg-auto">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false" aria-label="{{ i18n "nav.translations" }}"><i class="bi bi-translate" aria-hidden="true"></i></a>
+                        <ul class="dropdown-menu dropdown-menu-end">
                             {{ range .AllTranslations }}
                             <li><a class="dropdown-item{{ if eq .Lang $currentPage.Lang }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .Permalink }}">{{ .Language.Label }}</a></li>
                             {{ end }}
@@ -51,7 +51,7 @@
                 {{ end }}
                 {{- if eq $color_mode "auto" }}
                 {{ "<!-- theme toggle -->" | safeHTML }}
-                <li class="nav-item">
+                <li class="nav-item{{ if not .IsTranslated }} ms-lg-auto{{ end }}">
                     {{/* Rendered hidden: the toggle only works with JS, and the
                          no-JS @media fallback already honors the OS preference,
                          so an inert button would only mislead. The script below
