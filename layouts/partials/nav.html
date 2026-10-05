@@ -9,7 +9,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav">
                 {{ $currentPage := . }}
-                {{ range .Site.Menus.nav }}
+                {{ range site.Menus.nav }}
                     {{ if .HasChildren }}
                     <li class="nav-item dropdown nav-hover-dropdown">
                         <a class="nav-link dropdown-toggle{{ if eq .URL $currentPage.RelPermalink }} active" aria-current="page"{{ else }}"{{ end }} href="{{ .URL }}">{{ .Name }}</a>
@@ -25,7 +25,7 @@
                     </li>
                     {{ end }}
                 {{ end }}
-                {{- with $.Site.Params.social }}
+                {{- with site.Params.social }}
                 <li class="nav-item dropdown nav-hover-dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">{{ i18n "nav.social" }}</a>
                     <ul class="dropdown-menu">

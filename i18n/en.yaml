@@ -41,9 +41,9 @@
     previous: Previous
 
 - nav:
-    social: social
-    toggle_theme: toggle dark mode
-    translations: translations
+    social: Social
+    toggle_theme: Toggle theme
+    translations: Translations
 
 - tweet_archive:
     archived: Archived
