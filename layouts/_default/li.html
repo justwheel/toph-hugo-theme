@@ -1,0 +1,53 @@
+{{/*
+    _default/li.html — List item content view for paginated listings
+
+    Renders a single content page within a Bootstrap list-group.
+    Used by list.html and term.html via {{ .Render "li" }}.
+
+    Supports optional context dict (Hugo 0.166.0+) or direct Page context:
+      {{ .Render "li" }}
+      {{ .Render "li" (dict "page" . "excerpt_length" 250) }}
+
+    Context parameters (when passed as dict):
+      .page            — target Page (REQUIRED when passed as dict)
+      .excerpt_length  — maximum character length for excerpt (default 250)
+*/}}
+{{- $page := . -}}
+{{- $excerptLen := 250 -}}
+
+{{- if reflect.IsMap . -}}
+  {{- with .page }}{{ $page = . }}{{ end -}}
+  {{- with .excerpt_length }}{{ $excerptLen = . }}{{ end -}}
+{{- end -}}
+
+<li class="list-group-item">
+    {{/*
+        Display the post title. If no title is set in front matter,
+        fall back to the filename with title casing.
+        htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
+        "&rsquo;" → "'") so titles render as plain text, not escaped strings.
+        This is especially important for legacy WordPress imports.
+    */}}
+    <a href="{{ $page.Permalink }}">{{ or ($page.Title | htmlUnescape) (and $page.File $page.File.BaseFileName | title) }}</a>
+    {{/*
+        Only show the date if the page has one set. Hugo initializes .Date
+        to a zero time value when unset, so .Date.IsZero detects that.
+    */}}
+    {{ if not $page.Date.IsZero }}
+    <small class="text-muted ms-2">
+        <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format (site.Params.date_format | default "2006 January 02") }}</time>
+    </small>
+    {{ end }}
+    {{/*
+        Excerpt logic — show a short preview of each post's content.
+        Priority order:
+          1. Use .Params.description if the author set one in front matter.
+          2. Otherwise, fall back to truncated .Plain (safe plaintext).
+        htmlUnescape converts HTML entities so excerpts render cleanly.
+    */}}
+    {{ with $page.Params.description | default ($page.Plain | htmlUnescape | truncate $excerptLen) }}
+    <p class="term-excerpt text-muted mb-0 mt-1">
+        {{ . }}
+    </p>
+    {{ end }}
+</li>

@@ -25,43 +25,7 @@
 {{ if .Paginator.Pages }}
 <ul class="list-group" role="list">
 {{ range .Paginator.Pages }}
-    <li class="list-group-item">
-        {{/*
-            Display the post title. If no title is set in front matter,
-            fall back to the filename (e.g., "my-first-post" from my-first-post.md).
-            Apply | title for consistent Title Case capitalization.
-            htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
-            "&rsquo;" → "'") so titles render as plain text, not escaped strings.
-        */}}
-        <a href="{{ .Permalink }}">{{ .Title | default .File.BaseFileName | htmlUnescape | title }}</a>
-        {{/*
-            Only show the date if the page has one set. Hugo initializes .Date
-            to a zero time value when unset, so .Date.IsZero detects that.
-        */}}
-        {{ if not .Date.IsZero }}
-        <small class="text-muted ms-2">
-            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.date_format | default "2006 January 02") }}</time>
-        </small>
-        {{ end }}
-
-        {{/*
-            Excerpt logic — show a short preview of each post's content.
-
-            Priority order:
-              1. Use .Params.description if the author set one in front matter.
-                 This is a hand-crafted summary, so it's always preferred.
-              2. Otherwise, fall back to the first 250 characters of .Plain.
-                 .Plain strips all HTML, giving safe plaintext. We use
-                 truncate to trim it and add "…".
-            htmlUnescape converts HTML entities (e.g., "&amp;" → "&",
-            "&rsquo;" → "'") so excerpts render as plain text, not escaped strings.
-        */}}
-        {{ with .Params.description | default (.Plain | htmlUnescape | truncate 250) }}
-        <p class="term-excerpt text-muted mb-0 mt-1">
-            {{ . }}
-        </p>
-        {{ end }}
-    </li>
+    {{ .Render "li" }}
 {{ end }}
 </ul>
 

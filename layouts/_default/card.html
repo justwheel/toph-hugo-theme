@@ -1,0 +1,50 @@
+{{/*
+    _default/card.html — Content view for post cards
+
+    Renders a blog post card. Supports contextual rendering with a parameter
+    dictionary (Hugo 0.166.0+) or direct Page context.
+
+    Context parameters (when passed as dict):
+      .page            — target Page (REQUIRED when passed as dict)
+      .variant         — "featured" or "grid" (default "grid")
+      .badge           — optional badge text (e.g. "Latest Post" for featured)
+      .excerpt_length  — maximum character length for excerpt (default 140)
+*/}}
+{{- $page := . -}}
+{{- $variant := "grid" -}}
+{{- $badge := "" -}}
+{{- $excerptLen := 140 -}}
+
+{{- if reflect.IsMap . -}}
+  {{- with .page }}{{ $page = . }}{{ end -}}
+  {{- with .variant }}{{ $variant = . }}{{ end -}}
+  {{- with .badge }}{{ $badge = . }}{{ end -}}
+  {{- with .excerpt_length }}{{ $excerptLen = . }}{{ end -}}
+{{- end -}}
+
+{{- if eq $variant "featured" -}}
+<div class="recent-featured">
+    {{ with $badge }}<div class="recent-featured-label">{{ . }}</div>{{ end }}
+    <a class="recent-featured-title" href="{{ $page.Permalink }}">
+        {{- $page.Title | htmlUnescape -}}
+    </a>
+    <time class="recent-featured-date" datetime="{{ $page.Date.Format "2006-01-02" }}">
+        {{- $page.Date.Format (site.Params.date_format | default "2006 January 02") -}}
+    </time>
+    <p class="recent-featured-excerpt">
+        {{- $page.Params.description | default ($page.Plain | htmlUnescape | truncate $excerptLen) -}}
+    </p>
+</div>
+{{- else -}}
+<div class="recent-card">
+    <a class="recent-card-title" href="{{ $page.Permalink }}">
+        {{- $page.Title | htmlUnescape -}}
+    </a>
+    <time class="recent-card-date" datetime="{{ $page.Date.Format "2006-01-02" }}">
+        {{- $page.Date.Format (site.Params.date_format | default "2006 January 02") -}}
+    </time>
+    <p class="recent-card-excerpt">
+        {{- $page.Params.description | default ($page.Plain | htmlUnescape | truncate $excerptLen) -}}
+    </p>
+</div>
+{{- end -}}

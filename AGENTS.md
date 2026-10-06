@@ -7,7 +7,7 @@ This file provides guidance to AI agents (including Claude Code) when working wi
 
 Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
 
-- **Hugo minimum version**: 0.161.0 Extended (required for `css.Build` with nested `vars`)
+- **Hugo minimum version**: 0.166.0 Extended (required for `resources.Publish` and contextual `.Render`)
 - **Bootstrap CSS**: 5.3.8, vendored at `assets/vendor/bootstrap/bootstrap.min.css` — bumping it is a manual chore (see "External resources")
 - **Bootstrap JS**: 5.3.8 via CDN, loaded with `defer` at end of body by `partials/footer.html`
 - **Bootstrap Icons**: 1.11.3 via CDN
@@ -66,6 +66,8 @@ CI tools live in `.github/package.json` (pa11y-ci, serve). Install with `npm ci 
 baseof.html          HTML skeleton: head, nav, header, <main>, footer
   _default/
     biography.html   Biography layout: hero, for-hire, content, recent-posts, projects, team
+    card.html        Card content view for recent-posts (featured, grid variants)
+    li.html          List item content view for paginated listings (list.html, term.html)
     list.html        Paginated content list with excerpts
     single.html      Single page with blog guards ($is_structural, $is_blog_post)
     rss.xml          RSS 2.0 feed with full content, cover images, and <enclosure>
@@ -443,7 +445,7 @@ When vendoring or bumping a vendored asset:
 - Download from the official distribution, then verify its SHA384 against the publisher's own published SRI hash before committing
 - Keep the file pristine — do not reformat or strip trailing comments, or the hash check stops working on the next bump
 - Bump any companion file in the same commit. Bootstrap's pristine CSS retains its `sourceMappingURL`, so `bootstrap.min.css.map` must move with it or DevTools 404s against a stale map
-- Hugo publishes an asset only when a template touches it, so a companion file that no template references needs an explicit `.Publish`
+- Hugo publishes an asset only when a template touches it, so a companion file that no template references needs an explicit `resources.Publish` (assign to `$_` to suppress its return value from printing into `<head>`)
 - Record the version in the "Project overview" list above
 
 When loading anything from a CDN:

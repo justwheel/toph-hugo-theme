@@ -10,8 +10,8 @@ toph
 
 Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](https://gohugo.io/) static site generator.
 
-> **Hugo 0.161.0 or later is required.**
-> Toph uses Hugo's [`css.Build`](https://gohugo.io/functions/css/build/) function with [`vars`](https://gohugo.io/functions/css/build/#vars) to inject CSS custom properties at build time.
+> **Hugo 0.166.0 or later is required.**
+> Toph uses Hugo's contextual [`.Render`](https://gohugo.io/methods/page/render/) content views, [`resources.Publish`](https://gohugo.io/functions/resources/publish/), and [`css.Build`](https://gohugo.io/functions/css/build/) with [`vars`](https://gohugo.io/functions/css/build/#vars).
 > Older Hugo versions will fail to build.
 
 

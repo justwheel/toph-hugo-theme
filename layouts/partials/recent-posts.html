@@ -27,7 +27,7 @@
       especially important for post titles that may contain apostrophes, quotes,
       or ampersands from WordPress imports.
 */}}
-{{- $posts := where .Site.RegularPages "Section" "blog" -}}
+{{- $posts := where site.RegularPages "Section" "blog" -}}
 {{- $posts = where $posts "Params.hide_sitemap" "!=" true -}}
 {{- $posts = $posts.ByDate.Reverse -}}
 {{- $posts = first 5 $posts -}}
@@ -38,35 +38,14 @@
 
     {{/* Featured card — the most recent blog post */}}
     {{ with index $posts 0 }}
-    <div class="recent-featured">
-        <div class="recent-featured-label">Latest Post</div>
-        <a class="recent-featured-title" href="{{ .Permalink }}">
-            {{- .Title | htmlUnescape -}}
-        </a>
-        <time class="recent-featured-date" datetime="{{ .Date.Format "2006-01-02" }}">
-            {{- .Date.Format (site.Params.date_format | default "2006 January 02") -}}
-        </time>
-        <p class="recent-featured-excerpt">
-            {{- .Params.description | default (.Plain | htmlUnescape | truncate 250) -}}
-        </p>
-    </div>
+    {{ .Render "card" (dict "page" . "variant" "featured" "badge" "Latest Post" "excerpt_length" 250) }}
     {{ end }}
 
     {{/* Secondary grid — posts 2-5 */}}
     {{ if gt (len $posts) 1 }}
     <div class="recent-grid">
         {{ range after 1 $posts }}
-        <div class="recent-card">
-            <a class="recent-card-title" href="{{ .Permalink }}">
-                {{- .Title | htmlUnescape -}}
-            </a>
-            <time class="recent-card-date" datetime="{{ .Date.Format "2006-01-02" }}">
-                {{- .Date.Format (site.Params.date_format | default "2006 January 02") -}}
-            </time>
-            <p class="recent-card-excerpt">
-                {{- .Params.description | default (.Plain | htmlUnescape | truncate 140) -}}
-            </p>
-        </div>
+        {{ .Render "card" (dict "page" . "variant" "grid" "excerpt_length" 140) }}
         {{ end }}
     </div>
     {{ end }}
