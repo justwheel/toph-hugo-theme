@@ -222,6 +222,8 @@ Blog features (post-meta, post-nav, ToC) only render for blog posts.
 
 - `_default/_markup/render-heading.html` — Adds anchor links to Markdown headings (AsciiDoc headings are post-processed with `replaceRE` in `single.html`)
 - `_default/_markup/render-image.html` — Wraps images in `<figure>/<figcaption>` when a title is provided
+- `_default/_markup/render-link.html` — Resolves internal **Markdown** links against `.Page.GetPage` and `relURL` so links respect subpath `baseURL` deployments.
+  AsciiDoc bypasses render hooks, so `.adoc` content is not covered: root-relative links there still jump to the domain root.
 - `partials/resolve-image-path.html` — Shared image path resolution used by both `single.html` (cover images) and `rss.xml` (feed images). Accepts `dict "src" $src "file" .File` and returns the resolved path. Handles remote URLs (`https://`), protocol-relative URLs (`//`), absolute paths (`/path`), and relative filenames (resolved via `.File`).
 
 ### Shortcodes
