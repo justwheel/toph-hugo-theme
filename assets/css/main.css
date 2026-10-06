@@ -12,6 +12,7 @@
 @import './base/_nav.css';
 @import './base/_content.css';
 @import './base/_print.css';
+@import './base/_rtl.css';
 
 /* Page components */
 @import './components/_cover.css';

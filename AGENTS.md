@@ -140,6 +140,7 @@ assets/css/
     _nav.css                      Fixed navbar, dropdowns, hover states
     _content.css                  Main body: links, images, figures, ToC, profile
     _print.css                    Print stylesheet: hides navbar/UI, page numbering
+    _rtl.css                      Right-to-left layout overrides (Arabic)
   components/
     _cover.css                    Cover image for blog posts
     _hero.css                     Homepage hero section

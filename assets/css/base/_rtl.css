@@ -1,0 +1,17 @@
+/* ===[ Right-to-Left (RTL) Adaptations ]=== */
+
+/* Dropdown toggle caret spacing */
+[dir="rtl"] .dropdown-toggle::after {
+  margin-left: 0;
+  margin-right: 0.255em;
+}
+
+/* Desktop navigation layout */
+@media (min-width: 992px) {
+  /* In RTL, flip margin-start from margin-left to margin-right so utility
+     controls (translations, theme toggle) push to the left inline-end margin */
+  [dir="rtl"] .ms-lg-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+}

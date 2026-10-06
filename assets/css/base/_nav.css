@@ -39,6 +39,7 @@
 @media (max-width: 991.98px) {
   .navbar-brand {
     left: 50%;
+    margin: 0;
     position: absolute;
     top: 0.5rem;
     transform: translateX(-50%);
@@ -53,6 +54,11 @@
 
 /* Desktop layout */
 @media (min-width: 992px) {
+  .navbar-brand {
+    margin-right: 0;
+    margin-inline-end: var(--bs-navbar-brand-margin-end, 1rem);
+  }
+
   .navbar-nav {
     align-items: center;
     width: 100%;
@@ -156,13 +162,12 @@
     display: block;
   }
 
-  /* Right-aligned dropdown menus open inward from the right margin */
+  /* End-aligned dropdown menus open inward from the inline-end margin */
   .dropdown-menu-end,
   .dropdown-menu-lg-end,
   .ms-lg-auto > .dropdown-menu,
   .navbar-nav .nav-item:last-child > .dropdown-menu {
-    left: auto;
-    right: 0;
+    inset-inline: auto 0;
   }
 }
 
