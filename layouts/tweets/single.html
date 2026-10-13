@@ -21,7 +21,7 @@
             </div>
             <span class="tweet-archive-badge" aria-label="{{ i18n "tweet_archive.archived_label" }}"><i class="bi bi-archive" aria-hidden="true"></i> {{ i18n "tweet_archive.archived" }}</span>
         </div>
-        <blockquote class="tweet-archive-text" cite="{{ .RelPermalink }}">{{ .Content }}</blockquote>
+        <blockquote class="tweet-archive-text" cite="{{ .RelPermalink }}">{{ partial "render-page-content.html" . }}</blockquote>
         {{- if gt $imageCount 0 }}
         <div class="tweet-archive-images grid-{{ cond (gt $imageCount 4) "4" (printf "%d" $imageCount) }}">
             {{- range $i, $img := $images }}

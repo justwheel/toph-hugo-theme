@@ -15,7 +15,7 @@
       .Plain                — full page content stripped of HTML
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{ if .Paginator.Pages }}
 <ul class="list-group" role="list">

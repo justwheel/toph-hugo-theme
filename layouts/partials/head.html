@@ -31,16 +31,13 @@
     {{ end }}
 
     {{ "<!-- Theme SEO template -->" | safeHTML }}
-    {{ partial "seo-meta.html" . }}
+    {{ partial "meta-seo.html" . }}
 
     {{ "<!-- Google Analytics template -->" | safeHTML }}
     {{ template "_internal/google_analytics.html" . }}
 
-    {{ "<!-- OpenGraph template -->" | safeHTML }}
-    {{ template "_internal/opengraph.html" . }}
-
-    {{ "<!-- Twitter Cards template -->" | safeHTML }}
-    {{ template "_internal/twitter_cards.html" . }}
+    {{ "<!-- Theme OpenGraph/social preview templates -->" | safeHTML }}
+    {{ partial "meta-social.html" . }}
 
     {{ "<!-- favicon -->" | safeHTML }}
     {{- $favicon := $.Param "favicon" | default "/favicon.ico" }}

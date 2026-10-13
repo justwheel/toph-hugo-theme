@@ -25,7 +25,7 @@
     The exclusion list is configurable via params.taxonomy_exclude in config.yaml.
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{/*
     Load the exclusion list from site config (e.g., ["footer", "projects"]).

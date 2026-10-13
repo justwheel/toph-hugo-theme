@@ -102,11 +102,13 @@ If an index page lacks a layout declaration, Hugo silently falls back to `_defau
 | `hero.html` | Compact centered hero: profile photo, tagline, social icons, about link |
 | `header.html` | Page title (`biography.name` on home, `.Title` elsewhere) |
 | `footer.html` | Footer badges + footer-box (configurable license, repo link); also loads the deferred Bootstrap JS bundle, which every page needs for Bootstrap's declarative `data-bs-*` attributes |
-| `seo-meta.html` | Schema.org Person JSON-LD, OpenGraph, Twitter cards |
+| `meta-seo.html` | Canonical URL, description, and Schema.org Person/Article JSON-LD |
+| `meta-social.html` | OpenGraph and Twitter Card metadata with resolved featured-image URLs |
 | `pagination.html` | Bootstrap 5 pagination with i18n and ARIA labels |
 | `post-meta.html` | Date, updated, author, reading time, word count, taxonomy badges |
 | `post-nav.html` | Prev/next post navigation within section |
 | `recent-posts.html` | Homepage: 1 featured + 4 secondary cards with stretched links |
+| `render-page-content.html` | Renders page content and post-processes AsciiDoc heading anchors and subpath-relative links |
 | `resolve-image-path.html` | Shared image path resolution: handles remote URLs (https://), protocol-relative (//), absolute (/path), and relative (filename) paths |
 | `projects.html` | Project profiles with icons; receives filtered collection from caller |
 | `projects-carousel.html` | Image carousel above projects; receives filtered collection from caller |
@@ -222,11 +224,40 @@ Blog features (post-meta, post-nav, ToC) only render for blog posts.
 
 ### Render hooks and shared partials
 
-- `_default/_markup/render-heading.html` — Adds anchor links to Markdown headings (AsciiDoc headings are post-processed with `replaceRE` in `single.html`)
+- `_default/_markup/render-heading.html` — Adds anchor links to Markdown headings (AsciiDoc headings are post-processed with `replaceRE` in `partials/render-page-content.html`)
 - `_default/_markup/render-image.html` — Wraps images in `<figure>/<figcaption>` when a title is provided
 - `_default/_markup/render-link.html` — Resolves internal **Markdown** links against `.Page.GetPage` and `relURL` so links respect subpath `baseURL` deployments.
-  AsciiDoc bypasses render hooks, so `.adoc` content is not covered: root-relative links there still jump to the domain root.
-- `partials/resolve-image-path.html` — Shared image path resolution used by both `single.html` (cover images) and `rss.xml` (feed images). Accepts `dict "src" $src "file" .File` and returns the resolved path. Handles remote URLs (`https://`), protocol-relative URLs (`//`), absolute paths (`/path`), and relative filenames (resolved via `.File`).
+  Hugo's `relURL`/`absURL` treat a leading slash as domain-root-relative, so strip it before passing a local root-relative path when the configured baseURL path must be retained.
+  AsciiDoc bypasses render hooks, so `partials/render-page-content.html` applies equivalent root-relative link rebasing and heading-anchor post-processing across full page-body output: single and biography pages, section and taxonomy layouts, embedded projects and footer pages, standalone tweets, and RSS descriptions.
+- `partials/resolve-image-path.html` — Shared image path resolution used by `single.html` (cover images), `rss.xml` (feed images), and `meta-social.html` (social cards and Schema.org Article images). Accepts `dict "src" $src "file" .File` and returns the resolved path. Handles remote URLs (`https://`), protocol-relative URLs (`//`), absolute paths (`/path`), and relative filenames (resolved via `.File`).
+  Pass `"absolute" true` when the consumer requires an absolute URL; local paths are passed to `absURL` without their leading slash so a `baseURL` subpath is retained.
+- `partials/meta-social.html` — Emits OpenGraph and Twitter Card metadata using `resolve-image-path.html`, avoiding Hugo's built-in templates' inability to resolve relative images for standalone content files.
+
+#### Page-body rendering is a theme contract
+
+**Use `partial "render-page-content.html" <page>` when emitting a full page body from a layout or page-composition partial, including RSS descriptions.**
+This is an intentional departure from Hugo's customary direct `{{ .Content }}` output, not redundant indirection to simplify away.
+Hugo still owns content conversion: the helper reads the page's already-rendered `.Content`, passes Markdown through unchanged, and applies the theme's AsciiDoc-specific post-processing.
+It does not replace Hugo's markup engine or ask authors to use a different content format.
+
+**Why the helper is necessary:** Goldmark invokes Hugo render hooks, but Asciidoctor does not.
+Direct `.Content` output therefore includes the theme's heading anchors and internal-link handling for Markdown while silently omitting those features for AsciiDoc.
+In a subpath deployment, an AsciiDoc `href="/blog/"` escapes the configured site prefix and points at the domain root; it can look correct in a root-domain development build while failing on a GitHub Pages project site.
+Checking only `single.html` is insufficient because section introductions, taxonomy descriptions, embedded projects, footer pages, standalone tweets, and RSS descriptions are separate content-output paths.
+PR #100's review exposed this exact coverage gap after the helper initially reached only single and biography layouts.
+
+**Call-site rules:** Pass the page whose body is being rendered, including an embedded term or project page, rather than the containing page or an HTML string.
+The helper needs that page's `.File.Ext` to identify AsciiDoc reliably.
+Keep page context when testing for optional content: use `if .Content` followed by the helper, rather than `with .Content` followed by `{{ . }}`, which rebinds the context to the rendered HTML and bypasses processing.
+Reading `.Content` inside the helper or checking whether content exists is valid; the contract governs emitting page bodies, not every property access.
+Likewise, a fetched resource's `.Content`, such as the Google Fonts stylesheet, is not a page body and does not belong in this helper.
+Shortcodes that embed another page's content require separate consideration of both the embedded page and the host's rendering path: the current single-pass rebasing is not idempotent, so do not blindly introduce a second processing pass.
+
+**Do not revert helper calls to direct `.Content` output merely to match Hugo convention or shorten a template.**
+A replacement is justified only by a concrete rendering defect, a measured cost, or an upstream capability that makes this compatibility layer unnecessary.
+Such a change must preserve heading-anchor and root-relative-link behavior for both Markdown and AsciiDoc across every affected output path, including embedded page contexts and feeds.
+Enumerate the callers, verify root and subpath builds, check excluded external/protocol-relative/fragment links, and document the replacement mechanism and evidence before removing the helper.
+A successful Hugo build or a correct Markdown single page alone does not establish parity.
 
 ### Shortcodes
 

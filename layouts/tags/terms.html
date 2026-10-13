@@ -25,7 +25,7 @@
       .Params.hide_sitemap         — tags with this set are excluded from the cloud
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{- $exclude := site.Params.taxonomy_exclude | default slice -}}
 

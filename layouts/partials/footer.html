@@ -1,17 +1,17 @@
 <footer class="text-center">
-    {{ if .Site.GetPage "/footer" }}
+    {{ if site.GetPage "/footer" }}
     <div class="container-fluid">
-        {{ range where .Site.RegularPages ".Params.categories" "intersect" (slice "footer") }}
-        {{ .Content }}
+        {{ range where site.RegularPages ".Params.categories" "intersect" (slice "footer") }}
+        {{ partial "render-page-content.html" . }}
         {{ end }}
     </div>
     {{ end }}
     <div class="container-fluid rounded m-2" id="footer-box">
         <ul class="list-unstyled">
-            {{ with .Site.Params.legal.license }}
-            <li>{{ site.Title }} &copy; <a href="{{ .url }}" title="{{ .title }}" target="_blank">{{ .name }}</a>. {{ $.Site.Params.biography.first_online }}-{{ now.Format "2006" }}.</li>
+            {{ with site.Params.legal.license }}
+            <li>{{ site.Title }} &copy; <a href="{{ .url }}" title="{{ .title }}" target="_blank">{{ .name }}</a>. {{ site.Params.biography.first_online }}-{{ now.Format "2006" }}.</li>
             {{ end }}
-            <li><a href="{{ .Site.Params.git_repo }}" title="{{ .Site.Params.git_repo }}">{{ i18n "footer.find_this_site" | safeHTML }}</a></li>
+            <li><a href="{{ site.Params.git_repo }}" title="{{ site.Params.git_repo }}">{{ i18n "footer.find_this_site" | safeHTML }}</a></li>
         </ul>
     </div>
 

@@ -1,0 +1,121 @@
+{{- /*
+    meta-social.html — OpenGraph and Twitter Card metadata.
+
+    Hugo's embedded social templates do not resolve relative image filenames
+    beside standalone content files. Resolve those paths through
+    resolve-image-path.html before publishing social metadata.
+*/ -}}
+
+{{- $page := . -}}
+
+
+{{/* --- Shared page metadata --- */}}
+
+{{- $title := $page.Title | default site.Title -}}
+{{- $description := $page.Description | default ($page.Summary | plainify) | default site.Params.description -}}
+{{- $locale := site.Language.Locale | default site.Language.Lang | default "en-us" -}}
+
+
+{{/* --- Resolve page images, or fall back to the site's default images --- */}}
+
+{{- $images := slice -}}
+{{- $imageFile := false -}}
+
+{{- range $page.Params.images -}}
+    {{- with . -}}
+        {{- $images = $images | append . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if and $images $page.File -}}
+    {{- $imageFile = $page.File -}}
+{{- end -}}
+
+{{- if not $images -}}
+    {{- range site.Params.images -}}
+        {{- with . -}}
+            {{- $images = $images | append . -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+
+{{/*
+    Keep site-wide fallback images independent of the current page's .File.
+    Otherwise a relative site image such as "pages/logo.jpg" would be
+    incorrectly resolved inside the current post's content directory.
+*/}}
+
+{{- $imageURLs := slice -}}
+
+{{- range $images -}}
+    {{- $imageURL := partial "resolve-image-path.html" (dict
+        "src" .
+        "file" $imageFile
+        "absolute" true
+    ) -}}
+    {{- $imageURLs = $imageURLs | append $imageURL -}}
+{{- end -}}
+
+
+{{/* --- OpenGraph page identity and description --- */}}
+
+<meta property="og:site_name" content="{{ site.Title }}" />
+<meta property="og:url" content="{{ $page.Permalink }}" />
+<meta property="og:title" content="{{ $title }}" />
+
+{{- with $description }}
+<meta property="og:description" content="{{ . }}" />
+{{- end }}
+
+<meta property="og:locale" content="{{ strings.Replace $locale "-" "_" | lower }}" />
+<meta property="og:type" content="{{ if $page.IsPage }}article{{ else }}website{{ end }}" />
+
+
+{{/* --- OpenGraph article details --- */}}
+
+{{- if $page.IsPage }}
+
+    {{- with $page.Section }}
+<meta property="article:section" content="{{ . }}" />
+    {{- end }}
+
+    {{- if not $page.Date.IsZero }}
+<meta property="article:published_time" content="{{ $page.Date.Format "2006-01-02T15:04:05-07:00" }}" />
+    {{- end }}
+
+    {{/* Do not publish a modified time that predates the published time. */}}
+    {{- if and (not $page.Lastmod.IsZero) (not ($page.Lastmod.Before $page.Date)) }}
+<meta property="article:modified_time" content="{{ $page.Lastmod.Format "2006-01-02T15:04:05-07:00" }}" />
+    {{- end }}
+
+    {{/* Article tags belong with the OpenGraph article metadata. */}}
+    {{- range $page.Params.tags }}
+<meta property="article:tag" content="{{ . }}" />
+    {{- end }}
+
+{{- end }}
+
+
+{{/* --- OpenGraph images --- */}}
+
+{{- range $imageURLs }}
+<meta property="og:image" content="{{ . }}" />
+{{- end }}
+
+
+{{/* --- Twitter Card metadata --- */}}
+
+<meta name="twitter:card" content="{{ if $imageURLs }}summary_large_image{{ else }}summary{{ end }}" />
+
+{{- if $imageURLs }}
+    {{- with index $imageURLs 0 }}
+<meta name="twitter:image" content="{{ . }}" />
+    {{- end }}
+{{- end }}
+
+<meta name="twitter:title" content="{{ $title }}" />
+
+{{- with $description }}
+<meta name="twitter:description" content="{{ . }}" />
+{{- end }}

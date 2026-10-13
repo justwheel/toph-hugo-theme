@@ -8,7 +8,7 @@
   {{ if .Param "hire_me" }}
     {{ partial "for-hire.html" . }}
   {{ end }}
-  {{ .Content }}
+  {{ partial "render-page-content.html" . }}
   {{ partial "recent-posts.html" . }}
   {{ with where site.RegularPages ".Params.categories" "intersect" (slice "projects") }}
     {{ partial "projects-carousel.html" . }}

@@ -10,7 +10,7 @@
     as projects.
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{- $members := where .RegularPages ".Params.categories" "intersect" (slice "team") -}}
 

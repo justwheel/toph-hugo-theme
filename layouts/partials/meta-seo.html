@@ -1,3 +1,4 @@
+    {{- $page := . -}}
     {{- $description := .Description | default site.Params.description -}}
     {{- with $description }}
     <meta name="description" content="{{ . }}" />
@@ -8,7 +9,6 @@
     <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
     {{- end }}
     {{- end }}
-    <meta property="og:site_name" content="{{ site.Title }}" />
     <meta name="application-name" content="{{ site.Title }}" />
     {{ with site.Params.social.x }}<meta name="twitter:site" content="@{{ . }}" />{{ end }}
 
@@ -21,12 +21,6 @@
     <meta name="author" content="{{ $author }}" />
     {{- if $is_blog_post }}
     <meta property="article:author" content="{{ $author }}" />
-    {{- end }}
-
-    {{- if and $is_blog_post (isset .Params "tags") }}
-        {{- range .Params.tags }}
-    <meta property="article:tag" content="{{ . }}" />
-        {{- end }}
     {{- end }}
 
     {{- if .IsHome }}
@@ -90,7 +84,7 @@
         {{- with .Params.images }}
         {{- $img := index . 0 }}
         {{- if $img }}
-        "image": {{ (cond (urls.Parse $img).IsAbs $img ($img | absURL)) | jsonify | safeJS }},
+        "image": {{ partial "resolve-image-path.html" (dict "src" $img "file" $page.File "absolute" true) | jsonify | safeJS }},
         {{- end }}
         {{- end }}
         "mainEntityOfPage": {

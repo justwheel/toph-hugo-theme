@@ -20,7 +20,7 @@
       truncate            — Hugo function that trims a string to N characters + "…"
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{ if .Paginator.Pages }}
 <ul class="list-group" role="list">

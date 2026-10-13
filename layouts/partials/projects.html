@@ -35,7 +35,7 @@
             {{- end -}}
         {{- end }}
         <div class="p-3">
-        {{ .Content }}
+        {{ partial "render-page-content.html" . }}
         </div>
     </div>
     {{ end }}

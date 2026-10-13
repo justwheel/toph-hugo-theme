@@ -7,6 +7,10 @@
       - Relative filename (photo.jpg) — resolved relative to the page's
         content directory using the provided .file context
 
+    Set "absolute" to true when a consumer needs an absolute URL, such as
+    OpenGraph or Twitter metadata. Local paths are passed through absURL
+    without their leading slash so a baseURL subpath is retained.
+
     Usage:
       {{ $src = partial "resolve-image-path.html" (dict "src" $src "file" .File) }}
 */ -}}
@@ -15,5 +19,8 @@
   {{- with .file -}}
     {{- $src = path.Join "/" (path.Dir .Path) $src -}}
   {{- end -}}
+{{- end -}}
+{{- if and .absolute (not (urls.Parse $src).IsAbs) (not (hasPrefix $src "//")) -}}
+  {{- $src = absURL (strings.TrimPrefix "/" $src) -}}
 {{- end -}}
 {{- return $src -}}

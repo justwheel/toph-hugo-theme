@@ -1,0 +1,52 @@
+{{- /*
+    render-page-content.html — Render page content with format-specific fixes.
+
+    Markdown is rendered by Goldmark and receives Hugo render hooks directly.
+    Asciidoctor bypasses those hooks, so its rendered HTML needs equivalent
+    heading-anchor and baseURL-subpath link handling here.
+*/ -}}
+
+{{- $page := . -}}
+
+
+{{/* Keep Markdown's normal render-hook output unchanged. */}}
+
+{{- if not (and $page.File (eq $page.File.Ext "adoc")) -}}
+    {{- $page.Content -}}
+
+
+{{/* Post-process Asciidoctor's generated HTML. */}}
+
+{{- else -}}
+    {{- $content := $page.Content -}}
+
+
+    {{/* --- Match Markdown's clickable heading anchors --- */}}
+
+    {{- $content = $content | replaceRE
+        `(<h[2-6] id="([^"]+)"[^>]*>.+?)(</h[2-6]>)`
+        `${1}&nbsp;<a class="hanchor" href="#${2}" aria-label="Anchor link">🔗</a>${3}`
+    -}}
+
+
+    {{/* --- Rebase root-relative links for subpath deployments --- */}}
+
+    {{- $subpath := strings.TrimSuffix "/" (urls.Parse site.BaseURL).Path -}}
+
+    {{- if $subpath -}}
+        {{/*
+            Match only href values beginning with one slash. This excludes
+            protocol-relative URLs (//host), fragments, and relative links.
+            Go's RE2 engine does not support lookaround assertions.
+        */}}
+        {{- $content = $content | replaceRE
+            `href="(/[^/" ][^"]*|/)"`
+            (printf `href="%s$1"` $subpath)
+        -}}
+    {{- end -}}
+
+
+    {{/* .Content has already been rendered by Asciidoctor as HTML. */}}
+
+    {{- $content | safeHTML -}}
+{{- end -}}

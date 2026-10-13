@@ -22,7 +22,7 @@
 		{{/* Only root-relative paths need rebasing; page-relative ones
 		     already resolve against the rendered page URL. */}}
 		{{- if strings.HasPrefix $href "/" -}}
-			{{- $href = relURL $href -}}
+			{{- $href = relURL (strings.TrimPrefix "/" $href) -}}
 		{{- end -}}
 	{{- end -}}
 {{- end -}}

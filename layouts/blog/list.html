@@ -25,7 +25,7 @@
       truncate              — trims a string to N characters + "…"
 */}}
 {{ define "main" }}
-{{- .Content }}
+{{- partial "render-page-content.html" . }}
 
 {{/*
     Filter visible posts using where. Posts with hide_sitemap: true

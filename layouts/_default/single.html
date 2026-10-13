@@ -29,8 +29,8 @@
 {{/* --- Cover image (between title and metadata) --- */}}
 {{/*
     Renders the post's cover image from .Params.images (Hugo's standard
-    convention). Using .Params.images also enables the built-in OpenGraph
-    and Twitter Card templates to use the image for social sharing.
+    convention). The meta-social partial uses the same resolved image path
+    for OpenGraph, Twitter Card, and Schema.org metadata.
 
     Supports three path formats:
       - Remote URL (e.g., "https://cdn.example.com/photo.jpg") — used as-is
@@ -41,7 +41,7 @@
 {{ if and $is_blog_post .Params.images }}
     {{- $src := index .Params.images 0 -}}
     {{- $alt := .Title | plainify -}}
-    {{- $src = partial "resolve-image-path.html" (dict "src" $src "file" .File) -}}
+    {{- $src = partial "resolve-image-path.html" (dict "src" $src "file" .File "absolute" true) -}}
     <div class="cover-image">
         <img src="{{ $src }}" alt="{{ $alt }}" loading="lazy">
     </div>
@@ -80,18 +80,14 @@
     Heading anchors — clickable 🔗 links next to section headings.
 
     Markdown: Handled by the render-heading.html hook, which injects
-    anchors at render time. No processing needed here.
+    anchors at render time.
 
     AsciiDoc: Asciidoctor generates headings directly in .Content,
     bypassing Hugo's render hooks. We use replaceRE to inject the
-    same anchor markup into Asciidoctor-generated headings so both
-    formats get identical anchor behavior.
+    same anchor markup into Asciidoctor-generated headings; the shared
+    render-page-content partial also rebases root-relative links.
 */}}
-{{ if $isAsciidoc }}
-    {{- .Content | replaceRE `(<h[2-6] id="([^"]+)"[^>]*>.+?)(</h[2-6]>)` `${1}&nbsp;<a class="hanchor" href="#${2}" aria-label="Anchor link">🔗</a>${3}` | safeHTML }}
-{{ else }}
-    {{- .Content }}
-{{ end }}
+{{- partial "render-page-content.html" . -}}
 
 {{/* --- Previous/next post navigation --- */}}
 {{ if $is_blog_post }}
