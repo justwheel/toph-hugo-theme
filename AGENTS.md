@@ -10,7 +10,7 @@ Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, 
 - **Hugo minimum version**: 0.166.0 Extended (required for `resources.Publish` and contextual `.Render`)
 - **Bootstrap CSS**: 5.3.8, vendored at `assets/vendor/bootstrap/bootstrap.min.css` — bumping it is a manual chore (see "External resources")
 - **Bootstrap JS**: 5.3.8 via CDN, loaded with `defer` at end of body by `partials/footer.html`
-- **Bootstrap Icons**: 1.11.3 via CDN
+- **Bootstrap Icons**: 1.11.3, vendored at `assets/vendor/bootstrap-icons/` with both font formats and the upstream MIT license
 - **Google Fonts**: fetched and republished locally at build time by `partials/fonts.html`
 - **Content formats**: Markdown and AsciiDoc (via Asciidoctor)
 - **Example site**: `exampleSite/` — deployed to GitHub Pages as a live demo
@@ -95,7 +95,7 @@ If an index page lacks a layout declaration, Hugo silently falls back to `_defau
 
 | Partial | Purpose |
 |---------|---------|
-| `head.html` | Meta, CSS variables from config, stylesheet links (vendored Bootstrap, Icons CDN, `main.css`) |
+| `head.html` | Meta, CSS variables from config, stylesheet links (vendored Bootstrap and Icons, `main.css`) |
 | `fonts.html` | Fetches the Google Fonts stylesheet at build time, republishes each woff2 locally, and inlines the rewritten `@font-face` rules |
 | `font-weight.html` | Normalizes a configured `fonts.*_weight` into a CSS value and a `:wght@…` fragment; see "Heading and body font-weight binding" |
 | `nav.html` | Fixed navbar with hover-triggered dropdowns, social links from data registry, translation selector |
@@ -466,9 +466,15 @@ Hugo auto-escapes template output by default. Preserve this behavior:
 
 ### External resources
 
-Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79). What remains on a CDN is either kept off the critical path entirely (Bootstrap JS, deferred at end of body) or still pending migration (Bootstrap Icons).
+Render-blocking assets are served from our own origin, because every third-party origin on the critical path costs a DNS lookup and a TLS handshake before the page can paint (toph#79, toph#94).
+Bootstrap JS remains on a CDN, deferred at the end of the body.
+Google Fonts' build-time failure fallback can still introduce external stylesheets; verify the generated output before claiming that a build has no third-party render-blocking requests.
 
-That remaining icon stylesheet is not a loose end — measured against jwheel.org on 2026-10-02 it is **780 ms of render-blocking delay**, more than the vendored Bootstrap CSS (312 ms) and `main.css` (156 ms) combined. The cost is the cold cross-origin connection, not its 14 KB payload, so self-hosting it would recover most of that without waiting on the larger inline-SVG migration. Treat it as the highest-value performance work outstanding.
+Bootstrap Icons previously incurred **780 ms of render-blocking delay** against jwheel.org on 2026-10-02, more than the vendored Bootstrap CSS (312 ms) and `main.css` (156 ms) combined.
+Vendoring removes that cold cross-origin connection while preserving the `bi-*` class contract used by `data/social.yaml` and downstream sites.
+The pristine stylesheet references both `.woff2` and `.woff` files relative to its own directory, including upstream query strings.
+Keep both fonts alongside it and explicitly publish them from `head.html`; fingerprinting the CSS alone does not publish those dependencies.
+Check font loading under both root and subpath deployments, and measure production performance after deployment rather than treating the historical delay as a guaranteed saving.
 
 **Vendored assets** (`assets/vendor/`) are checked in, reviewed at commit time, and fingerprinted by Hugo, which emits the `integrity` attribute itself. This is a *smaller* trust surface than a CDN — the bytes cannot change without a commit. The honest cost is that nobody bumps the version for us: upstream tracking is manual.
 
