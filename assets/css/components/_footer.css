@@ -13,6 +13,11 @@ footer #footer-box {
   font-size: 0.8rem;
 }
 
+/* Separate the license and source links so their touch targets do not crowd. */
+footer #footer-box li:not(:last-child) {
+  margin-bottom: 0.75rem;
+}
+
 /* Prevent Bootstrap's element rule code { color: var(--bs-code-color) } from
    overriding inherited --secondary text color on the --primary background */
 footer #footer-box code {
