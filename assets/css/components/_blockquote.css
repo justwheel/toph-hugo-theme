@@ -1,0 +1,102 @@
+/* ===[ Blockquotes & Verse: Markdown & AsciiDoc ]=== */
+
+/* Shared container for Markdown blockquotes and AsciiDoc quoteblocks/verseblocks */
+main blockquote:not(.tweet-archive-text),
+main .quoteblock,
+main .verseblock {
+  background-color: var(--quote-bg);
+  border-inline-start: 4px solid var(--quote-border);
+  border-start-end-radius: 6px;
+  border-end-end-radius: 6px;
+  color: var(--quote-text);
+  margin: 1.75rem 0;
+  padding: 1.15rem 1.5rem;
+  position: relative;
+}
+
+/* Reset inner blockquote in AsciiDoc quoteblock */
+main .quoteblock blockquote {
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography for quote body */
+main blockquote:not(.tweet-archive-text) p,
+main .quoteblock blockquote p,
+main .verseblock pre {
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.65;
+}
+
+main blockquote:not(.tweet-archive-text) > :last-child,
+main .quoteblock blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* AsciiDoc block title */
+main .quoteblock > .title,
+main .verseblock > .title {
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Attribution & citation (AsciiDoc native and Markdown semantic) */
+main .quoteblock .attribution,
+main .verseblock .attribution,
+main blockquote:not(.tweet-archive-text) footer,
+main blockquote:not(.tweet-archive-text) figcaption {
+  color: var(--quote-attribution);
+  font-size: 0.875rem;
+  font-style: normal;
+  margin-top: 0.75rem;
+  text-align: end;
+}
+
+main .quoteblock .attribution cite,
+main .verseblock .attribution cite,
+main blockquote:not(.tweet-archive-text) cite {
+  color: var(--quote-cite);
+  font-style: italic;
+}
+
+/* Verse block override: poetry and lyrics must not render as monospace code */
+main .verseblock pre {
+  color: inherit;
+  font-family: var(--default-font), sans-serif;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+/* Nested Markdown blockquotes */
+main blockquote:not(.tweet-archive-text) blockquote {
+  border-inline-start: 3px solid var(--quote-nested-border);
+  font-size: 0.95rem;
+  margin: 0.75rem 0;
+  padding: 0.5rem 1rem;
+}
+
+/* AsciiDoc epigraph role */
+main .quoteblock.epigraph {
+  border-inline-start-width: 2px;
+  padding-inline-start: 1.75rem;
+}
+
+/* AsciiDoc lead role */
+main .quoteblock.lead p {
+  font-size: 1.2rem;
+  line-height: 1.75;
+}
+
+/* Inline code inside quotes resets font-style */
+main blockquote:not(.tweet-archive-text) code,
+main .quoteblock code {
+  font-style: normal;
+}
