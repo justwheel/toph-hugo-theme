@@ -7,7 +7,7 @@ This file provides guidance to AI agents (including Claude Code) when working wi
 
 Toph is a lightweight, responsive Hugo theme for biography and portfolio sites, built on Bootstrap 5.3 and licensed MPL-2.0. It features project profiles, dynamic footer badges, a data-driven social media system, blogging with taxonomy support, and Schema.org SEO.
 
-- **Hugo minimum version**: 0.166.0 Extended (required for `resources.Publish` and contextual `.Render`)
+- **Hugo minimum version**: 0.166.0 Extended (required for `resources.Publish` and contextual `.Render`); local development and CI are currently pinned to 0.169.0
 - **Bootstrap CSS**: 5.3.8, vendored at `assets/vendor/bootstrap/bootstrap.min.css` — bumping it is a manual chore (see "External resources")
 - **Bootstrap JS**: 5.3.8 via CDN, loaded with `defer` at end of body by `partials/footer.html`
 - **Bootstrap Icons**: 1.11.3, vendored at `assets/vendor/bootstrap-icons/` with both font formats and the upstream MIT license
@@ -151,6 +151,7 @@ assets/css/
     _post-meta.css                Blog post metadata bar
     _post-nav.css                 Prev/next post navigation
     _asciidoc-admonition.css      AsciiDoc admonition blocks (note, tip, warning…)
+    _blockquote.css               Blockquotes and verse blocks (Markdown & AsciiDoc)
     _code.css                     Code block borders
     _pdf-download.css             PDF download shortcode card
     _team.css                     Team member card grid
@@ -356,6 +357,21 @@ The global function is shorter, more idiomatic, and eliminates an entire class o
 When modifying existing templates that use `$.Site` or `.Site`, convert them to `site` as part of the change.
 Do not leave mixed usage in the same file.
 
+### Reserved front-matter fields use Page methods (Hugo 0.169.0+)
+
+Hugo v0.169.0 deprecated reading reserved front-matter fields through `.Params` or `.Param` — the lookups are redirected to the corresponding `Page` method and logged as deprecated, and the redirect will be removed in a future release.
+
+| Use this | Not this |
+|----------|----------|
+| `.Title` | `.Params.title` or `.Param "title"` |
+| `.Date` | `.Params.date` or `.Param "date"` |
+| `.Description` | `.Params.description` or `.Param "description"` |
+
+- Namespaced `.Param` lookups are unaffected and remain correct: `.Param "icon"`, `.Param "author"`, `.Param "hire_me"`, `.Param "biography.name"`, `.Param "colors.*"`, `.Param "fonts.*"`.
+- `where` lookups over non-reserved fields are likewise unaffected: `"Params.tweet_id"`, `"Params.hide_sitemap"`.
+- Site config stays on `site.Params.*` (e.g., `site.Params.description`) — the deprecation governs **page** front matter, not site configuration.
+- The migration is tracked in toph#103.
+
 ### JSON-LD structured data
 
 Use `| jsonify | safeJS` when outputting dynamic values inside `<script type="application/ld+json">` blocks.
@@ -423,7 +439,7 @@ Bootstrap's hover surface is `--bs-tertiary-bg` and its active surface is `--bs-
 
 ### Testing dark mode
 
-Headless Chrome defaults to `prefers-color-scheme: dark`, so a default Pa11y run exercises **dark mode**, not light. To test a specific mode, emulate it explicitly. To reproduce the no-JS path, disable JavaScript *and* emulate dark — the bug class above is invisible with JavaScript on.
+Headless Chrome defaults `prefers-color-scheme` to **light**, so a default Pa11y run exercises **light mode**, not dark. To test dark mode, emulate it explicitly (or use a `--config` overlay pinning `params.color_mode: dark` — forced modes render server-side, so the crawl is deterministic). To reproduce the no-JS path, disable JavaScript *and* emulate dark — the bug class above is invisible with JavaScript on.
 
 
 ## Performance
@@ -509,7 +525,7 @@ When evaluating any change for security:
 The user and the agent work as a team. Communication on GitHub must be effective, genuine, and honest. This requires a human-in-the-loop check before every public-facing action.
 
 Workflow:
-1. Write the payload to a file under `/tmp` — no need to ask first, `/tmp` is always writable
+1. Write the payload to a file under `/tmp` (harness-preferred: `/tmp/opencode`) — no need to ask first, `/tmp` is always writable
 2. Present it for review — for edits to existing content, show a precise diff and confirm nothing else changed
 3. Present a copy-pasteable `gh api` or `gh issue create` command that reads the payload from that file
 4. **The user runs the command.** Their execution is the consent
@@ -547,7 +563,7 @@ Comments posted through the API follow different conventions than files in the r
 
 - **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics. Follow the 50/72 rule: subject line ≤ 50 characters, body lines wrapped at ≤ 72 characters. Wrap body lines **greedily** — pack each line with as many words as fit without reaching 73 characters, rather than breaking early for balance. Wrap technical identifiers, file paths, layout names, and code entities in backticks (`` ` ``). Backticks must never be split across line breaks (must open and close on the same line).
 - **Commit trailer**: `Assisted-by: <model name> (<context window>)`. Verify the model from the current session environment before writing it — never assume it from earlier in the conversation, since the user may switch models mid-session.
-- **Commit messages go in a file**: write to `/tmp/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it.
+- **Commit messages go in a file**: write to `/tmp/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it. The harness-preferred location is `/tmp/opencode`.
 - **Branching**: Feature branches off `main` with descriptive names (e.g., `a11y/navbar-contrast`, `blog/taxonomy-templates`). The user creates branches.
 - **GPG signing**: All commits must be GPG-signed (`commit.gpgsign = true`)
 - **DCO**: Use `--signoff` flag (never write `Signed-off-by` manually in message text)
