@@ -329,7 +329,7 @@ The `id` parameter must match a content page's `tweet_id` front matter. If no ma
 
 ### i18n
 
-Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. All four are enabled in the example site config with explicit weights (`en: 1`, `ar: 2`, `hi: 3`, `es: 4`), so every language is exercised by a CI build. Namespaces: `404_page`, `footer`, `hero`, `hire_me`, `index`, `misc`, `nav`, `tweet_archive`, sorted alphabetically within each file. Coverage is **not** uniform: `ar.yaml` and `hi.yaml` carry six namespaces, omitting `hire_me` and `index`, so `partials/for-hire.html` falls back to English on those two languages. The `index` namespace is referenced by no layout at all and is a cleanup candidate in either direction — finish it or drop it.
+Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. All four are enabled in the example site config with explicit weights (`en: 1`, `ar: 2`, `hi: 3`, `es: 4`), so every language is exercised by a CI build. Namespaces: `404_page`, `footer`, `hero`, `hire_me`, `index`, `misc`, `nav`, `recent_posts`, `tweet_archive`, sorted alphabetically within each file. Coverage is **not** uniform: `ar.yaml` and `hi.yaml` carry seven namespaces, omitting `hire_me` and `index`, so `partials/for-hire.html` falls back to English on those two languages. The `index` namespace is referenced by no layout at all and is a cleanup candidate in either direction — finish it or drop it.
 
 ### Archetypes
 

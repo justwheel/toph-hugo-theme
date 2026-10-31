@@ -45,6 +45,11 @@
     toggle_theme: alternar modo oscuro
     translations: idiomas
 
+- recent_posts:
+    latest: Última publicación
+    title: Publicaciones recientes
+    view_all: Ver todas las publicaciones →
+
 - tweet_archive:
     archived: Archivado
     archived_label: Este tweet ha sido archivado

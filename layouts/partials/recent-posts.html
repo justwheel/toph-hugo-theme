@@ -7,7 +7,7 @@
     exists.
 
     Key Hugo variables used:
-      .Site.RegularPages           — all regular (non-section) pages in the site
+      site.RegularPages            — all regular (non-section) pages in the site
       where ... "Section" "blog"   — filter to pages in the blog section
       .Params.hide_sitemap         — front matter flag to exclude from listings
       .Title                       — page title
@@ -15,6 +15,11 @@
       .Date                        — publication date from front matter
       .Params.description          — optional excerpt from front matter
       .Plain                       — page content as plain text (stripped of HTML)
+
+    i18n keys used:
+      recent_posts.title           — section heading ("Recent Posts")
+      recent_posts.latest          — badge label for the featured card ("Latest Post")
+      recent_posts.view_all        — archive link ("View all posts →")
 
     Filtering behavior:
       Pages with `hide_sitemap: true` in their front matter are excluded from
@@ -34,11 +39,12 @@
 
 {{ if $posts }}
 <section class="recent-posts">
-    <h2>Recent Posts</h2>
+    <h2>{{ i18n "recent_posts.title" | default "Recent Posts" }}</h2>
 
     {{/* Featured card — the most recent blog post */}}
     {{ with index $posts 0 }}
-    {{ .Render "card" (dict "page" . "variant" "featured" "badge" "Latest Post" "excerpt_length" 250) }}
+    {{ $badge := i18n "recent_posts.latest" | default "Latest Post" }}
+    {{ .Render "card" (dict "page" . "variant" "featured" "badge" $badge "excerpt_length" 250) }}
     {{ end }}
 
     {{/* Secondary grid — posts 2-5 */}}
@@ -52,7 +58,7 @@
 
     {{/* Footer with "View all posts" link */}}
     <div class="recent-view-all">
-        <a href="{{ "blog/" | relURL }}">View all posts →</a>
+        <a href="{{ "blog/" | relLangURL }}">{{ i18n "recent_posts.view_all" | default "View all posts →" }}</a>
     </div>
 </section>
 {{ end }}

@@ -20,6 +20,11 @@
     toggle_theme: डार्क मोड टॉगल करें
     translations: भाषाएँ
 
+- recent_posts:
+    latest: नवीनतम पोस्ट
+    title: हाल की पोस्ट
+    view_all: सभी पोस्ट देखें →
+
 - tweet_archive:
     archived: संग्रहीत
     archived_label: यह ट्वीट संग्रहीत किया गया है

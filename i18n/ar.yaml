@@ -20,6 +20,11 @@
     toggle_theme: تبديل الوضع الداكن
     translations: لغات
 
+- recent_posts:
+    latest: أحدث مقالة
+    title: المقالات الحديثة
+    view_all: عرض جميع المقالات ←
+
 - tweet_archive:
     archived: مؤرشف
     archived_label: تم أرشفة هذا التغريدة

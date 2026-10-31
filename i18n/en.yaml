@@ -45,6 +45,11 @@
     toggle_theme: Toggle theme
     translations: Translations
 
+- recent_posts:
+    latest: Latest Post
+    title: Recent Posts
+    view_all: View all posts →
+
 - tweet_archive:
     archived: Archived
     archived_label: This tweet has been archived
