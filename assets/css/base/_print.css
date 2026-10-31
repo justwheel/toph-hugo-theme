@@ -89,7 +89,6 @@
   main .quoteblock,
   main .verseblock {
     background-color: transparent !important;
-    border-inline-start-color: #333 !important;
     color: #000 !important;
   }
 

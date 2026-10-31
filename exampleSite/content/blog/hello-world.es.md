@@ -46,6 +46,14 @@ No se necesita configuración: si existen publicaciones de blog, aparecen.
 
 Al final de cada publicación, los enlaces de anterior y siguiente permiten a los lectores moverse entre publicaciones sin volver al archivo.
 
+## Citas y extractos
+
+Las citas de Markdown escritas con la sintaxis estándar `>` reciben automáticamente el estilo editorial del tema:
+
+> La simplicidad es un requisito previo para la fiabilidad.
+>
+> — Edsger W. Dijkstra
+
 ## Primeros pasos
 
 Crea una nueva publicación de blog con el arquetipo integrado de Hugo:

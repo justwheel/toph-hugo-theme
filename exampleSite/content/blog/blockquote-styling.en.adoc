@@ -1,15 +1,14 @@
 ---
-title: "Editorial Blockquotes and Verse in AsciiDoc and Markdown"
+title: "Editorial Blockquotes and Verse in AsciiDoc"
 date: 2026-10-29
 categories:
   - "features"
 tags:
   - "toph"
   - "asciidoc"
-  - "markdown"
   - "typography"
 author: "Justin Wheeler"
-description: "Toph introduces an editorial quotation system with dedicated styling for AsciiDoc quote blocks, verse blocks, and standard Markdown blockquotes."
+description: "Toph introduces an editorial quotation system with dedicated styling for AsciiDoc quote blocks and verse blocks."
 ---
 
 Quotations should never fade into surrounding body copy.
@@ -60,29 +59,3 @@ And miles to go before I sleep,
 And miles to go before I sleep.
 ____
 
-
-== Markdown blockquote support
-
-Markdown blockquotes authored with standard `>` syntax receive the same visual container and typographic refinement automatically.
-No custom classes, HTML wrappers, or shortcodes are required.
-
-When authored in Markdown:
-
-[source,markdown]
-----
-> Simplicity is prerequisite for reliability.
->
-> — Edsger W. Dijkstra
-----
-
-Markdown blockquotes support nested levels, multi-paragraph excerpts, and inline formatting like bold, italics, and code.
-
-
-== Accessibility, dark mode, and RTL
-
-The blockquote system is engineered to satisfy strict design and accessibility requirements:
-
-* **WCAG AA contrast**: Text and attribution colors maintain at least 4.5:1 contrast against the tinted surface across both light and dark modes.
-* **Right-to-left layout**: Built with CSS logical properties (`border-inline-start`, `border-start-end-radius`, `text-align: end`), the border accent and attribution seamlessly flip for Arabic (`ar`).
-* **Print optimization**: Print stylesheets render transparent backgrounds with clean ink-friendly borders to prevent toner waste.
-* **Component isolation**: Standard blog quotes remain strictly isolated from self-hosted archived tweet cards.

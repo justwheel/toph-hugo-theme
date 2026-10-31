@@ -1,15 +1,14 @@
 ---
-title: "Bloques de citas y versos editoriales en AsciiDoc y Markdown"
+title: "Bloques de citas y versos editoriales en AsciiDoc"
 date: 2026-10-29
 categories:
   - "features"
 tags:
   - "toph"
   - "asciidoc"
-  - "markdown"
   - "typography"
 author: "Justin Wheeler"
-description: "Toph introduce un sistema de citas editoriales con estilos dedicados para bloques de citas y versos en AsciiDoc y Markdown estándar."
+description: "Toph introduce un sistema de citas editoriales con estilos dedicados para bloques de citas y versos en AsciiDoc."
 ---
 
 Las citas nunca deben confundirse con el texto principal circundante.
@@ -46,16 +45,3 @@ y millas que recorrer antes de dormir,
 y millas que recorrer antes de dormir.
 ____
 
-
-== Soporte para citas en Markdown
-
-Las citas redactadas en Markdown con la sintaxis estándar `>` reciben automáticamente el mismo contenedor visual y refinamiento tipográfico sin necesidad de clases HTML ni shortcodes.
-
-
-== Accesibilidad, modo oscuro y RTL
-
-El sistema de citas está diseñado conforme a estándares rigurosos:
-
-* **Contraste WCAG AA**: Mantiene un contraste superior a 4.5:1 en modo claro y oscuro.
-* **Diseño RTL**: Construido con propiedades lógicas de CSS, adaptándose perfectamente al árabe (`ar`).
-* **Optimización para impresión**: Diseñado para ahorrar tinta con fondos transparentes.

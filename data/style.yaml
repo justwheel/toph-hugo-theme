@@ -129,19 +129,9 @@ admonition:
 
 quote:
   light:
-    border: "var(--accent-color)"
     bg: "rgba(0, 0, 0, 0.025)"
-    text: "var(--text-body)"
-    attribution: "var(--text-muted)"
-    cite: "var(--text-secondary)"
-    nested-border: "var(--border-medium)"
   dark:
-    border: "var(--accent-color)"
     bg: "rgba(255, 255, 255, 0.03)"
-    text: "var(--text-body)"
-    attribution: "var(--text-muted)"
-    cite: "var(--text-secondary)"
-    nested-border: "var(--border-medium)"
 
 # Bootstrap's own --bs-* variables, re-pointed at the theme palette so
 # Bootstrap-native components (.card, .list-group-item, .accordion)
