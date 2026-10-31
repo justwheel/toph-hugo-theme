@@ -1,0 +1,61 @@
+---
+title: "Editorial Blockquotes and Verse in AsciiDoc"
+date: 2026-10-29
+categories:
+  - "features"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "typography"
+author: "Justin Wheeler"
+description: "Toph introduces an editorial quotation system with dedicated styling for AsciiDoc quote blocks and verse blocks."
+---
+
+Quotations should never fade into surrounding body copy.
+When reading an article, a reader needs an immediate visual cue that marks an excerpted voice, an interview response, poetry, or historical documentation.
+Toph provides an editorial blockquote design system crafted for both AsciiDoc and Markdown.
+
+Every quotation features an accent rule on the inline start, a subtle tinted background, refined asymmetric corner rounding, and relaxed italic typography.
+
+
+== AsciiDoc quote blocks
+
+AsciiDoc provides first-class syntax for quote blocks using the `[quote]` attribute and four underscores (`____`).
+This syntax natively supports block titles, author attribution, and cited publication sources.
+
+.Universal Declaration of Human Rights
+[quote, United Nations General Assembly, Universal Declaration of Human Rights (1948)]
+____
+All human beings are born free and equal in dignity and rights.
+They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.
+____
+
+AsciiDoc quote blocks also support multiple paragraphs and embedded lists:
+
+.Principles of Digital Autonomy
+[quote, Declaration of Digital Autonomy]
+____
+We call for the adoption of principles that place technology in service of humanity:
+
+. In service of the people who use it
+. Informed consent and transparency
+. Empowering individual and collective digital action
+. Protecting privacy and fundamental rights by design
+____
+
+
+== Verse blocks for poetry and lyrics
+
+Standard HTML `<pre>` tags default to monospace Courier type, which strips song lyrics and poetry of their literary feel.
+AsciiDoc solves this with the `[verse]` block.
+Toph styles verse blocks with the same visual container as quotes while preserving line breaks and rendering in the clean site body typeface.
+
+.Stopping by Woods on a Snowy Evening
+[verse, Robert Frost, New Hampshire (1923)]
+____
+The woods are lovely, dark and deep,
+But I have promises to keep,
+And miles to go before I sleep,
+And miles to go before I sleep.
+____
+

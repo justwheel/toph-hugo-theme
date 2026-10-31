@@ -46,6 +46,14 @@ No configuration is needed — if blog posts exist, they show up.
 
 At the bottom of each post, previous and next links let readers move between posts without going back to the archive.
 
+## Blockquotes and excerpts
+
+Markdown blockquotes authored with standard `>` syntax receive editorial quotation styling automatically:
+
+> Simplicity is prerequisite for reliability.
+>
+> — Edsger W. Dijkstra
+
 ## Getting started
 
 Create a new blog post with Hugo's built-in archetype:

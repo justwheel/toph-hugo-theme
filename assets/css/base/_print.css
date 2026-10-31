@@ -84,6 +84,14 @@
     break-inside: avoid;
   }
 
+  /* Clean ink-friendly borders and transparent background for quotes */
+  main blockquote:not(.tweet-archive-text),
+  main .quoteblock,
+  main .verseblock {
+    background-color: transparent !important;
+    color: #000 !important;
+  }
+
   /* Hide the hero social links and "for hire" banner */
   .hero-links,
   .for-hire {
