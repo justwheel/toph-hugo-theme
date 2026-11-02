@@ -1,0 +1,61 @@
+/* ===[ Blockquotes: Markdown and AsciiDoc quote/verse ]=== */
+
+main blockquote:not(.tweet-archive-text),
+main .quoteblock,
+main .verseblock {
+  background-color: var(--quote-bg);
+  border-inline-start: 4px solid var(--accent-color);
+  border-start-end-radius: 6px;
+  border-end-end-radius: 6px;
+  margin: 1.75rem 0;
+  padding: 1.15rem 1.5rem;
+}
+
+/* AsciiDoc wraps its <blockquote> in .quoteblock; style the wrapper only */
+main .quoteblock blockquote {
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+main blockquote:not(.tweet-archive-text) p,
+main .verseblock pre {
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.65;
+}
+
+main blockquote > :last-child,
+main .quoteblock blockquote > :last-child > :last-child {
+  margin-bottom: 0;
+}
+
+/* Keep verse line breaks, drop the code-block look from _code.css */
+main .verseblock pre {
+  border: 0;
+  font-family: inherit;
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+}
+
+main :is(.quoteblock, .verseblock) > .title {
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+main :is(.quoteblock, .verseblock) .attribution {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+  text-align: end;
+}
+
+main blockquote code {
+  font-style: normal;
+}

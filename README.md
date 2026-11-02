@@ -441,7 +441,7 @@ The source CSS is organized under `assets/css/` in four directories:
 assets/css/
   main.css                 @import entrypoint (no rules, only imports)
   base/                    Variables, global styles, navbar, main content area
-  components/              Cover image, hero, PDF download, tweet archive, team card grid, post metadata, post nav, code blocks, footer
+  components/              Cover image, hero, blockquotes & verses, PDF download, tweet archive, team card grid, post metadata, post nav, code blocks, footer
   taxonomy/                Sort controls, term excerpts, categories grid, tags word cloud
   blog/                    Recent posts, blog archive accordion
 ```

@@ -1,0 +1,47 @@
+---
+title: "Bloques de citas y versos editoriales en AsciiDoc"
+date: 2026-10-29
+categories:
+  - "features"
+tags:
+  - "toph"
+  - "asciidoc"
+  - "typography"
+author: "Justin Wheeler"
+description: "Toph introduce un sistema de citas editoriales con estilos dedicados para bloques de citas y versos en AsciiDoc."
+---
+
+Las citas nunca deben confundirse con el texto principal circundante.
+Al leer un artículo, el lector necesita una señal visual inmediata que distinga una voz citada, una entrevista, poesía o documentación histórica.
+Toph proporciona un sistema de diseño editorial para citas creado tanto para AsciiDoc como para Markdown.
+
+Cada cita cuenta con una línea de acento en el borde inicial, un fondo sutilmente matizado, esquinas suavemente redondeadas y tipografía en cursiva relajada.
+
+
+== Bloques de citas en AsciiDoc
+
+AsciiDoc proporciona una sintaxis de primera clase para bloques de citas mediante el atributo `[quote]` y cuatro guiones bajos (`____`).
+Esta sintaxis admite títulos de bloque, atribución de autor y fuentes citadas.
+
+.Declaración Universal de los Derechos Humanos
+[quote, Asamblea General de las Naciones Unidas, Declaración Universal de los Derechos Humanos (1948)]
+____
+Todos los seres humanos nacen libres e iguales en dignidad y derechos y, dotados como están de razón y conciencia, deben comportarse fraternalmente los unos con los otros.
+____
+
+
+== Bloques de versos para poesía y letras
+
+Las etiquetas HTML estándar `<pre>` utilizan fuentes monoespaciadas, lo que resta elegancia literaria a la poesía.
+AsciiDoc resuelve esto con el bloque `[verse]`.
+Toph aplica a los versos el mismo contenedor visual que a las citas, conservando los saltos de línea y utilizando la tipografía limpia del sitio.
+
+.Parando junto a los bosques en una noche nevada
+[verse, Robert Frost, New Hampshire (1923)]
+____
+Los bosques son hermosos, oscuros y profundos,
+pero tengo promesas que cumplir,
+y millas que recorrer antes de dormir,
+y millas que recorrer antes de dormir.
+____
+

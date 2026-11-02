@@ -127,6 +127,12 @@ admonition:
     icon-caution: "#BC8479"
     icon-important: "#9780AD"
 
+quote:
+  light:
+    bg: "rgba(0, 0, 0, 0.025)"
+  dark:
+    bg: "rgba(255, 255, 255, 0.03)"
+
 # Bootstrap's own --bs-* variables, re-pointed at the theme palette so
 # Bootstrap-native components (.card, .list-group-item, .accordion)
 # render on our surfaces instead of Bootstrap's lighter, bluer defaults.
