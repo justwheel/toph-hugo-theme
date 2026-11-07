@@ -189,6 +189,8 @@ Toph ships a switchable light/dark theme driven by the `color_mode` site param: 
 Every neutral group in `data/style.yaml` has parallel `light:` and `dark:` subtrees with the same keys. `head.html` flattens each into a CSS variable by joining group and key with a hyphen, so `text.light.body` and `text.dark.body` both become `--text-body` — in different scopes.
 
 A group may be dark-only by omitting its `light:` subtree; the light range then finds nothing and emits nothing.
+A group may also be light-only, by omitting its `dark:` subtree, which keeps its values constant across modes.
+`print:` is that case: paper does not change with the color mode, so `@media print` in `_print.css` remaps every mode-dependent token to it and the dark `<style>` block can never override those values.
 The `bs:` group overrides Bootstrap's own tokens: surface variables are dark-only, while `--bs-code-color` is configured across both modes.
 
 **Invariant for `bs:` tokens:** Every key under `light:` must also appear under `dark:`.
@@ -440,6 +442,25 @@ Bootstrap's hover surface is `--bs-tertiary-bg` and its active surface is `--bs-
 ### Testing dark mode
 
 Headless Chrome defaults `prefers-color-scheme` to **light**, so a default Pa11y run exercises **light mode**, not dark. To test dark mode, emulate it explicitly (or use a `--config` overlay pinning `params.color_mode: dark` — forced modes render server-side, so the crawl is deterministic). To reproduce the no-JS path, disable JavaScript *and* emulate dark — the bug class above is invisible with JavaScript on.
+
+### Print is a third rendering target
+
+Printing is not a variant of light mode.
+`assets/css/base/_print.css` remaps every token that `head.html` emits for dark mode onto the light-only `print:` group in `data/style.yaml`, using selectors specific enough (`html:root[data-bs-theme]`, `html:root:not([data-bs-theme])`) to outrank both dark `<style>` blocks regardless of source order.
+A document printed from a dark page must be identical to one printed from a light page.
+
+When you add a color token, add it to the dark subtree **and** to the print remap, or it leaks the dark value onto paper.
+Brand-colored surfaces (badges, tags, the footer box, the PDF download card) carry `--secondary` text tuned for a colored background.
+Chrome drops backgrounds when printing, so each of those needs an explicit ink-on-paper override rather than a token remap.
+
+`.github/scripts/print_contrast.py` audits this.
+It reads the print-media computed color of every element owning a text node, on every sitemap URL, and checks it against a plain-white paper and against a composited-background paper, failing below WCAG AA.
+Its default matrix runs light, dark, and no-JS dark, because the no-JS path never sets `data-bs-theme` and falls back to Bootstrap's light rules; `--skip-no-js` drops that cell.
+Run it against an `auto` build and against a `params.color_mode: dark` build; it is deliberately not wired into CI yet (toph#78).
+An unreadable color value is reported as a failure rather than skipped, so an unsupported serialization cannot hide a regression.
+
+The audit measures computed CSS, which is what the theme controls.
+Chromium's default `print-color-adjust: economy` rewrites low-contrast text on its way to paper — `#767676` is embedded as `#212121` — so these numbers describe the stylesheet, not the exact ink.
 
 
 ## Performance

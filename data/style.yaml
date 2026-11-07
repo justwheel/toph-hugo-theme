@@ -1,25 +1,32 @@
 # Neutral/utility CSS custom properties for the Toph theme.
 #
 # Group and key are joined with a hyphen to form the variable name; the
-# light: and dark: subtrees emit the same names into different scopes:
-#   text.light.body → --text-body in :root
-#   text.dark.body  → --text-body in :root[data-bs-theme="dark"]
+# `light:` and `dark:` subtrees emit same names into different scopes:
+#   `text.light.body` → `--text-body` in `:root`
+#   `text.dark.body`  → `--text-body` in `:root[data-bs-theme="dark"]`
 #
 # Light neutrals are injected into the stylesheet at build time via
-# css.Build vars (@import 'hugo:vars'). Dark values are emitted as an
-# inline <style> block in head.html.
+# `css.Build` vars (`@import 'hugo:vars'`). Dark values are emitted as
+# an inline `<style>` block in `head.html`.
 #
-# Most dark values are derived from their light peers via color-mix(),
-# computed once and stored as literal hex here (not as live color-mix()
-# strings) to keep this format uniform. A few (nav.*, bg.modal-overlay)
-# are shared unchanged between modes because they already meet contrast.
+# Most dark values are derived from their light peers via
+# `color-mix()`, computed once and stored as literal hex here (not as
+# live `color-mix()` strings) to keep this format uniform. A few
+# (`nav.*`, `bg.modal-overlay`) are shared unchanged between modes
+# because they already meet contrast.
 #
-# Brand colors and fonts are per-site config (params.colors,
-# params.fonts), injected separately in head.html.
+# A group may also be light-only, by omitting its `dark:` subtree, when
+# its values must stay constant across modes. The `print:` group below
+# is the example: paper does not change with the color mode, so its
+# values must never be overridden by the dark `<style>` block in
+# `head.html`.
 #
-# To override a value, add a data/style.yaml to your site root; Hugo
-# merges it over this one. Keep the light:/dark: nesting — a flat
-# text.body key is silently ignored.
+# Brand colors and fonts are per-site config (`params.colors`,
+# `params.fonts`), injected separately in `head.html`.
+#
+# To override a value, add a `data/style.yaml` to your site root; Hugo
+# merges it over this one. Keep the `light:`/`dark:` nesting — a flat
+# `text.body` key is silently ignored.
 
 text:
   light:
@@ -133,27 +140,31 @@ quote:
   dark:
     bg: "rgba(255, 255, 255, 0.03)"
 
-# Bootstrap's own --bs-* variables, re-pointed at the theme palette so
-# Bootstrap-native components (.card, .list-group-item, .accordion)
-# render on our surfaces instead of Bootstrap's lighter, bluer defaults.
+# Bootstrap's own `--bs-*` variables, re-pointed at the theme palette
+# so Bootstrap-native components (`.card`, `.list-group-item`,
+# `.accordion`) render on our surfaces instead of Bootstrap's lighter,
+# bluer defaults.
 #
-# INVARIANT: every key under light: must also appear under dark:.
-# main.css (:root) loads after bootstrap.min.css ([data-bs-theme=dark]).
-# Both selectors share specificity (0,1,0), so an unpaired light token
-# in :root outranks Bootstrap's dark rule in every dark mode — not only
-# on the no-JS path where [data-bs-theme=dark] is absent.
+# INVARIANT: every key under `light:` must also appear under `dark:`.
+# `main.css` (`:root`) loads after `bootstrap.min.css`
+# (`[data-bs-theme=dark]`). Both selectors share specificity (0,1,0),
+# so an unpaired light token in `:root` outranks Bootstrap's dark rule
+# in every dark mode — not only on the no-JS path where
+# `[data-bs-theme=dark]` is absent.
 #
 # Surface variables are dark-only (Bootstrap's light defaults suit our
 # light palette). Both background AND foreground tokens are redefined
 # so components render with readable text; overriding only backgrounds
 # previously left light text on dark surfaces (~1:1) when JS was off.
-# tertiary-bg (hover) and secondary-bg (active) map to card-hover/card-active.
+# `tertiary-bg` (hover) and `secondary-bg` (active) map to
+# `card-hover`/`card-active`.
 #
-# code-color is overridden in both modes: Bootstrap's #d63384 clears
-# 4.5:1 only on pure white, falling to 4.00:1 on linen and 4.27:1 on
-# --bg-toc. Darkened to #a52a63 to hold 6.00:1 on linen and 5.45:1 on
-# our darkest light neutral surface. The dark value (#e685b5) is
-# Bootstrap 5.3.8's own default, restated to satisfy the invariant above.
+# `code-color` is overridden in both modes: Bootstrap's `#d63384`
+# clears 4.5:1 only on pure white, falling to 4.00:1 on `linen` and
+# 4.27:1 on `--bg-toc`. Darkened to `#a52a63` to hold 6.00:1 on
+# `linen` and 5.45:1 on our darkest light neutral surface. The dark
+# value (`#e685b5`) is Bootstrap 5.3.8's own default, restated to
+# satisfy the invariant above.
 bs:
   light:
     code-color: "#a52a63"
@@ -167,3 +178,15 @@ bs:
     emphasis-color: "var(--text-body)"
     border-color: "var(--border-light)"
     code-color: "#e685b5"
+
+# Print palette. Light-only on purpose: paper does not change with the
+# color mode, so these values must never be overridden by the dark
+# `<style>` block in `head.html`.
+print:
+  light:
+    ink: "#000000"      # 21.00:1
+    paper: "#ffffff"
+    muted: "#767676"    # 4.54:1, matches the accessible gray floor
+    code: "#a52a63"     # 6.75:1, the same value as bs.light.code-color
+    link: "#003366"     # 12.61:1, the same value as text.light.link
+    border: "#555555"   # 7.46:1

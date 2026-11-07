@@ -1,6 +1,97 @@
 /* ===[ Print stylesheet ]=== */
 
+/* This partial is imported before the component partials, so a print rule
+ * that re-colors a class or id already styled further down `main.css` loses
+ * at equal specificity. Overrides of that shape carry `!important` below.
+ *
+ * Paper does not change with the color mode, so every color here resolves
+ * through the light-only `print:` group in `data/style.yaml`. That group is
+ * never overridden by the dark `<style>` block in `head.html`. */
+
 @media print {
+  /* Remap every mode-dependent color token to the print palette (toph#82).
+   * Without this, a document printed from a dark page carries the dark
+   * tokens — light text at 1.99-2.50:1 — onto white paper.
+   *
+   * The selectors must outrank the dark blocks emitted by `head.html`:
+   *   html:root[data-bs-theme]        (0,2,1) beats :root[data-bs-theme="dark"] (0,2,0)
+   *   html:root:not([data-bs-theme])  (0,2,1) beats the no-JS prefers-color-scheme fallback (0,2,0)
+   *   html:root                       (0,1,1) covers light mode
+   * Specificity, not source order, is what makes this win: `main.css` loads
+   * before the inline dark `<style>` block. */
+  html:root,
+  html:root[data-bs-theme],
+  html:root:not([data-bs-theme]) {
+    /* Text */
+    --text-body: var(--print-ink);
+    --text-muted: var(--print-muted);
+    --text-secondary: var(--print-muted);
+    --text-link: var(--print-link);
+    --text-link-hover: var(--print-link);
+    --text-anchor: var(--print-muted);
+    --primary-text: var(--print-ink);
+    --accent-text: var(--print-ink);
+
+    /* Surfaces */
+    --bg-white: var(--print-paper);
+    --bg-toc: var(--print-paper);
+    --bg-caption: var(--print-paper);
+    --bg-hover: var(--print-paper);
+    --bg-card-hover: var(--print-paper);
+    --bg-card-active: var(--print-paper);
+    --bg-modal-overlay: var(--print-paper);
+    --quote-bg: var(--print-paper);
+    --admonition-bg-note: var(--print-paper);
+    --admonition-bg-tip: var(--print-paper);
+    --admonition-bg-warning: var(--print-paper);
+    --admonition-bg-caution: var(--print-paper);
+    --admonition-bg-important: var(--print-paper);
+    --nav-bg: var(--print-paper);
+    --nav-hover-bg: var(--print-paper);
+    --nav-dropdown-bg: var(--print-paper);
+
+    /* Borders */
+    --border-light: var(--print-border);
+    --border-medium: var(--print-border);
+    --border-lighter: var(--print-border);
+    --border-toc: var(--print-border);
+    --admonition-border-note: var(--print-border);
+    --admonition-border-tip: var(--print-border);
+    --admonition-border-warning: var(--print-border);
+    --admonition-border-caution: var(--print-border);
+    --admonition-border-important: var(--print-border);
+    --nav-dropdown-border: var(--print-border);
+
+    /* Iconography and navbar text (the navbar is hidden here, but the tokens
+     * still resolve on the off-chance a site prints with it visible) */
+    --admonition-icon-note: var(--print-ink);
+    --admonition-icon-tip: var(--print-ink);
+    --admonition-icon-warning: var(--print-ink);
+    --admonition-icon-caution: var(--print-ink);
+    --admonition-icon-important: var(--print-ink);
+    --nav-text: var(--print-ink);
+    --nav-hover-decoration: var(--print-ink);
+    --nav-dropdown-text: var(--print-ink);
+
+    /* Bootstrap tokens: surfaces and foregrounds move as a unit, for the same
+     * reason the dark palette does -- an unpaired token paints light text on
+     * a light surface. */
+    --bs-body-color: var(--print-ink);
+    --bs-emphasis-color: var(--print-ink);
+    --bs-secondary-color: var(--print-muted);
+    --bs-tertiary-color: var(--print-muted);
+    --bs-body-bg: var(--print-paper);
+    --bs-secondary-bg: var(--print-paper);
+    --bs-tertiary-bg: var(--print-paper);
+    --bs-border-color: var(--print-border);
+    --bs-code-color: var(--print-code);
+
+    /* Shadows paint paper-colored so they disappear without invalidating the
+     * `box-shadow` shorthand that consumes them. */
+    --shadow-navbar: var(--print-paper);
+    --shadow-card: var(--print-paper);
+  }
+
   /* Remove the fixed navbar entirely */
   .navbar {
     display: none !important;
@@ -13,8 +104,8 @@
 
   /* Use print-friendly colors */
   body {
-    background-color: #fff;
-    color: #000;
+    background-color: var(--print-paper);
+    color: var(--print-ink);
   }
 
   /* Ensure content uses full page width */
@@ -44,14 +135,13 @@
     display: none;
   }
 
-  /* Remove footer background color for print */
-  footer #footer-box {
-    background-color: transparent;
-    color: #000;
-  }
-
+  /* Repaint the footer box, which is a brand-colored surface on screen.
+   * `!important` is required: _footer.css is imported after this partial and
+   * wins at equal specificity. */
+  footer #footer-box,
   footer #footer-box a {
-    color: #000;
+    background-color: var(--print-paper) !important;
+    color: var(--print-ink) !important;
   }
 
   /* Hide heading anchor links */
@@ -84,12 +174,37 @@
     break-inside: avoid;
   }
 
-  /* Transparent background and black text for quotes */
-  main blockquote:not(.tweet-archive-text),
-  main .quoteblock,
-  main .verseblock {
-    background-color: transparent !important;
-    color: #000 !important;
+  /* Brand-colored surfaces carry --secondary text, which is tuned for a
+   * brand-colored background. Chrome drops backgrounds by default when
+   * printing, leaving that near-white text on white paper at 1.00:1. Repaint
+   * each surface as ink on paper so it reads whether or not the reader
+   * enables background graphics. */
+  main #projects h3,
+  main a.post-meta-category,
+  main a.post-meta-tag,
+  .tags-sort-btn.active,
+  .terms-sort-btn.active,
+  .category-count,
+  .blog-archive .archive-year-count,
+  .blog-archive .archive-month-count,
+  .pdf-download__icon,
+  .pdf-download__button {
+    background-color: var(--print-paper) !important;
+    color: var(--print-ink) !important;
+  }
+
+  /* The PDF download affordances rely on a filled background to be
+   * recognizable; a hairline border keeps the shape once that fill is gone. */
+  .pdf-download__icon,
+  .pdf-download__button {
+    border: 1px solid var(--print-border);
+  }
+
+  /* The tag cloud dims low-frequency tags with opacity on screen. Dithering a
+   * 40% gray onto paper drops it to roughly 2.9:1, so print them at full
+   * strength. */
+  .tag-cloud-item {
+    opacity: 1 !important;
   }
 
   /* Hide the hero social links and "for hire" banner */
@@ -114,7 +229,15 @@
  * at the bottom of every printed page. Supported in Chromium-based
  * browsers (Chrome, Edge). Firefox ignores @page margin boxes
  * entirely — users can enable page numbers via the browser's
- * print dialog (Headers and Footers checkbox). */
+ * print dialog (Headers and Footers checkbox).
+ *
+ * The token resolves here, but the value that reaches paper is not the value
+ * declared: Chromium's default print economy mode (the initial value of
+ * `print-color-adjust`) darkens light text before writing the PDF, reducing
+ * lightness by about a third. `#767676` is embedded as `#212121`; the PDF
+ * content stream of both modes carries `0.129 0.129 0.129 rg` and no
+ * `0.463 0.463 0.463 rg`. The color still comes from the palette so it stays
+ * a single source. */
 @page {
   margin: 2cm;
 
@@ -122,6 +245,6 @@
     content: "Page " counter(page) " of " counter(pages);
     font-family: var(--default-font), sans-serif;
     font-size: 0.75rem;
-    color: #767676;
+    color: var(--print-muted);
   }
 }

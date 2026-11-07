@@ -38,7 +38,6 @@ node_modules/
 # accessed
 .nfs*
 
-
 ##### ---- macOS ---- #####
 # General
 .DS_Store
@@ -68,7 +67,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-
 ##### ---- Windows ---- #####
 # Windows thumbnail cache files
 Thumbs.db
@@ -96,8 +94,7 @@ $RECYCLE.BIN/
 *.lnk
 
 
-
-##### ----- PROGRAMMING LANGUAGES ----- #####
+###################### ----- PROGRAMMING LANGUAGES ----- ######################
 
 ##### ---- Go ---- #####
 # Binaries for programs and plugins
@@ -116,6 +113,10 @@ $RECYCLE.BIN/
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+##### ---- Python ---- #####
+# Bytecode caches from testing scripts and tooling
+__pycache__/
+*.pyc
 
 
 ########################### ----- TEXT EDITORS ----- ##########################
@@ -152,7 +153,6 @@ bh_unicode_properties.cache
 # Sublime-github package stores a github token in this file
 # https://packagecontrol.io/packages/sublime-github
 GitHub.sublime-settings
-
 
 ##### ---- Vim ---- #####
 # Swap

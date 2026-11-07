@@ -143,11 +143,11 @@ main .admonitionblock.important td.icon::before {
   }
 
   main .admonitionblock table {
-    background: #fff !important;
-    border-inline-start-color: #555 !important;
+    background: var(--print-paper) !important;
+    border-inline-start-color: var(--print-border) !important;
   }
 
   main .admonitionblock td.icon::before {
-    color: #000 !important;
+    color: var(--print-ink) !important;
   }
 }
