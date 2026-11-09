@@ -258,7 +258,9 @@ Toph includes a full-featured blogging system with taxonomy support, pagination,
 hugo new blog/my-first-post.md
 ```
 
-This uses the `blog.md` archetype which scaffolds the standard front matter fields.
+This uses the `blog.md` archetype, which scaffolds `title`, `date`, `draft`, `categories`, `tags`, `author`, `description`, `images`, and `toc`.
+For AsciiDoc, run `hugo new blog/my-first-post.adoc`.
+The `blog.adoc` archetype carries the same fields except `toc`, because AsciiDoc uses the `:toc:` attribute instead.
 Set `draft: false` when ready to publish.
 
 #### Configuration

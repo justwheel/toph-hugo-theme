@@ -336,7 +336,13 @@ Translation files in `i18n/`: `en.yaml`, `es.yaml`, `ar.yaml`, `hi.yaml`. All fo
 ### Archetypes
 
 - `default.md` — Generic content
-- `blog.md` — Blog post with title, date, draft, categories, tags, author, description
+- `blog.md` — Markdown blog post with title, date, draft, categories, tags, author, description, images, and toc
+- `blog.adoc` — AsciiDoc blog post with the same front matter, minus `toc`
+
+Hugo selects an archetype by file extension.
+Without `blog.adoc`, `hugo new blog/post.adoc` fell back to Hugo's built-in stub with only `title`, `date`, and `draft`.
+Keep both blog archetypes in sync when a front-matter field is added, so Markdown and AsciiDoc posts start from the same scaffold.
+AsciiDoc posts enable a table of contents with the `:toc:` document attribute instead of the `toc` front-matter key.
 
 
 ## Hugo template conventions

@@ -1,0 +1,12 @@
+---
+title: "{{ replace .Name "-" " " | title }}"
+date: {{ .Date }}
+draft: true
+categories: []
+tags: []
+author: ""
+description: ""
+images: []
+---
+
+// Add :toc: on the line below to enable a table of contents.
