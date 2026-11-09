@@ -1,6 +1,7 @@
 # AGENTS.md
 
-This file provides guidance to AI agents (including Claude Code) when working with code in this repository.
+This file provides guidance to AI agents — OpenCode, Codex, Claude Code, and any other harness — when working with code in this repository.
+It covers behavior that holds for any downstream site; site-specific editorial policy, taxonomy decisions, deployment details, and harness environment facts belong in that site's own `AGENTS.md`.
 
 
 ## Project overview
@@ -473,7 +474,7 @@ Chromium's default `print-color-adjust: economy` rewrites low-contrast text on i
 
 ### Measure before optimizing, and attribute the metric
 
-Never assume which element is the Largest Contentful Paint. Read it from `lcp-breakdown-insight` — `.details.items[1]` names the actual DOM node, and `.details.items[0]` splits the metric into time-to-first-byte, load delay, load time, and element render delay. Two rounds of image optimization were spent on jwheel.org before anyone checked, and the LCP element turned out to be a text paragraph with no image on the critical path at all. A text LCP is gated by render-blocking stylesheets, not by bytes, so the whole optimization strategy differs.
+Never assume which element is the Largest Contentful Paint. Read it from `lcp-breakdown-insight` — `.details.items[1]` names the actual DOM node, and `.details.items[0]` splits the metric into time-to-first-byte, load delay, load time, and element render delay. Two rounds of image optimization were once spent on a downstream site before anyone checked, and the LCP element turned out to be a text paragraph with no image on the critical path at all. A text LCP is gated by render-blocking stylesheets, not by bytes, so the whole optimization strategy differs.
 
 **Lighthouse 13 renamed the diagnostic audits to `*-insight`.** `render-blocking-resources` no longer exists; it is `render-blocking-insight`. The same applies to `cache-insight`, `lcp-breakdown-insight`, `third-parties-insight`, `font-display-insight`, and others. Enumerate what is actually present with `jq -r '.audits | keys[] | select(test("insight"))'` before querying. A `jq` lookup of a stale audit name with a `// []` fallback returns empty and reads as "no problems found" — that exact mistake sent an investigation down a wrong path for several rounds.
 
@@ -513,7 +514,7 @@ Render-blocking assets are served from our own origin, because every third-party
 Bootstrap JS remains on a CDN, deferred at the end of the body.
 Google Fonts' build-time failure fallback can still introduce external stylesheets; verify the generated output before claiming that a build has no third-party render-blocking requests.
 
-Bootstrap Icons previously incurred **780 ms of render-blocking delay** against jwheel.org on 2026-10-02, more than the vendored Bootstrap CSS (312 ms) and `main.css` (156 ms) combined.
+Bootstrap Icons previously incurred **780 ms of render-blocking delay** against a downstream production site in October 2026, more than the vendored Bootstrap CSS (312 ms) and `main.css` (156 ms) combined.
 Vendoring removes that cold cross-origin connection while preserving the `bi-*` class contract used by `data/social.yaml` and downstream sites.
 The pristine stylesheet references both `.woff2` and `.woff` files relative to its own directory, including upstream query strings.
 Keep both fonts alongside it and explicitly publish them from `head.html`; fingerprinting the CSS alone does not publish those dependencies.
@@ -545,14 +546,14 @@ When evaluating any change for security:
 5. **Review Hugo function usage** — `safeHTML`, `safeJS`, `safeURL`, `safeCSS`, and `htmlUnescape` all bypass Hugo's built-in escaping. Grep for these before any release or merge to `main`.
 
 
-## GitHub API access (CRITICAL)
+## GitHub API Access (CRITICAL)
 
 **ALWAYS** get explicit user consent before **any** mutating GitHub API call under their account. "Mutating" means any POST, PATCH, PUT, or DELETE — not only publishing new content. This includes comments, replies, and issue or PR creation; edits to an existing title, description, or comment; labels, assignees, milestones, and review requests; state changes such as closing, reopening, merging, or submitting a review; and branch, tag, or release operations. Read-only GET calls need no approval.
 
 The user and the agent work as a team. Communication on GitHub must be effective, genuine, and honest. This requires a human-in-the-loop check before every public-facing action.
 
 Workflow:
-1. Write the payload to a file under `/tmp` (harness-preferred: `/tmp/opencode`) — no need to ask first, `/tmp` is always writable
+1. Write the payload to a file under `/tmp/agents/<harness>/` (`/tmp/agents/opencode/`, `/tmp/agents/codex/`, `/tmp/agents/claude-code/`, …) — no need to ask first, that directory is always writable
 2. Present it for review — for edits to existing content, show a precise diff and confirm nothing else changed
 3. Present a copy-pasteable `gh api` or `gh issue create` command that reads the payload from that file
 4. **The user runs the command.** Their execution is the consent
@@ -588,13 +589,15 @@ Comments posted through the API follow different conventions than files in the r
 
 ## Git conventions
 
-- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics. Follow the 50/72 rule: subject line ≤ 50 characters, body lines wrapped at ≤ 72 characters. Wrap body lines **greedily** — pack each line with as many words as fit without reaching 73 characters, rather than breaking early for balance. Wrap technical identifiers, file paths, layout names, and code entities in backticks (`` ` ``). Backticks must never be split across line breaks (must open and close on the same line).
+- **Commit messages**: Use [gitmoji](https://gitmoji.dev/) prefix, component scope, and emphasize WHY in the body. Concise — 3 to 6 sentences typical. Do not restate the diff or narrate mechanics. Follow the 50/72 rule: subject line ≤ 50 characters, body lines wrapped at ≤ 72 characters. Wrap body lines **greedily** — pack each line with as many words as fit without reaching 73 characters, rather than breaking early for balance. Wrap technical identifiers, file paths, layout names, and code entities in backticks (`` ` ``). Backticks must never be split across line breaks (must open and close on the same line). A commit hash stays **bare**, never in backticks: GitHub autolinks a hash only when it is plain text.
 - **Commit trailer**: `Assisted-by: <model name> (<context window>)`. Verify the model from the current session environment before writing it — never assume it from earlier in the conversation, since the user may switch models mid-session.
-- **Commit messages go in a file**: write to `/tmp/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it. The harness-preferred location is `/tmp/opencode`.
+- **Commit messages go in a file**: write to `/tmp/agents/<harness>/commit-<descriptive-name>.txt` with a unique, tab-completable name. Note that `/tmp` is periodically cleaned; if a message file disappears before it is used, rewrite it. Write each artifact once — `/tmp` is RAM-backed, so never mirror the same file to a second path. A line beginning with `#` is a comment to Git and is stripped, so confirm `grep -c '^#'` returns 0 before handing over.
 - **Branching**: Feature branches off `main` with descriptive names (e.g., `a11y/navbar-contrast`, `blog/taxonomy-templates`). The user creates branches.
+- **Staging**: Prefer directory or glob arguments over long explicit file lists, and check `git status --porcelain` first so untracked in-progress work is not captured. Never run `git reset` without permission; the user stages work manually to track it.
+- **Worktrees**: Isolated worktrees suit parallel or agent-driven changes that must not touch the main checkout. A new worktree needs `git submodule update --init` when the repository uses submodules; move an uncommitted change back with a `git diff` patch applied in the main checkout, then remove the worktree and its branch.
 - **GPG signing**: All commits must be GPG-signed (`commit.gpgsign = true`)
 - **DCO**: Use `--signoff` flag (never write `Signed-off-by` manually in message text)
-- **NEVER** run `git push`, `git commit`, or create PRs — the user does these manually
+- **NEVER** run `git push`, `git commit`, `git merge`, or create PRs — the user does these manually
 - **NEVER** use `--no-gpg-sign` or skip hooks
 - Always use fully-expanded flag forms in suggested commands (`--signoff`, not `-s`)
 - **License**: MPL-2.0
@@ -604,9 +607,10 @@ Comments posted through the API follow different conventions than files in the r
 Annotated tag messages are written as GitHub-flavored Markdown and become the basis for release notes.
 
 - **Use setext headings** — the heading text on one line, a matching-length run of `-` beneath it — never `##`. `git tag` defaults to `--cleanup=strip`, which silently deletes every line beginning with `#`. Setext renders as the same `<h2>` on GitHub and no cleanup mode can strip it
-- Draft to `/tmp/tag-toph-<version>.txt` and confirm `grep -c '^#'` returns 0 before tagging
-- Create with `git tag --cleanup=verbatim --file=/tmp/tag-toph-<version>.txt --sign <version> <commit>`. `tag.gpgsign` is not set (unlike `commit.gpgsign`), so `--sign` must be explicit or the tag is unsigned
+- Draft to `/tmp/agents/<harness>/tag-toph-<version>.txt` and confirm `grep -c '^#'` returns 0 before tagging
+- Create with `git tag --cleanup=verbatim --file=/tmp/agents/<harness>/tag-toph-<version>.txt --sign <version> <commit>`. `tag.gpgsign` is not set (unlike `commit.gpgsign`), so `--sign` must be explicit or the tag is unsigned
 - Verify with `git tag --verify <version>` and `git tag -l --format='%(contents)' <version>` before pushing, to confirm every heading survived
+- Tag message files must end with a trailing newline: `--cleanup=verbatim` does not normalize whitespace, so a missing final newline makes Git append the PGP signature block directly onto the last line and GPG verification fails (`error: no signature found`)
 - One sentence per line does **not** apply to tag messages — that convention governs repository `.md` and `.adoc` files
 - A GitHub release body is stored separately and is never re-read from the tag. Editing or force-pushing a tag does not update an existing release; check and fix both
 
