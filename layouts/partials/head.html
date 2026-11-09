@@ -43,6 +43,9 @@
     <link rel="{{ .Rel }}" type="{{ .MediaType }}" href="{{ .Permalink }}" title="{{ if $.IsHome }}{{ site.Title }}{{ else }}{{ printf "%s | %s" $.Title site.Title }}{{ end }}">
     {{- end }}
 
+    {{ "<!-- /llms.txt and native source discovery (opt-in via data/llms.yaml) -->" | safeHTML }}
+    {{- partial "llms/head.html" . }}
+
     {{ "<!-- colors and fonts from Hugo config -->" | safeHTML }}
     {{- $color_primary := $.Param "colors.light.primary" -}}
     {{- $color_secondary := $.Param "colors.light.secondary" -}}

@@ -49,12 +49,14 @@ The GitHub Actions workflow (`.github/workflows/hugo.yml`) runs on all pushes an
 
 1. Installs Hugo Extended, Dart Sass, Node.js 24, pa11y-ci, serve, and Asciidoctor
 2. Builds the site with the GitHub Pages baseURL
-3. **Rebuilds with `--baseURL http://localhost:3000/`** for Pa11y (critical — without this, Chromium fetches stale CSS from the deployed site instead of freshly built assets)
-4. Runs Pa11y accessibility audit against all sitemap URLs
-5. Rebuilds again with the Pages baseURL for the deployment artifact
-6. Deploys to GitHub Pages (only on `main`)
+3. **Verifies the `/llms.txt` feature in both directions** with `.github/scripts/llms_fixture.sh` (see "Machine-readable index and source files")
+4. **Rebuilds with `--baseURL http://localhost:3000/`** for Pa11y (critical — without this, Chromium fetches stale CSS from the deployed site instead of freshly built assets)
+5. Runs Pa11y accessibility audit against all sitemap URLs
+6. Rebuilds again with the Pages baseURL for the deployment artifact
+7. Deploys to GitHub Pages (only on `main`)
 
 CI tools live in `.github/package.json` (pa11y-ci, serve). Install with `npm ci --prefix .github`.
+`.github/scripts/check_llms.py` uses only the Python standard library, because the runner image is not guaranteed to carry PyYAML.
 
 **Pa11y accessibility rules**: Only errors fail the build (`includeWarnings` is OFF). HTMLCS transparency checks (G18.Abs) are warnings, not errors.
 
@@ -111,6 +113,7 @@ If an index page lacks a layout declaration, Hugo silently falls back to `_defau
 | `recent-posts.html` | Homepage: 1 featured + 4 secondary cards with stretched links |
 | `render-page-content.html` | Renders page content and post-processes AsciiDoc heading anchors and subpath-relative links |
 | `resolve-image-path.html` | Shared image path resolution: handles remote URLs (https://), protocol-relative (//), absolute (/path), and relative (filename) paths |
+| `llms/*.html` | Opt-in `/llms.txt` and native source publishing; inert without `data/llms.yaml` (see "Machine-readable index and source files") |
 | `projects.html` | Project profiles with icons; receives filtered collection from caller |
 | `projects-carousel.html` | Image carousel above projects; receives filtered collection from caller |
 | `team.html` | Homepage team card grid; receives filtered collection from caller |
@@ -344,6 +347,56 @@ Hugo selects an archetype by file extension.
 Without `blog.adoc`, `hugo new blog/post.adoc` fell back to Hugo's built-in stub with only `title`, `date`, and `draft`.
 Keep both blog archetypes in sync when a front-matter field is added, so Markdown and AsciiDoc posts start from the same scaffold.
 AsciiDoc posts enable a table of contents with the `:toc:` document attribute instead of the `toc` front-matter key.
+
+## Machine-readable index and source files
+
+`layouts/partials/llms/` publishes an `/llms.txt` index and an unmodified copy of the source file behind every published page.
+The user-facing documentation is in `README.md` under the same heading; this section records what a template author must not break.
+
+- **Opt-in is a hard requirement.** The feature reads `hugo.Data.llms` and does nothing unless `enabled` is the YAML boolean `true`.
+  An absent file, `enabled: false`, or `enabled` written as the string `"true"` must all produce zero output — a theme upgrade must never switch this on for anyone.
+  Toph ships no data file at the theme root, and that is what keeps the promise: never add one.
+  `exampleSite/data/llms.yaml` is switched on because the example site is the demonstration, not because the theme has a default.
+
+- **Publication uses `resources.FromString` + `.Publish`, not output formats.** That is deliberate and load-bearing: `outputs` is not merged from a theme config, and a `home` output format would have to survive the `layout: biography` lookup.
+  Do not "simplify" this into a custom output format without accepting that every downstream site would then have to edit `outputs` itself.
+
+- **Sources are the complete files.** Read them with `os.ReadFile .File.Filename`; `.RawContent` drops front matter and `.Content` is rendered HTML.
+  Byte fidelity is CI-checked, so any normalization, trimming, or rewriting shows up immediately as a failure.
+
+- **Eligibility lives in `llms/eligible.html`.** Drafts and pages outside their publish window are excluded even when a developer passes `--buildDrafts` or `--buildFuture`.
+  `hide_sitemap` and `taxonomy_exclude` are **not** consulted — they describe listing behavior, and reusing them here would drop public project pages.
+
+- **`partialCached` is a cache, not a once-only lock.** `llms/publish.html` is keyed on the language and may be evaluated more than once under concurrency, so every write must be deterministic and idempotent.
+  Do not add a mutable "already published" flag.
+
+- **Selection order must be deterministic.** Hugo's `sort` guarantees no stability, so `llms/select.html` encodes ordering as a single composite key (date descending, with a path-ascending rank inverted into the tie-breaker) rather than chaining two sorts.
+  Two builds of the same checkout must produce identical `llms.txt` bytes.
+
+- **Text handling goes through `llms/text.html`.** `plainify` strips tags but leaves entities, so `htmlUnescape` follows it; `truncate` is avoided because on a string it emits HTML entities.
+  The index is built as a slice of lines joined by explicit newlines and never emitted through an HTML output action, which is what keeps Go's contextual auto-escaping out of the file.
+
+- **AsciiDoc parity is by construction.** Both formats are published natively, so there is no conversion branch to keep in sync.
+  The `<link rel="alternate">` type comes from `.File.Ext`: `text/asciidoc` for `.adoc`, `text/markdown` otherwise.
+  Never label an AsciiDoc source as Markdown.
+
+- **HTTP `Content-Type` is the host's decision.** Hugo knows both media types and the `<link>` elements advertise them, but GitHub Pages offers no per-repository MIME mapping.
+  Do not claim format-specific response headers without checking a real deployment.
+
+- **Verification is CI-enforced.** `.github/scripts/check_llms.py` checks index structure, link resolution, and byte fidelity against a finished build; `.github/scripts/llms_fixture.sh` proves both the disabled and enabled directions against `exampleSite`.
+  Both run in the theme workflow.
+
+### Hugo API facts this feature depends on
+
+Each of these cost a debugging round; none is obvious from the documentation.
+
+- **`site.Pages` is language-scoped; `site.AllPages` is not.** `site.AllPages` mixes every language of a multilingual build and is deprecated as of 0.156, so an enumeration must start from `site.Pages`.
+- **`.ExpiryDate` is always a `time.Time`**, zero when unset, so `lt .ExpiryDate now` is true for every page that has no expiry. Guard with `.ExpiryDate.IsZero` before comparing; `.PublishDate` needs the same guard for pages with no date.
+- **YAML integers arrive as `uint64`** through `hugo.Data`, not `int`. A validation that tests `printf "%T"` against `"int"` rejects every value a user writes.
+- **`reflect.IsString` and `reflect.IsBool` do not exist.** Hugo's `reflect` namespace offers only `IsMap` and `IsSlice`; for scalars, compare `printf "%T"` or use `eq` against a literal (which returns false, not an error, on a type mismatch).
+- **`resources.FromString` publishes at exactly the target path given**, and its `.RelPermalink` carries the configured `baseURL` subpath, so no manual URL joining is needed. Spaces in the path are percent-encoded by `.RelPermalink`, and `--minify` leaves text resources untouched.
+- **`truncate` escapes its input as HTML**, and `plainify` does not decode entities — hence the `plainify` then `htmlUnescape` order in `llms/text.html`.
+- **`errorf` logs and fails the build but does not stop template execution**, so a guard that emits an error must also avoid running the code that depends on the missing value.
 
 
 ## Hugo template conventions

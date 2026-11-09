@@ -1,0 +1,36 @@
+{{- /*
+  llms/text.html — make an arbitrary string safe to place inside a Markdown
+  link label or as plain note text in /llms.txt.
+
+  Context: dict "text" STRING "max" INT (max 0 or unset means no truncation).
+  Returns: string
+
+  Order matters. `plainify` strips tags but leaves entities alone, so
+  `&lt;=&gt;` in a description would otherwise reach the index as literal
+  HTML escaping. `htmlUnescape` decodes them; it is the correct tool here
+  because the destination is a plain-text file, not template output, and the
+  value never returns to an HTML context.
+
+  `truncate` is deliberately avoided: on a string it emits HTML entities
+  (`&lt;`, `&#34;`) because it treats its input as HTML. Truncating by rune
+  count after sanitizing keeps the output plain text and cannot split a
+  multi-byte character.
+*/ -}}
+{{- $t := "" -}}
+{{- with .text -}}{{- $t = printf "%v" . -}}{{- end -}}
+{{- $t = $t | plainify | htmlUnescape -}}
+{{- /* Go's \s class is ASCII-only, so a decoded &nbsp; would survive the
+       whitespace collapse and land in the index as a stray non-breaking
+       space. Normalize it to an ordinary space first. */ -}}
+{{- $t = replace $t "\u00a0" " " -}}
+{{- $t = replaceRE `\s+` " " $t | strings.TrimSpace -}}
+{{- $max := .max | default 0 -}}
+{{- if and (gt $max 0) (gt (strings.RuneCount $t) $max) -}}
+  {{- $t = printf "%s…" (substr $t 0 (sub $max 1)) -}}
+{{- end -}}
+{{- /* Backslash first, then the bracket pair, so the escaping it introduces is
+       not escaped a second time. */ -}}
+{{- $t = replace $t "\\" "\\\\" -}}
+{{- $t = replace $t "[" "\\[" -}}
+{{- $t = replace $t "]" "\\]" -}}
+{{- return $t -}}

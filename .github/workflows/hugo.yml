@@ -106,6 +106,11 @@ jobs:
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
 
+      - name: Verify /llms.txt and source publishing
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+        run: .github/scripts/llms_fixture.sh
+
       - name: Run Accessibility Audit
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache

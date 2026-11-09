@@ -1,0 +1,78 @@
+{{- /*
+  llms/document.html — render the /llms.txt body.
+
+  Context: dict "cfg" CONFIG "sources" MAP
+  Returns: string
+
+  Document shape follows the llms.txt proposal: one H1, an optional blockquote
+  summary, optional prose, then H2 sections of link lists, with `## Optional`
+  last. Empty sections are omitted rather than emitted as empty headings.
+
+  Built as a slice of lines joined by explicit newlines. Every generated value
+  passes through llms/text.html, and no value is emitted through an HTML output
+  action, so the content reaches resources.FromString as plain text rather than
+  HTML-escaped markup.
+*/ -}}
+{{- $cfg := .cfg -}}
+{{- $sources := .sources -}}
+{{- $lines := slice -}}
+
+{{- $lines = $lines | append (printf "# %s" (partial "llms/text.html" (dict "text" $cfg.index.title "max" 0))) -}}
+
+{{- with $cfg.index.summary -}}
+  {{- $lines = $lines | append "" -}}
+  {{- $lines = $lines | append (printf "> %s" (partial "llms/text.html" (dict "text" . "max" 0))) -}}
+{{- end -}}
+
+{{- with $cfg.index.intro -}}
+  {{- $lines = $lines | append "" -}}
+  {{- range (split (strings.TrimSpace .) "\n") -}}
+    {{- with strings.TrimSpace . -}}
+      {{- $lines = $lines | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range $cfg.sections -}}
+  {{- $sec := . -}}
+  {{- $pages := partial "llms/select.html" (dict "section" $sec "cfg" $cfg) -}}
+  {{- if $pages -}}
+    {{- $lines = $lines | append "" -}}
+    {{- $lines = $lines | append (printf "## %s" (partial "llms/text.html" (dict "text" $sec.title "max" 0))) -}}
+    {{- range $pages -}}
+      {{- $lines = $lines | append (partial "llms/entry.html" (dict "page" . "sources" $sources)) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* --- optional: cross-links that are not page-level sections --- */ -}}
+{{- $optional := slice -}}
+{{- range $cfg.optional -}}
+  {{- $opt := . -}}
+  {{- $url := "" -}}
+  {{- if $opt.page -}}
+    {{- with site.GetPage (printf "/%s" $opt.page) -}}
+      {{- $url = .Permalink -}}
+    {{- else -}}
+      {{- warnf "llms: optional entry %q links to %q, which does not exist; omitting it" $opt.title $opt.page -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $url = absURL $opt.url -}}
+  {{- end -}}
+  {{- with $url -}}
+    {{- $line := printf "- [%s](%s)" (partial "llms/text.html" (dict "text" $opt.title "max" 0)) . -}}
+    {{- with $opt.description -}}
+      {{- $line = printf "%s: %s" $line (partial "llms/text.html" (dict "text" . "max" 200)) -}}
+    {{- end -}}
+    {{- $optional = $optional | append (printf "%s." $line) -}}
+  {{- end -}}
+{{- end -}}
+{{- if $optional -}}
+  {{- $lines = $lines | append "" -}}
+  {{- $lines = $lines | append "## Optional" -}}
+  {{- range $optional -}}
+    {{- $lines = $lines | append . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return printf "%s\n" (delimit $lines "\n") -}}

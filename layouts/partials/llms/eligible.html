@@ -1,0 +1,45 @@
+{{- /*
+  llms/eligible.html — is this page's source file published?
+
+  Context: dict "page" PAGE "cfg" CONFIG "lang" STRING
+  Returns: bool
+
+  Eligibility is about the source export only; it says nothing about a page's
+  suitability for the /llms.txt index, which is curated separately.
+
+  Deliberate exclusions:
+    - No backing file, or a format other than Markdown/AsciiDoc.
+    - Drafts, and pages outside their publish window. This holds even when a
+      developer builds with --buildDrafts or --buildFuture: previewing HTML is
+      not permission to publish a source file.
+    - Pages with no rendered output (build.render: never, headless bundles),
+      which have an empty RelPermalink.
+    - A page in a language the sources config excludes.
+
+  `hide_sitemap` and `taxonomy_exclude` are NOT consulted. They describe
+  listing and sitemap behavior; reusing them here would silently drop the
+  Projects section, which is public content with a real HTML page.
+*/ -}}
+{{- $page := .page -}}
+{{- $cfg := .cfg -}}
+{{- $lang := .lang -}}
+{{- $ok := false -}}
+{{- with $page.File -}}
+  {{- if in (slice "md" "adoc") .Ext -}}
+    {{- if and (not $page.Draft) $page.RelPermalink (eq $page.Lang $lang) -}}
+      {{- $future := and (not $page.PublishDate.IsZero) (gt $page.PublishDate now) -}}
+      {{- $expired := and (not $page.ExpiryDate.IsZero) (lt $page.ExpiryDate now) -}}
+      {{- if not (or $future $expired) -}}
+        {{- $src := $cfg.sources -}}
+        {{- $lang_ok := or (eq $src.languages "all") (in $src.languages $page.Lang) -}}
+        {{- if $lang_ok -}}
+          {{- $bare := strings.Trim $page.Path "/" -}}
+          {{- if not (or (in $src.exclude_pages $bare) (in $src.exclude_sections $page.Section)) -}}
+            {{- $ok = true -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $ok -}}

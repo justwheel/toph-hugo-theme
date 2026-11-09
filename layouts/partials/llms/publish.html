@@ -1,0 +1,50 @@
+{{- /*
+  llms/publish.html — publish the native source file of every eligible page,
+  and build /llms.txt for the configured index language.
+
+  Context: dict "cfg" CONFIG
+  Returns: dict "sources" (page path -> absolute source URL) "index" (URL or "")
+
+  Call through partialCached keyed on the language. partialCached is a cache,
+  not a one-shot lock: Hugo may evaluate it more than once under concurrency,
+  so every write here must be deterministic and idempotent. It is — the same
+  page always yields the same target path and the same bytes.
+
+  resources.FromString + .Publish is what makes this feature data-only. No
+  custom output format is involved, so no site needs to edit `outputs`, touch
+  homepage front matter, or work around the `layout: biography` lookup.
+*/ -}}
+{{- $cfg := .cfg -}}
+{{- $sources := dict -}}
+{{- $lang := site.Language.Lang -}}
+
+{{- if and $cfg.enabled $cfg.sources.enabled -}}
+  {{- range site.Pages -}}
+    {{- if partial "llms/eligible.html" (dict "page" . "cfg" $cfg "lang" $lang) -}}
+      {{- $target := path.Join $cfg.sources.prefix .Lang .File.Path -}}
+      {{- /* The complete file, read from the build checkout, including front
+             matter, comments, shortcodes, and AsciiDoc attributes. .RawContent
+             would drop front matter; .Content would substitute rendered HTML. */ -}}
+      {{- $content := os.ReadFile .File.Filename -}}
+      {{- $r := resources.FromString $target $content -}}
+      {{- $_ := $r.Publish -}}
+      {{- $sources = merge $sources (dict .Path $r.Permalink) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $index := "" -}}
+{{- if and $cfg.enabled $cfg.index.enabled (eq $lang $cfg.index.language) -}}
+  {{- $doc := partial "llms/document.html" (dict "cfg" $cfg "sources" $sources) -}}
+  {{- $bytes := len $doc -}}
+  {{- if gt $bytes $cfg.index.max_bytes -}}
+    {{- errorf "llms: /llms.txt is %d bytes, over the configured index.max_bytes of %d" $bytes $cfg.index.max_bytes -}}
+  {{- else if gt $bytes $cfg.index.target_bytes -}}
+    {{- warnf "llms: /llms.txt is %d bytes, over the configured index.target_bytes of %d" $bytes $cfg.index.target_bytes -}}
+  {{- end -}}
+  {{- $r := resources.FromString "llms.txt" $doc -}}
+  {{- $_ := $r.Publish -}}
+  {{- $index = $r.Permalink -}}
+{{- end -}}
+
+{{- return dict "sources" $sources "index" $index -}}

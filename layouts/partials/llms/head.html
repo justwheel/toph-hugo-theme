@@ -1,0 +1,26 @@
+{{- /*
+  llms/head.html — emit discovery relations for /llms.txt and this page's source.
+
+  Context: the current Page.
+  Output: <link> elements, or nothing when the feature is not enabled.
+
+  `describedby` is a registered link relation meaning "this resource describes
+  the current context", which is what /llms.txt does. The per-page relation uses
+  the page's real format: AsciiDoc is never labelled text/markdown.
+*/ -}}
+{{- $cfg := partialCached "llms/config.html" "llms" -}}
+{{- if $cfg.enabled -}}
+  {{- $pub := partialCached "llms/publish.html" (dict "cfg" $cfg) site.Language.Lang -}}
+  {{- if $pub.index }}
+  {{ "<!-- llms.txt discovery -->" | safeHTML }}
+  <link rel="describedby" type="text/plain" href="{{ $pub.index }}">
+  {{- end -}}
+  {{- $src := index $pub.sources .Path -}}
+  {{- with $src -}}
+    {{- $type := "text/markdown" -}}
+    {{- with $.File -}}
+      {{- if eq .Ext "adoc" -}}{{- $type = "text/asciidoc" -}}{{- end -}}
+    {{- end }}
+  <link rel="alternate" type="{{ $type }}" href="{{ . }}">
+  {{- end -}}
+{{- end -}}

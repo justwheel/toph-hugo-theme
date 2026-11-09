@@ -1,0 +1,290 @@
+{{- /*
+  llms/config.html — normalize data/llms.yaml into a validated configuration dict.
+
+  Returns a dict and never touches the filesystem. The whole feature is inert
+  unless a site supplies data/llms.yaml with `enabled: true`, so a theme upgrade
+  alone can never switch it on. Hugo data files are global, not per language:
+  one data/llms.yaml configures every language of a multilingual site.
+
+  Call with any context; the context is ignored. Cache it yourself with
+  partialCached "llms/config.html" "llms" — the result depends only on the data
+  file and site.Title.
+*/ -}}
+{{- $cfg := dict
+  "enabled" false
+  "index" (dict
+    "enabled" true
+    "language" "en"
+    "title" site.Title
+    "summary" ""
+    "intro" ""
+    "target_bytes" 20000
+    "max_bytes" 100000
+  )
+  "sources" (dict
+    "enabled" true
+    "prefix" "source"
+    "languages" "all"
+    "exclude_sections" slice
+    "exclude_pages" slice
+  )
+  "sections" slice
+  "optional" slice
+-}}
+
+{{- $raw := hugo.Data.llms -}}
+
+{{- if $raw -}}
+{{- if not (reflect.IsMap $raw) -}}
+  {{- errorf "llms: data/llms.yaml must be a map, got %T" $raw -}}
+{{- end -}}
+
+{{- /* --- enabled: strictly a boolean, never a truthy string --- */ -}}
+{{- $v := index $raw "enabled" -}}
+{{- if eq $v true -}}
+  {{- $cfg = merge $cfg (dict "enabled" true) -}}
+{{- else if and $v (ne $v false) -}}
+  {{- errorf "llms: data/llms.yaml `enabled` must be a boolean (true or false), got %T %q" $v $v -}}
+{{- end -}}
+
+{{- /* --- index --- */ -}}
+{{- with index $raw "index" -}}
+  {{- if not (reflect.IsMap .) -}}
+    {{- errorf "llms: `index` must be a map, got %T" . -}}
+  {{- end -}}
+  {{- $m := . -}}
+  {{- $index := $cfg.index -}}
+
+  {{- $t := index $m "enabled" -}}
+  {{- if eq $t true -}}
+    {{- $index = merge $index (dict "enabled" true) -}}
+  {{- else if eq $t false -}}
+    {{- $index = merge $index (dict "enabled" false) -}}
+  {{- else if $t -}}
+    {{- errorf "llms: `index.enabled` must be a boolean, got %T %q" $t $t -}}
+  {{- end -}}
+
+  {{- range $key := slice "language" "title" "summary" "intro" -}}
+    {{- with index $m $key -}}
+      {{- if ne (printf "%T" .) "string" -}}
+        {{- errorf "llms: `index.%s` must be a string, got %T" $key . -}}
+      {{- end -}}
+      {{- $index = merge $index (dict $key .) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- /* YAML integers arrive as uint64 through the data-file decoder, so
+         "must be an integer" has to accept the whole numeric family rather
+         than testing for Go's int alone. */ -}}
+  {{- range $key := slice "target_bytes" "max_bytes" -}}
+    {{- with index $m $key -}}
+      {{- if not (in (slice "int" "int64" "uint64") (printf "%T" .)) -}}
+        {{- errorf "llms: `index.%s` must be an integer, got %T" $key . -}}
+      {{- end -}}
+      {{- $n := int . -}}
+      {{- if le $n 0 -}}
+        {{- errorf "llms: `index.%s` must be greater than zero, got %d" $key $n -}}
+      {{- end -}}
+      {{- $index = merge $index (dict $key $n) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if le $index.max_bytes $index.target_bytes -}}
+    {{- errorf "llms: `index.max_bytes` (%d) must be greater than `index.target_bytes` (%d)" $index.max_bytes $index.target_bytes -}}
+  {{- end -}}
+
+  {{- $langs := slice -}}
+  {{- range hugo.Sites -}}{{- $langs = $langs | append .Language.Lang -}}{{- end -}}
+  {{- if not (in $langs $index.language) -}}
+    {{- errorf "llms: `index.language` is %q but this site defines only %s" $index.language (delimit $langs ", ") -}}
+  {{- end -}}
+
+  {{- $cfg = merge $cfg (dict "index" $index) -}}
+{{- end -}}
+
+{{- /* --- sources --- */ -}}
+{{- with index $raw "sources" -}}
+  {{- if not (reflect.IsMap .) -}}
+    {{- errorf "llms: `sources` must be a map, got %T" . -}}
+  {{- end -}}
+  {{- $m := . -}}
+  {{- $sources := $cfg.sources -}}
+
+  {{- $t := index $m "enabled" -}}
+  {{- if eq $t true -}}
+    {{- $sources = merge $sources (dict "enabled" true) -}}
+  {{- else if eq $t false -}}
+    {{- $sources = merge $sources (dict "enabled" false) -}}
+  {{- else if $t -}}
+    {{- errorf "llms: `sources.enabled` must be a boolean, got %T %q" $t $t -}}
+  {{- end -}}
+
+  {{- with index . "prefix" -}}
+    {{- if ne (printf "%T" .) "string" -}}
+      {{- errorf "llms: `sources.prefix` must be a string, got %T" . -}}
+    {{- end -}}
+    {{- /* The prefix is joined onto the publish root, so it must be a single
+           relative path segment tree: no scheme, no leading slash, no "..". */ -}}
+    {{- if or (strings.Contains . "://") (strings.HasPrefix . "/") (strings.Contains . "..") -}}
+      {{- errorf "llms: `sources.prefix` must be a relative path such as \"source\"; got %q" . -}}
+    {{- end -}}
+    {{- $sources = merge $sources (dict "prefix" (strings.TrimSuffix "/" .)) -}}
+  {{- end -}}
+
+  {{- with index . "languages" -}}
+    {{- if ne (printf "%T" .) "string" -}}
+      {{- errorf "llms: `sources.languages` must be \"all\" or a list of language codes, got %T" . -}}
+    {{- end -}}
+    {{- $sources = merge $sources (dict "languages" .) -}}
+  {{- end -}}
+
+  {{- range $key := slice "exclude_sections" "exclude_pages" -}}
+    {{- with index $m $key -}}
+      {{- if not (reflect.IsSlice .) -}}
+        {{- errorf "llms: `sources.%s` must be a list, got %T" $key . -}}
+      {{- end -}}
+      {{- $clean := slice -}}
+      {{- range . -}}
+        {{- if ne (printf "%T" .) "string" -}}
+          {{- errorf "llms: `sources.%s` entries must be strings, got %T" $key . -}}
+        {{- end -}}
+        {{- /* Normalize to a bare path with no leading or trailing slash so
+               comparisons never depend on how the author wrote it. */ -}}
+        {{- $clean = $clean | append (strings.Trim . "/") -}}
+      {{- end -}}
+      {{- $sources = merge $sources (dict $key $clean) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $cfg = merge $cfg (dict "sources" $sources) -}}
+{{- end -}}
+
+{{- /* --- sections --- */ -}}
+{{- with index $raw "sections" -}}
+  {{- if not (reflect.IsSlice .) -}}
+    {{- errorf "llms: `sections` must be a list, got %T" . -}}
+  {{- end -}}
+  {{- $sections := slice -}}
+  {{- range $i, $s := . -}}
+    {{- if not (reflect.IsMap $s) -}}
+      {{- errorf "llms: `sections[%d]` must be a map, got %T" $i $s -}}
+    {{- end -}}
+    {{- $title := index $s "title" -}}
+    {{- if ne (printf "%T" $title) "string" -}}
+      {{- errorf "llms: `sections[%d].title` must be a string, got %T" $i $title -}}
+    {{- end -}}
+
+    {{- /* Exactly one selector per section keeps resolution unambiguous. */ -}}
+    {{- $kind := "" -}}
+    {{- $selector := "" -}}
+    {{- range $key := slice "pages" "section" "taxonomy" -}}
+      {{- $val := index $s $key -}}
+      {{- if $val -}}
+        {{- if $kind -}}
+          {{- errorf "llms: `sections[%d]` declares both `%s` and `%s`; use exactly one selector" $i $kind $key -}}
+        {{- end -}}
+        {{- $kind = $key -}}
+        {{- $selector = $val -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if not $kind -}}
+      {{- errorf "llms: `sections[%d]` (%q) needs one of `pages`, `section`, or `taxonomy`" $i $title -}}
+    {{- end -}}
+    {{- if and (ne $kind "pages") (ne (printf "%T" $selector) "string") -}}
+      {{- errorf "llms: `sections[%d].%s` must be a string, got %T" $i $kind $selector -}}
+    {{- end -}}
+    {{- if and (eq $kind "pages") (not (reflect.IsSlice $selector)) -}}
+      {{- errorf "llms: `sections[%d].pages` must be a list, got %T" $i $selector -}}
+    {{- end -}}
+
+    {{- $featured := slice -}}
+    {{- with index $s "featured" -}}
+      {{- if not (reflect.IsSlice .) -}}
+        {{- errorf "llms: `sections[%d].featured` must be a list, got %T" $i . -}}
+      {{- end -}}
+      {{- range . -}}
+        {{- if ne (printf "%T" .) "string" -}}
+          {{- errorf "llms: `sections[%d].featured` entries must be page paths, got %T" $i . -}}
+        {{- end -}}
+        {{- $featured = $featured | append (strings.Trim . "/") -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- $limit := 20 -}}
+    {{- with index $s "limit" -}}
+      {{- if not (in (slice "int" "int64" "uint64") (printf "%T" .)) -}}
+        {{- errorf "llms: `sections[%d].limit` must be an integer, got %T" $i . -}}
+      {{- end -}}
+      {{- $limit = int . -}}
+      {{- if le $limit 0 -}}
+        {{- errorf "llms: `sections[%d].limit` must be greater than zero, got %d" $i $limit -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- $sections = $sections | append (dict
+      "title" $title
+      "kind" $kind
+      "selector" $selector
+      "featured" $featured
+      "limit" $limit
+    ) -}}
+  {{- end -}}
+  {{- $cfg = merge $cfg (dict "sections" $sections) -}}
+{{- end -}}
+
+{{- /* --- optional --- */ -}}
+{{- with index $raw "optional" -}}
+  {{- if not (reflect.IsSlice .) -}}
+    {{- errorf "llms: `optional` must be a list, got %T" . -}}
+  {{- end -}}
+  {{- $optional := slice -}}
+  {{- range $i, $o := . -}}
+    {{- if not (reflect.IsMap $o) -}}
+      {{- errorf "llms: `optional[%d]` must be a map, got %T" $i $o -}}
+    {{- end -}}
+    {{- $title := index $o "title" -}}
+    {{- if ne (printf "%T" $title) "string" -}}
+      {{- errorf "llms: `optional[%d].title` must be a string, got %T" $i $title -}}
+    {{- end -}}
+    {{- $page := index $o "page" -}}
+    {{- $url := index $o "url" -}}
+    {{- if and $page $url -}}
+      {{- errorf "llms: `optional[%d]` declares both `page` and `url`; use exactly one" $i -}}
+    {{- end -}}
+    {{- if not (or $page $url) -}}
+      {{- errorf "llms: `optional[%d]` (%q) needs either `page` or `url`" $i $title -}}
+    {{- end -}}
+    {{- $note := "" -}}
+    {{- with index $o "description" -}}
+      {{- if ne (printf "%T" .) "string" -}}
+        {{- errorf "llms: `optional[%d].description` must be a string, got %T" $i . -}}
+      {{- end -}}
+      {{- $note = . -}}
+    {{- end -}}
+    {{- $page_ref := "" -}}
+    {{- with $page -}}
+      {{- if ne (printf "%T" .) "string" -}}
+        {{- errorf "llms: `optional[%d].page` must be a logical page path, got %T" $i . -}}
+      {{- end -}}
+      {{- $page_ref = strings.Trim . "/" -}}
+    {{- end -}}
+    {{- $url_ref := "" -}}
+    {{- with $url -}}
+      {{- if ne (printf "%T" .) "string" -}}
+        {{- errorf "llms: `optional[%d].url` must be a string, got %T" $i . -}}
+      {{- end -}}
+      {{- $url_ref = . -}}
+    {{- end -}}
+    {{- $optional = $optional | append (dict
+      "title" $title
+      "page" $page_ref
+      "url" $url_ref
+      "description" $note
+    ) -}}
+  {{- end -}}
+  {{- $cfg = merge $cfg (dict "optional" $optional) -}}
+{{- end -}}
+
+{{- end -}}
+
+{{- return $cfg -}}

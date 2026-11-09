@@ -32,6 +32,7 @@ Toph: a lightweight, responsive theme for a biography site, for use with [Hugo](
 - [Multilingual support](#internationalization) (English, Spanish, Arabic with RTL, Hindi)
 - First-class support for both Markdown and AsciiDoc content
 - [Search engine optimization](#search-engine-optimization): meta description, canonical URL, hreflang, structured data (WebSite, Person, Article, BreadcrumbList JSON-LD)
+- Opt-in [machine-readable index and source files](#machine-readable-index-and-source-files): `/llms.txt` plus unmodified copies of every published Markdown and AsciiDoc file
 - 404 page with localized "Return to homepage" link
 - [Print-friendly output](#print-stylesheet) with page numbering
 - [Easy customization of colors and fonts in Hugo configuration](#custom-colors-and-fonts)
@@ -335,6 +336,137 @@ params:
 ```
 
 Both fields are optional and guarded with `{{ with }}` — they are omitted from the JSON-LD if not configured.
+
+### Machine-readable index and source files
+
+Toph can publish a `/llms.txt` index and an unmodified copy of the source file behind every published page.
+This is **off by default and stays off** unless your site adds `data/llms.yaml` with `enabled: true`.
+A theme upgrade alone can never switch it on, and deleting that one file removes every trace of the feature.
+
+Toph ships no default data file, because a working default would mean a theme bump silently started publishing files for every downstream site.
+`exampleSite/data/llms.yaml` carries a complete schema with the feature switched on: the demo site publishes a real `/llms.txt`, and that file is the one to copy.
+
+#### What it publishes
+
+Two things, both through `resources.FromString` and `.Publish` rather than through Hugo output formats.
+That choice is what keeps the feature data-only: no site needs to edit `outputs`, add front matter to its homepage, or work around the `layout: biography` template lookup.
+
+1. **Source copies** at `/<prefix>/<language>/<content-relative-path>`.
+   For example `content/blog/2026/10/post.adoc` is published at `/source/en/blog/2026/10/post.adoc`, and its Arabic translation at `/source/ar/blog/2026/10/post.ar.adoc`.
+   The bytes are read straight from the build checkout with `os.ReadFile`, so front matter, comments, shortcodes, and AsciiDoc attributes survive intact.
+   `.RawContent` is deliberately not used: it drops front matter.
+
+2. **`/llms.txt`**, in exactly one language, built from the sections you list.
+   It is written once per build by whichever language matches `index.language`.
+
+Every eligible page also gets two `<link>` relations in `<head>`:
+
+```html
+<link rel="describedby" type="text/plain" href="/llms.txt">
+<link rel="alternate" type="text/markdown" href="/source/en/about-me.md">
+```
+
+The per-page relation carries the page's real type, so an AsciiDoc page is advertised as `text/asciidoc` and never as Markdown.
+
+#### Which pages are eligible
+
+A page's source is published when it has a backing `.md` or `.adoc` file, is not a draft, is inside its publish window, and has rendered output.
+Drafts and future-dated posts stay private **even under `--buildDrafts` or `--buildFuture`**: previewing HTML is not permission to publish a source file.
+`hide_sitemap` and `taxonomy_exclude` are not consulted, because they describe listing behavior; reusing them here would silently drop project pages, which are public.
+
+Generated listing pages have no source file and are simply skipped in the index, which links to their HTML instead.
+
+#### Configuration
+
+```yaml
+enabled: true
+
+index:
+  enabled: true
+  language: en
+  title: My Site
+  summary: One line, rendered as a blockquote.
+  intro: |
+    A short paragraph of plain text.
+  target_bytes: 20000
+  max_bytes: 100000
+
+sources:
+  enabled: true
+  prefix: source
+  languages: all
+  exclude_sections: []
+  exclude_pages: []
+
+sections:
+  - title: Pages
+    pages: [/]
+
+  - title: Projects
+    section: projects
+
+  - title: Writing
+    section: blog
+    featured:
+      - /blog/2024/02/favourite-post
+    limit: 20
+
+  - title: Topics
+    taxonomy: categories
+    limit: 12
+
+optional:
+  - title: Sitemap
+    url: sitemap.xml
+```
+
+Each entry in `sections` uses exactly one selector: `pages` for an ordered list of paths, `section` for a content section sorted newest first, or `taxonomy` for terms sorted busiest first.
+`featured` is an ordered list of page paths that always lead their section, and `limit` caps the section after duplicates are removed.
+`optional` becomes the final `## Optional` section and accepts either a logical `page` path or a `url` resolved against the site base.
+
+Every value is validated at build time.
+A misspelled key, a wrong type, an `enabled` written as the string `"true"`, an unsafe `prefix`, a featured page outside its section, or a path that does not exist fails the build with a named diagnostic rather than silently producing a short index.
+
+#### What it does not do
+
+- It does not convert AsciiDoc to Markdown.
+  Both formats are published as they are, which is the point: no middle layer rewrites the author's text.
+- It does not change any HTML permalink, the sitemap, the RSS feeds, or any existing metadata.
+- It does not touch `robots.txt`, and it does not imply a crawling or training policy.
+  Content licences still apply to the source copies.
+- It does not fetch anything at build time.
+- It does not promise a specific HTTP `Content-Type`.
+  Hugo knows `text/markdown` and `text/asciidoc`, and the `<link>` elements advertise them, but the host decides the response header.
+  GitHub Pages, for example, offers no per-repository MIME mapping. Verify what your host actually returns after deploying.
+
+#### Limitations worth knowing
+
+Published sources are the author's files, not a self-contained reproduction of the build.
+Relative links still resolve against the original content location, AsciiDoc `include::` directives are not expanded, and images referenced by a page are not copied alongside it.
+Front matter is published too, so review comments and metadata for anything you would not want read before enabling this.
+
+#### Turning it off
+
+Set `enabled: false`, or delete `data/llms.yaml`.
+Neither removes files already written to an existing `public/` directory, so rebuild into a clean destination:
+
+```bash
+hugo --destination /tmp/site-check
+```
+
+#### Verifying a build
+
+`.github/scripts/check_llms.py` inspects a finished build directory and needs only the Python standard library:
+
+```bash
+python3 .github/scripts/check_llms.py \
+  --public public \
+  --content content \
+  --base-url https://example.org/
+```
+
+It checks the index structure, resolves every same-origin link in it, compares each published source file with its content original byte for byte, and — when the feature is off — asserts that the build carries no index, no source tree, and no discovery links.
+`.github/scripts/llms_fixture.sh` runs both directions against `exampleSite`, and CI calls it on every push.
 
 ### Shortcodes
 

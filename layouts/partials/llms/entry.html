@@ -1,0 +1,59 @@
+{{- /*
+  llms/entry.html — one bullet in an /llms.txt section.
+
+  Context: dict "page" PAGE "sources" MAP
+  Returns: string, a single Markdown list line
+
+  The link label points at the original source file when one was published,
+  because that is the artifact this feature exists to expose; the rendered page
+  is offered as a second link so a reader can see the HTML output and cite a
+  stable URL. Pages with no source (generated taxonomy listings) link straight
+  to their HTML page.
+*/ -}}
+{{- $page := .page -}}
+{{- $src := index .sources $page.Path -}}
+
+{{- /* The homepage's _index file carries no title of its own, and an untitled
+       page would otherwise render as an empty link label. */ -}}
+{{- $title := "" -}}
+{{- with $page.Title -}}
+  {{- $title = partial "llms/text.html" (dict "text" . "max" 120) -}}
+{{- end -}}
+{{- if not $title -}}
+  {{- with $page.LinkTitle -}}
+    {{- $title = partial "llms/text.html" (dict "text" . "max" 120) -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $title -}}
+  {{- if $page.IsHome -}}
+    {{- $title = partial "llms/text.html" (dict "text" site.Title "max" 120) -}}
+  {{- else -}}
+    {{- with $page.File -}}
+      {{- $title = partial "llms/text.html" (dict "text" (humanize .TranslationBaseName) "max" 120) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $url := $page.Permalink -}}
+{{- with $src -}}{{- $url = . -}}{{- end -}}
+
+{{- $desc := "" -}}
+{{- with $page.Description -}}
+  {{- $desc = . -}}
+{{- else -}}
+  {{- with $page.Summary -}}{{- $desc = . -}}{{- end -}}
+{{- end -}}
+{{- $line := printf "- [%s](%s)" $title $url -}}
+{{- with partial "llms/text.html" (dict "text" $desc "max" 200) -}}
+  {{- $line = printf "%s: %s" $line . -}}
+{{- end -}}
+{{- /* Exactly one terminator between the note and the next link, whatever
+       punctuation the note itself ended with. */ -}}
+{{- if $src -}}
+  {{- $sep := "." -}}
+  {{- if findRE `[.!?]$` $line -}}{{- $sep = "" -}}{{- end -}}
+  {{- $line = printf "%s%s [Rendered page](%s)." $line $sep $page.Permalink -}}
+{{- else if not (findRE `[.!?]$` $line) -}}
+  {{- $line = printf "%s." $line -}}
+{{- end -}}
+{{- return $line -}}
