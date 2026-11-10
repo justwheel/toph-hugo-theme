@@ -5,107 +5,79 @@
   Context: dict "section" SECTION "cfg" CONFIG
   Returns: slice of Page
 
-  Deterministic ordering matters because the same data must produce the same
-  file on every build. Hugo's `sort` gives no stability guarantee, so ordering
-  is expressed as a single composite key rather than as a chain of sorts:
-  a path-ascending rank, inverted into the key, is used as the tie-breaker for
-  a date-descending primary key.
+  Two selectors remain: `pages` (kept exactly as written) and `section`
+  (published pages, newest first, with `featured` leading). Determinism matters
+  because the same checkout must produce the same file on every build. Hugo's
+  collection `sort` is stable, so ordering is expressed as two passes: path
+  ascending first, then date descending. Equal dates therefore keep their
+  path-ascending order instead of depending on map iteration.
 */ -}}
 {{- $sec := .section -}}
-{{- $cfg := .cfg -}}
 {{- $title := $sec.title -}}
 {{- $pages := slice -}}
 {{- $seen := slice -}}
-{{- $rank_base := 1000000 -}}
 
-{{- /* --- explicitly listed pages --- */ -}}
 {{- if eq $sec.kind "pages" -}}
   {{- range $sec.selector -}}
-    {{- if ne (printf "%T" .) "string" -}}
-      {{- errorf "llms: section %q has a `pages` entry that is not a page path: %T" $title . -}}
-    {{- end -}}
-    {{- $ref := strings.Trim . "/" -}}
+    {{- $ref := . -}}
     {{- $p := site.GetPage (printf "/%s" $ref) -}}
     {{- if not $p -}}
-      {{- errorf "llms: section %q links to %q, which does not exist" $title . -}}
-    {{- else if and $p.RelPermalink (not $p.Draft) -}}
-      {{- if not (in $seen $p.Path) -}}
-        {{- $pages = $pages | append $p -}}
-        {{- $seen = $seen | append $p.Path -}}
-      {{- end -}}
-    {{- else -}}
-      {{- warnf "llms: section %q links to %q, which is not published; omitting it" $title . -}}
+      {{- errorf "llms: section %q lists %q, which does not exist" $title $ref -}}
+    {{- else if not (partial "llms/published.html" $p) -}}
+      {{- warnf "llms: section %q lists %q, which is not published; omitting it" $title $ref -}}
+    {{- else if not (in $seen $p.Path) -}}
+      {{- $pages = $pages | append $p -}}
+      {{- $seen = $seen | append $p.Path -}}
     {{- end -}}
   {{- end -}}
 
-{{- /* --- a content section, featured first then newest --- */ -}}
 {{- else if eq $sec.kind "section" -}}
   {{- $ref := strings.Trim $sec.selector "/" -}}
   {{- $node := site.GetPage (printf "/%s" $ref) -}}
   {{- if not $node -}}
     {{- errorf "llms: section %q selects section %q, which does not exist" $title $sec.selector -}}
-  {{- end -}}
+  {{- else -}}
+    {{- /* Filter first: unpublished pages must not consume the limit. */ -}}
+    {{- $candidates := slice -}}
+    {{- $eligible := slice -}}
+    {{- range $node.RegularPagesRecursive -}}
+      {{- if partial "llms/published.html" . -}}
+        {{- $candidates = $candidates | append . -}}
+        {{- $eligible = $eligible | append .Path -}}
+      {{- end -}}
+    {{- end -}}
 
-  {{- /* Featured entries must belong to the selected section; a featured page
-         from somewhere else is a data mistake, not a curatable edge case. */ -}}
-  {{- $eligible_set := slice -}}
-  {{- range $node.RegularPagesRecursive -}}{{- $eligible_set = $eligible_set | append .Path -}}{{- end -}}
-  {{- range $sec.featured -}}
-    {{- $p := site.GetPage (printf "/%s" .) -}}
-    {{- if not $p -}}
-      {{- errorf "llms: section %q features %q, which does not exist" $title . -}}
-    {{- else if not (in $eligible_set $p.Path) -}}
-      {{- errorf "llms: section %q features %q, which is not inside section %q" $title . $sec.selector -}}
-    {{- else if and $p.RelPermalink (not $p.Draft) -}}
-      {{- if not (in $seen $p.Path) -}}
+    {{- /* Featured entries lead in the order written, and must belong to the
+           selected section: a path from somewhere else is a data mistake, not
+           a curatable edge case. */ -}}
+    {{- range $sec.featured -}}
+      {{- $p := site.GetPage (printf "/%s" .) -}}
+      {{- if not $p -}}
+        {{- errorf "llms: section %q features %q, which does not exist" $title . -}}
+      {{- else if not (in $eligible $p.Path) -}}
+        {{- errorf "llms: section %q features %q, which is not a published page in section %q" $title . $sec.selector -}}
+      {{- else if not (in $seen $p.Path) -}}
         {{- $pages = $pages | append $p -}}
         {{- $seen = $seen | append $p.Path -}}
       {{- end -}}
-    {{- else -}}
-      {{- warnf "llms: section %q features %q, which is not published; omitting it" $title . -}}
     {{- end -}}
-  {{- end -}}
 
-  {{- $n := $sec.limit -}}
-  {{- if gt (len $pages) $n -}}{{- $n = len $pages -}}{{- end -}}
+    {{- /* Featuring more pages than the limit keeps them all; the limit is a
+           floor for featured entries and a cap for the chronological fill. */ -}}
+    {{- $n := $sec.limit -}}
+    {{- if gt (len $pages) $n -}}{{- $n = len $pages -}}{{- end -}}
 
-  {{- $keyed := slice -}}
-  {{- range $i, $p := (sort $node.RegularPagesRecursive "Path" "asc") -}}
-    {{- if and $p.RelPermalink (not $p.Draft) -}}
-      {{- $keyed = $keyed | append (dict
-        "key" (printf "%s|%08d" ($p.Date.Format "2006-01-02T15:04:05") (sub $rank_base $i))
-        "page" $p) -}}
-    {{- end -}}
-  {{- end -}}
-  {{- range (sort $keyed "key" "desc") -}}
-    {{- if lt (len $pages) $n -}}
-      {{- if not (in $seen .page.Path) -}}
-        {{- $pages = $pages | append .page -}}
-        {{- $seen = $seen | append .page.Path -}}
+    {{- $sorted := sort $candidates "Path" "asc" -}}
+    {{- $sorted = sort $sorted "Date" "desc" -}}
+    {{- range $sorted -}}
+      {{- if lt (len $pages) $n -}}
+        {{- if not (in $seen .Path) -}}
+          {{- $pages = $pages | append . -}}
+          {{- $seen = $seen | append .Path -}}
+        {{- end -}}
       {{- end -}}
     {{- end -}}
-  {{- end -}}
-  {{- $pages = first $n $pages -}}
-
-{{- /* --- taxonomy terms, busiest first --- */ -}}
-{{- else if eq $sec.kind "taxonomy" -}}
-  {{- $ref := strings.Trim $sec.selector "/" -}}
-  {{- $node := site.GetPage (printf "/%s" $ref) -}}
-  {{- if not $node -}}
-    {{- errorf "llms: section %q selects taxonomy %q, which does not exist" $title $sec.selector -}}
-  {{- end -}}
-  {{- $keyed := slice -}}
-  {{- range $i, $term := (sort $node.Pages "Title" "asc") -}}
-    {{- if and $term.RelPermalink (not $term.Draft) -}}
-      {{- $keyed = $keyed | append (dict
-        "key" (printf "%08d|%08d" (len $term.Pages) (sub $rank_base $i))
-        "page" $term) -}}
-    {{- end -}}
-  {{- end -}}
-  {{- range (sort $keyed "key" "desc") -}}
-    {{- if lt (len $pages) $sec.limit -}}
-      {{- $pages = $pages | append .page -}}
-    {{- end -}}
+    {{- $pages = first $n $pages -}}
   {{- end -}}
 {{- end -}}
 

@@ -5,21 +5,28 @@ The checker works on a finished build directory, never on templates, so it
 tests the artifact that actually ships. It has no third-party dependencies:
 the runner image is not guaranteed to carry PyYAML, and nothing here needs it.
 
-When the feature is off it asserts that the build is genuinely inert.
-When it is on it checks four independent things:
+What it can assert, independently:
 
   * the index parses as llms.txt (one H1, sections of link entries),
   * every same-origin link in the index resolves to a published file,
-  * every published source file still matches its content-checkout original
-    byte for byte,
-  * no source file carries draft front matter.
+  * each entry's rendered-page citation link resolves too,
+  * published source files still match their content checkout byte for byte,
+  * no published source carries draft front matter,
+  * a selected source file was or was not published,
+  * a disabled build carries no index, no source tree, and no discovery links,
+    including minified HTML where Hugo drops attribute quotes.
 
 Usage:
   check_llms.py --public public --content content \\
-      --base-url https://example.org/sub/
+      --base-url https://example.org/sub/ --expect enabled
 
 Exit status is 0 when every check passes, 1 otherwise. Failures are printed
 one per line with a short reason.
+
+`--expect` sets the default for both halves of the feature; `--expect-index`
+and `--expect-sources` override it when a site runs only one of them. Use
+`--expect enabled` in CI: leaving it at `auto` would let a total loss of the
+feature pass as an intentional disabled build.
 """
 
 from __future__ import annotations
@@ -33,8 +40,15 @@ from urllib.parse import unquote, urlparse
 # `- [label](target): note` and the variant with no note. The label may hold
 # backslash-escaped brackets, so a naive `[^\]]*` would stop too early.
 ENTRY_RE = re.compile(r"^- \[((?:\\.|[^\\\]])*)\]\(\s*([^)\s]+)\s*\)(.*)$")
+RENDERED_RE = re.compile(r"\[Rendered page\]\(\s*([^)\s]+)\s*\)")
 HEADING_RE = re.compile(r"^(#+) (.+)$")
-DRAFT_RE = re.compile(r"^draft:\s*true\s*$", re.MULTILINE)
+DRAFT_RE = re.compile(r"^(?:draft:\s*true|:draft:\s*true)\s*$", re.MULTILINE)
+LINK_RE = re.compile(r"<link\b[^>]*>", re.IGNORECASE)
+ATTR_RE = re.compile(
+    r"""([A-Za-z_:][-A-Za-z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))"""
+)
+
+FEATURE_TYPES = {"text/markdown", "text/asciidoc"}
 
 
 class Report:
@@ -49,59 +63,108 @@ class Report:
         self.notes.append(message)
 
 
-def check_inert(public: Path, report: Report) -> None:
-    """A build with the feature disabled must carry no trace of it."""
-    if (public / "llms.txt").exists():
-        report.fail("llms.txt exists but the feature is expected to be off")
-    source = public / "source"
-    if source.exists():
-        report.fail("source/ exists but the feature is expected to be off")
+def link_attributes(tag: str) -> dict[str, str]:
+    """Parse a <link> tag's attributes, quoted or minified-unquoted."""
+    attributes: dict[str, str] = {}
+    for match in ATTR_RE.finditer(tag):
+        value = next(group for group in match.groups()[1:] if group is not None)
+        attributes[match.group(1).lower()] = value
+    return attributes
 
-    offenders = []
+
+def feature_links(text: str) -> tuple[bool, bool]:
+    """Report (index discovery, per-page source alternate) in rendered HTML."""
+    described, source = False, False
+    for tag in LINK_RE.findall(text):
+        attributes = link_attributes(tag)
+        relations = attributes.get("rel", "").lower().split()
+        if "describedby" in relations:
+            described = True
+        if "alternate" in relations and attributes.get("type", "").lower() in FEATURE_TYPES:
+            source = True
+        if described and source:
+            break
+    return described, source
+
+
+def check_inert(public: Path, prefix: str, report: Report, *, index: bool, sources: bool) -> None:
+    """A build with the feature disabled must carry no trace of it."""
+    if index:
+        if (public / "llms.txt").exists():
+            report.fail("llms.txt exists but the index is expected to be off")
+        else:
+            report.ok("no llms.txt index")
+
+    source_root = public / prefix
+    if sources:
+        files = [path for path in source_root.rglob("*") if path.is_file()] if source_root.is_dir() else []
+        if files:
+            report.fail(f"{prefix}/ exists with {len(files)} file(s) but sources are expected to be off")
+        else:
+            report.ok(f"no {prefix}/ source tree")
+
+    offenders: list[tuple[str, Path]] = []
     for html in public.rglob("*.html"):
         try:
             text = html.read_text(encoding="utf-8", errors="replace")
         except OSError as exc:  # pragma: no cover - unreadable artifact
             report.fail(f"cannot read {html}: {exc}")
             continue
-        if 'rel="describedby"' in text:
-            offenders.append(html)
-            if len(offenders) >= 3:
-                break
-    for html in offenders:
-        report.fail(f"{html.relative_to(public)} carries llms.txt discovery while disabled")
+        described, source = feature_links(text)
+        if (index and described) or (sources and source):
+            offenders.append((html.relative_to(public).as_posix(), html))
+    for name, _ in offenders[:3]:
+        report.fail(f"{name} carries a feature discovery link while disabled")
     if not offenders:
-        report.ok("disabled build carries no llms.txt, no source/, no discovery links")
+        report.ok("disabled build carries no feature discovery links")
 
 
-def check_source_fidelity(public: Path, content: Path, report: Report) -> int:
+def check_source_fidelity(
+    public: Path,
+    content: Path | None,
+    prefix: str,
+    report: Report,
+    expect_source: list[str],
+    expect_no_source: list[str],
+) -> int:
     """Every published source file must equal its file in the content tree."""
-    source = public / "source"
-    if not source.is_dir():
-        report.fail("source/ is missing from an enabled build")
-        return 0
+    source_root = public / prefix
+    files = sorted(path for path in source_root.rglob("*") if path.is_file()) if source_root.is_dir() else []
 
-    files = sorted(p for p in source.rglob("*") if p.is_file())
+    for wanted in expect_source:
+        if not (source_root / wanted).is_file():
+            report.fail(f"expected source {prefix}/{wanted} was not published")
+    for unwanted in expect_no_source:
+        if (source_root / unwanted).is_file():
+            report.fail(f"source {prefix}/{unwanted} was published but should have been excluded")
+
     if not files:
-        report.fail("source/ is empty")
+        report.fail(f"{prefix}/ is missing or empty from an enabled source export")
         return 0
 
+    compared = 0
     for published in files:
-        rel = published.relative_to(source)
+        rel = published.relative_to(source_root)
         parts = rel.parts
         if len(parts) < 2:
             report.fail(f"{published.relative_to(public)} is not language-namespaced")
             continue
-        original = content / Path(*parts[1:])
-        if not original.is_file():
-            report.fail(f"{published.relative_to(public)} has no original under {content}")
-            continue
-        if published.read_bytes() != original.read_bytes():
-            report.fail(f"{published.relative_to(public)} differs from {original}")
-            continue
+        if content is not None:
+            original = content / Path(*parts[1:])
+            if not original.is_file():
+                report.fail(f"{published.relative_to(public)} has no original under {content}")
+                continue
+            if published.read_bytes() != original.read_bytes():
+                report.fail(f"{published.relative_to(public)} differs from {original}")
+                continue
+            compared += 1
         if DRAFT_RE.search(published.read_text(encoding="utf-8", errors="replace")):
             report.fail(f"{published.relative_to(public)} is a draft and must not be published")
-    report.ok(f"{len(files)} published source files match their originals byte for byte")
+
+    if content is not None:
+        report.ok(f"{compared} published source files match their originals byte for byte")
+    else:
+        report.ok(f"{len(files)} published source files")
     return len(files)
 
 
@@ -128,7 +191,7 @@ def local_path(public: Path, url: str, base_url: str | None) -> Path | None:
     return public / path.lstrip("/")
 
 
-def check_index(public: Path, base_url: str | None, report: Report) -> None:
+def check_index(public: Path, base_url: str | None, prefix: str, report: Report) -> None:
     index = public / "llms.txt"
     if not index.is_file():
         report.fail("llms.txt is missing from an enabled build")
@@ -150,8 +213,10 @@ def check_index(public: Path, base_url: str | None, report: Report) -> None:
 
     sections = 0
     entries = 0
+    source_links = 0
     current: str | None = None
     section_counts: dict[str, int] = {}
+    prefix_path = f"/{prefix.strip('/')}/"
     for number, line in enumerate(lines, start=1):
         heading = HEADING_RE.match(line)
         if heading and heading.group(1) == "##":
@@ -172,21 +237,44 @@ def check_index(public: Path, base_url: str | None, report: Report) -> None:
             report.fail(f"llms.txt:{number} appears before any section heading")
         else:
             section_counts[current] += 1
-        target = match.group(2)
-        resolved = local_path(public, target, base_url)
-        if resolved is None:
-            continue
-        if resolved.is_dir():
-            resolved = resolved / "index.html"
-        if not resolved.is_file():
-            report.fail(f"llms.txt:{number} links to {target}, which is not in the build")
+
+        primary = match.group(2)
+        if prefix_path in urlparse(primary).path:
+            source_links += 1
+        targets = [primary]
+        rendered = RENDERED_RE.search(match.group(3))
+        if rendered:
+            targets.append(rendered.group(1))
+        for target in targets:
+            resolved = local_path(public, target, base_url)
+            if resolved is None:
+                continue
+            if resolved.is_dir():
+                resolved = resolved / "index.html"
+            if not resolved.is_file():
+                report.fail(f"llms.txt:{number} links to {target}, which is not in the build")
 
     if sections == 0:
         report.fail("llms.txt has no sections")
     for name, count in section_counts.items():
         if count == 0:
             report.fail(f"llms.txt section {name!r} is empty")
-    report.ok(f"llms.txt parsed: 1 H1, {sections} sections, {entries} entries")
+
+    stats = f"llms.txt parsed: 1 H1, {sections} sections, {entries} entries, {len(raw)} bytes"
+    if source_links:
+        stats += f", {source_links} source links"
+    report.ok(stats)
+    if source_links == 0:
+        report.ok("no index entry links to a source (HTML-only index)")
+
+
+def resolve_expectation(own: str, overall: str) -> str:
+    """Apply the overall expectation to a half that did not state its own."""
+    if own != "auto":
+        return own
+    if overall != "auto":
+        return overall
+    return "auto"
 
 
 def main() -> int:
@@ -201,7 +289,38 @@ def main() -> int:
         "--expect",
         choices=("auto", "enabled", "disabled"),
         default="auto",
-        help="force an expectation instead of inferring it from llms.txt",
+        help="overall expectation; sets the default for both halves",
+    )
+    parser.add_argument(
+        "--expect-index",
+        choices=("auto", "enabled", "disabled"),
+        default="auto",
+        help="override the index expectation (llms.txt)",
+    )
+    parser.add_argument(
+        "--expect-sources",
+        choices=("auto", "enabled", "disabled"),
+        default="auto",
+        help="override the source-export expectation",
+    )
+    parser.add_argument(
+        "--source-prefix",
+        default="source",
+        help="published source prefix configured in data/llms.yaml (default: source)",
+    )
+    parser.add_argument(
+        "--expect-source",
+        action="append",
+        default=[],
+        metavar="REL",
+        help="content-relative source that must be published, language directory first",
+    )
+    parser.add_argument(
+        "--expect-no-source",
+        action="append",
+        default=[],
+        metavar="REL",
+        help="content-relative source that must not be published, language directory first",
     )
     args = parser.parse_args()
 
@@ -210,19 +329,41 @@ def main() -> int:
         print(f"FAIL {public} is not a directory", file=sys.stderr)
         return 1
 
-    report = Report()
-    enabled = (public / "llms.txt").is_file()
-    if args.expect == "enabled" and not enabled:
-        report.fail("expected an enabled build but llms.txt is missing")
-    elif args.expect == "disabled":
-        enabled = False
+    prefix = args.source_prefix.strip("/")
+    index_expect = resolve_expectation(args.expect_index, args.expect)
+    source_expect = resolve_expectation(args.expect_sources, args.expect)
 
-    if enabled:
-        check_index(public, args.base_url, report)
-        if args.content:
-            check_source_fidelity(public, args.content, report)
-    else:
-        check_inert(public, report)
+    report = Report()
+    index_present = (public / "llms.txt").is_file()
+
+    if index_expect in ("enabled", "auto") and index_present:
+        check_index(public, args.base_url, prefix, report)
+    elif index_expect == "enabled":
+        report.fail("expected an enabled index but llms.txt is missing")
+
+    if index_expect == "disabled" or source_expect == "disabled":
+        check_inert(
+            public,
+            prefix,
+            report,
+            index=index_expect == "disabled",
+            sources=source_expect == "disabled",
+        )
+
+    if source_expect in ("enabled", "auto"):
+        source_root = public / prefix
+        has_sources = source_root.is_dir() and any(path.is_file() for path in source_root.rglob("*"))
+        if source_expect == "enabled" and not has_sources:
+            report.fail(f"{prefix}/ is missing or empty from an enabled source export")
+        if has_sources or args.expect_source or args.expect_no_source:
+            check_source_fidelity(
+                public,
+                args.content,
+                prefix,
+                report,
+                args.expect_source,
+                args.expect_no_source,
+            )
 
     for failure in report.failures:
         print(f"FAIL {failure}")

@@ -1,0 +1,24 @@
+{{- /*
+  llms/published.html — is this page part of the public build?
+
+  Context: a Page. Returns: bool
+
+  Shared by the two places that select pages for the index or lead a section
+  with `featured`. Hugo already excludes drafts and out-of-window pages from a
+  normal build, but `--buildDrafts` and `--buildFuture` put them back, and an
+  index must not advertise a page the site is still withholding. An empty
+  RelPermalink covers pages built with `render: never` and headless bundles.
+
+  This says nothing about a page's source file, which llms/eligible.html
+  decides; a generated taxonomy listing is published HTML with no source.
+*/ -}}
+{{- $page := . -}}
+{{- $ok := false -}}
+{{- if and (not $page.Draft) $page.RelPermalink -}}
+  {{- $future := and (not $page.PublishDate.IsZero) (gt $page.PublishDate now) -}}
+  {{- $expired := and (not $page.ExpiryDate.IsZero) (lt $page.ExpiryDate now) -}}
+  {{- if not (or $future $expired) -}}
+    {{- $ok = true -}}
+  {{- end -}}
+{{- end -}}
+{{- return $ok -}}

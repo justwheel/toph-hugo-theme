@@ -14,23 +14,24 @@ enabled: true
 # themselves can still be published for every language.
 index:
   enabled: true
+  # Defaults to the site's default content language. Must be a language this
+  # site defines.
   language: en
-  # Defaults to the site title when omitted.
+  # Defaults to the indexed language's site title when omitted.
   title: Example Hugo site with Toph theme
   summary: A one-line description of the site, shown as a blockquote.
   intro: |
     Replace this paragraph with whatever a reader should know before using
     this index. It is rendered as plain text, not Markdown prose, so keep it
     short.
-  target_bytes: 20000
-  max_bytes: 100000
 
 # Unmodified copies of every published Markdown and AsciiDoc file. Change
 # `prefix` if `source/` collides with something your site already serves.
 sources:
   enabled: true
   prefix: source
-  # "all", or a list of language codes such as [en, ar].
+  # "all", or a list of language codes such as [en, ar]. An empty list
+  # publishes no source files.
   languages: all
   # Bare section names, e.g. [footer], to withhold a whole section. Note that
   # hide_sitemap and taxonomy_exclude are NOT consulted here.
@@ -40,9 +41,9 @@ sources:
 
 # Ordered index sections. Each section uses exactly one selector:
 #   pages:    an ordered list of logical page paths, kept as written
-#   section:  a section name; its pages newest first
-#   taxonomy: a taxonomy name; its terms busiest first
-# `featured` is an ordered list of page paths that always lead a section.
+#   section:  a section name; its published pages newest first
+# `featured` is an ordered list of page paths, inside a `section` selector,
+# that always lead that section.
 sections:
   - title: Pages
     pages:
@@ -57,12 +58,12 @@ sections:
     limit: 10
 
   - title: Topics
-    taxonomy: categories
-    limit: 8
+    pages:
+      - /categories/announcements
 
 optional:
   - title: Full blog archive
-    page: /blog
+    url: /blog
   - title: Sitemap
     url: sitemap.xml
   - title: RSS feed

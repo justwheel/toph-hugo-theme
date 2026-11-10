@@ -49,7 +49,7 @@ The GitHub Actions workflow (`.github/workflows/hugo.yml`) runs on all pushes an
 
 1. Installs Hugo Extended, Dart Sass, Node.js 24, pa11y-ci, serve, and Asciidoctor
 2. Builds the site with the GitHub Pages baseURL
-3. **Verifies the `/llms.txt` feature in both directions** with `.github/scripts/llms_fixture.sh` (see "Machine-readable index and source files")
+3. **Verifies the `/llms.txt` feature** with `.github/scripts/llms_fixture.sh`: the enabled checker runs against the build step's artifact, then a generated fixture site proves the disabled cases and the configuration guards (see "Machine-readable index and source files")
 4. **Rebuilds with `--baseURL http://localhost:3000/`** for Pa11y (critical — without this, Chromium fetches stale CSS from the deployed site instead of freshly built assets)
 5. Runs Pa11y accessibility audit against all sitemap URLs
 6. Rebuilds again with the Pages baseURL for the deployment artifact
@@ -355,8 +355,10 @@ The user-facing documentation is in `README.md` under the same heading; this sec
 
 - **Opt-in is a hard requirement.** The feature reads `hugo.Data.llms` and does nothing unless `enabled` is the YAML boolean `true`.
   An absent file, `enabled: false`, or `enabled` written as the string `"true"` must all produce zero output — a theme upgrade must never switch this on for anyone.
+  The string form warns and stays inert; it must not fail the build, because an inert build is the promise.
   Toph ships no data file at the theme root, and that is what keeps the promise: never add one.
   `exampleSite/data/llms.yaml` is switched on because the example site is the demonstration, not because the theme has a default.
+  `llms/config.html` returns early when the feature is disabled, so a disabled site is never asked for a valid index language or resolvable sections.
 
 - **Publication uses `resources.FromString` + `.Publish`, not output formats.** That is deliberate and load-bearing: `outputs` is not merged from a theme config, and a `home` output format would have to survive the `layout: biography` lookup.
   Do not "simplify" this into a custom output format without accepting that every downstream site would then have to edit `outputs` itself.
@@ -365,13 +367,21 @@ The user-facing documentation is in `README.md` under the same heading; this sec
   Byte fidelity is CI-checked, so any normalization, trimming, or rewriting shows up immediately as a failure.
 
 - **Eligibility lives in `llms/eligible.html`.** Drafts and pages outside their publish window are excluded even when a developer passes `--buildDrafts` or `--buildFuture`.
+  Source-language selection is an exact list membership against `sources.langs`, with `sources.all` as a separate flag: never compare language codes with a substring test, and never let an explicit empty list fall back to "all" through truthiness.
   `hide_sitemap` and `taxonomy_exclude` are **not** consulted — they describe listing behavior, and reusing them here would drop public project pages.
+
+- **Index eligibility lives in `llms/published.html`.** It is shared by both selectors and by `featured`, and it filters drafts, pages outside their publish window, and pages with no rendered output before they can consume a section's `limit`.
+  Filtering on `.Draft` alone leaves future and expired pages in an index built with preview flags.
 
 - **`partialCached` is a cache, not a once-only lock.** `llms/publish.html` is keyed on the language and may be evaluated more than once under concurrency, so every write must be deterministic and idempotent.
   Do not add a mutable "already published" flag.
 
-- **Selection order must be deterministic.** Hugo's `sort` guarantees no stability, so `llms/select.html` encodes ordering as a single composite key (date descending, with a path-ascending rank inverted into the tie-breaker) rather than chaining two sorts.
+- **Selection order must be deterministic.** Hugo 0.169.0's collection `sort` uses a stable sort, so `llms/select.html` orders with two passes — path ascending, then date descending — and equal dates keep their path-ascending order.
+  Do not reintroduce a composite rank key; do not use `.ByDate.Reverse`, which reverses equal-date groups too.
   Two builds of the same checkout must produce identical `llms.txt` bytes.
+
+- **The globally cached config must not read render-order state.** `llms/config.html` is cached under a single key, so its defaults come from `hugo.Sites.Default.Language.Lang` and from the matching entry in `hugo.Sites`, never from `site.Language.Lang` or `site.Title`.
+  A language-dependent default inside that file would make the index language depend on which page rendered first.
 
 - **Text handling goes through `llms/text.html`.** `plainify` strips tags but leaves entities, so `htmlUnescape` follows it; `truncate` is avoided because on a string it emits HTML entities.
   The index is built as a slice of lines joined by explicit newlines and never emitted through an HTML output action, which is what keeps Go's contextual auto-escaping out of the file.
@@ -383,20 +393,25 @@ The user-facing documentation is in `README.md` under the same heading; this sec
 - **HTTP `Content-Type` is the host's decision.** Hugo knows both media types and the `<link>` elements advertise them, but GitHub Pages offers no per-repository MIME mapping.
   Do not claim format-specific response headers without checking a real deployment.
 
-- **Verification is CI-enforced.** `.github/scripts/check_llms.py` checks index structure, link resolution, and byte fidelity against a finished build; `.github/scripts/llms_fixture.sh` proves both the disabled and enabled directions against `exampleSite`.
-  Both run in the theme workflow.
+- **Verification is CI-enforced.** `.github/scripts/check_llms.py` checks index structure, source and citation link resolution, byte fidelity, exact language selection, and inert output against a finished build.
+  `.github/scripts/llms_fixture.sh` runs the enabled checker against the build the workflow already produced, then builds a generated fixture site through the disabled cases and the configuration guards.
+  It must never edit the committed `exampleSite/data/llms.yaml`.
+  Both scripts run in the theme workflow, and every enabled invocation passes `--expect enabled`: `--expect auto` would let a total feature loss pass as an intentional opt-out.
 
 ### Hugo API facts this feature depends on
 
 Each of these cost a debugging round; none is obvious from the documentation.
 
 - **`site.Pages` is language-scoped; `site.AllPages` is not.** `site.AllPages` mixes every language of a multilingual build and is deprecated as of 0.156, so an enumeration must start from `site.Pages`.
+- **`hugo.Sites.Default.Language.Lang` is the configured default content language**, and it does not depend on which language rendered the template. `hugo.Sites` is ordered by language weight and `hugo.Sites.Default` is a `Site`, so its `.Title` is the default language's title. Inside a globally `partialCached` config, `site.Language.Lang` and `site.Title` are the wrong source: they follow whichever page rendered first.
+- **`collections.Sort` is stable.** `tpl/collections/sort.go` uses `sort.Stable` in 0.169.0 (and `resources/page/pages_sort.go` does the same), so a two-pass sort is a deterministic way to express a primary and a tie-breaker. `.ByDate.Reverse` is different: reversing a date sort also reverses equal-date groups.
+- **`with` treats an empty slice as false, but `isset` tests key presence.** Use `isset $m "languages"` for any list where an explicit empty value is meaningful; `with` would silently apply the default instead.
 - **`.ExpiryDate` is always a `time.Time`**, zero when unset, so `lt .ExpiryDate now` is true for every page that has no expiry. Guard with `.ExpiryDate.IsZero` before comparing; `.PublishDate` needs the same guard for pages with no date.
 - **YAML integers arrive as `uint64`** through `hugo.Data`, not `int`. A validation that tests `printf "%T"` against `"int"` rejects every value a user writes.
 - **`reflect.IsString` and `reflect.IsBool` do not exist.** Hugo's `reflect` namespace offers only `IsMap` and `IsSlice`; for scalars, compare `printf "%T"` or use `eq` against a literal (which returns false, not an error, on a type mismatch).
 - **`resources.FromString` publishes at exactly the target path given**, and its `.RelPermalink` carries the configured `baseURL` subpath, so no manual URL joining is needed. Spaces in the path are percent-encoded by `.RelPermalink`, and `--minify` leaves text resources untouched.
 - **`truncate` escapes its input as HTML**, and `plainify` does not decode entities — hence the `plainify` then `htmlUnescape` order in `llms/text.html`.
-- **`errorf` logs and fails the build but does not stop template execution**, so a guard that emits an error must also avoid running the code that depends on the missing value.
+- **`errorf` logs and fails the build but does not stop template execution**, so a guard that emits an error must also avoid running the code that depends on the missing value. Go template variables are block-scoped, so a value assigned inside `if` is not visible after `end`.
 
 
 ## Hugo template conventions

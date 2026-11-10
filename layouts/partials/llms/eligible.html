@@ -14,7 +14,7 @@
       not permission to publish a source file.
     - Pages with no rendered output (build.render: never, headless bundles),
       which have an empty RelPermalink.
-    - A page in a language the sources config excludes.
+    - A page in a language the sources config does not select.
 
   `hide_sitemap` and `taxonomy_exclude` are NOT consulted. They describe
   listing and sitemap behavior; reusing them here would silently drop the
@@ -31,7 +31,10 @@
       {{- $expired := and (not $page.ExpiryDate.IsZero) (lt $page.ExpiryDate now) -}}
       {{- if not (or $future $expired) -}}
         {{- $src := $cfg.sources -}}
-        {{- $lang_ok := or (eq $src.languages "all") (in $src.languages $page.Lang) -}}
+        {{- /* Exact membership against the validated list. `all` is a separate
+               flag, so no arbitrary string ever reaches this test and `es`
+               cannot match `es-mx`. */ -}}
+        {{- $lang_ok := or $src.all (in $src.langs $page.Lang) -}}
         {{- if $lang_ok -}}
           {{- $bare := strings.Trim $page.Path "/" -}}
           {{- if not (or (in $src.exclude_pages $bare) (in $src.exclude_sections $page.Section)) -}}

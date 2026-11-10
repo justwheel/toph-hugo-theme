@@ -36,12 +36,6 @@
 {{- $index := "" -}}
 {{- if and $cfg.enabled $cfg.index.enabled (eq $lang $cfg.index.language) -}}
   {{- $doc := partial "llms/document.html" (dict "cfg" $cfg "sources" $sources) -}}
-  {{- $bytes := len $doc -}}
-  {{- if gt $bytes $cfg.index.max_bytes -}}
-    {{- errorf "llms: /llms.txt is %d bytes, over the configured index.max_bytes of %d" $bytes $cfg.index.max_bytes -}}
-  {{- else if gt $bytes $cfg.index.target_bytes -}}
-    {{- warnf "llms: /llms.txt is %d bytes, over the configured index.target_bytes of %d" $bytes $cfg.index.target_bytes -}}
-  {{- end -}}
   {{- $r := resources.FromString "llms.txt" $doc -}}
   {{- $_ := $r.Publish -}}
   {{- $index = $r.Permalink -}}

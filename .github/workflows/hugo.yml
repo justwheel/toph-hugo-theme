@@ -109,6 +109,8 @@ jobs:
       - name: Verify /llms.txt and source publishing
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          LLMS_PUBLIC: exampleSite/public
+          LLMS_BASE_URL: ${{ steps.pages.outputs.base_url }}/
         run: .github/scripts/llms_fixture.sh
 
       - name: Run Accessibility Audit

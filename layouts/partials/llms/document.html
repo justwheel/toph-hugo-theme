@@ -48,24 +48,15 @@
 {{- /* --- optional: cross-links that are not page-level sections --- */ -}}
 {{- $optional := slice -}}
 {{- range $cfg.optional -}}
-  {{- $opt := . -}}
-  {{- $url := "" -}}
-  {{- if $opt.page -}}
-    {{- with site.GetPage (printf "/%s" $opt.page) -}}
-      {{- $url = .Permalink -}}
-    {{- else -}}
-      {{- warnf "llms: optional entry %q links to %q, which does not exist; omitting it" $opt.title $opt.page -}}
-    {{- end -}}
-  {{- else -}}
-    {{- $url = absURL $opt.url -}}
+  {{- $url := .url -}}
+  {{- /* Same-site URLs are resolved against the site base so a deployment
+         subpath survives; external, protocol-relative, and scheme URLs are
+         left exactly as written. */ -}}
+  {{- if and (not (findRE `^[A-Za-z][A-Za-z0-9+.-]*:` $url)) (not (strings.HasPrefix $url "//")) -}}
+    {{- $url = absURL (strings.TrimPrefix "/" $url) -}}
   {{- end -}}
-  {{- with $url -}}
-    {{- $line := printf "- [%s](%s)" (partial "llms/text.html" (dict "text" $opt.title "max" 0)) . -}}
-    {{- with $opt.description -}}
-      {{- $line = printf "%s: %s" $line (partial "llms/text.html" (dict "text" . "max" 200)) -}}
-    {{- end -}}
-    {{- $optional = $optional | append (printf "%s." $line) -}}
-  {{- end -}}
+  {{- $line := printf "- [%s](%s)" (partial "llms/text.html" (dict "text" .title "max" 0)) $url -}}
+  {{- $optional = $optional | append $line -}}
 {{- end -}}
 {{- if $optional -}}
   {{- $lines = $lines | append "" -}}

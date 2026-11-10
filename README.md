@@ -388,8 +388,6 @@ index:
   summary: One line, rendered as a blockquote.
   intro: |
     A short paragraph of plain text.
-  target_bytes: 20000
-  max_bytes: 100000
 
 sources:
   enabled: true
@@ -411,21 +409,29 @@ sections:
       - /blog/2024/02/favourite-post
     limit: 20
 
-  - title: Topics
-    taxonomy: categories
-    limit: 12
-
 optional:
   - title: Sitemap
     url: sitemap.xml
 ```
 
-Each entry in `sections` uses exactly one selector: `pages` for an ordered list of paths, `section` for a content section sorted newest first, or `taxonomy` for terms sorted busiest first.
-`featured` is an ordered list of page paths that always lead their section, and `limit` caps the section after duplicates are removed.
-`optional` becomes the final `## Optional` section and accepts either a logical `page` path or a `url` resolved against the site base.
+`index.language` defaults to the site's default content language, read from the site's own configuration rather than from whichever language happens to render first.
+`index.title` defaults to that language's site title.
 
-Every value is validated at build time.
-A misspelled key, a wrong type, an `enabled` written as the string `"true"`, an unsafe `prefix`, a featured page outside its section, or a path that does not exist fails the build with a named diagnostic rather than silently producing a short index.
+Each entry in `sections` uses exactly one selector: `pages` for an ordered list of page paths, or `section` for a content section's published pages.
+Section pages sort by date descending, with path ascending breaking equal dates; Hugo's `sort` is stable, so the tie order is reproducible.
+`featured` is an ordered list of page paths inside the section that always lead it, and `limit` caps the chronological fill after duplicates are removed.
+Featuring more pages than the limit keeps them all.
+
+`optional` becomes the final `## Optional` section and accepts only `title` and `url`.
+A relative `url` is resolved against the site base URL, so a deployment subpath survives; an absolute `url` is left alone.
+
+`languages` accepts `all` or a list of language codes.
+An empty list publishes no source files, and membership is exact: selecting `es` never matches `es-mx`.
+
+Structural mistakes are caught at build time.
+A section without a selector, an unsafe `prefix`, a featured page outside its section, or a missing page path fails or warns with a named diagnostic rather than silently producing a short index.
+The retired `taxonomy` selector and the retired optional `page` field fail with a migration message: list term pages explicitly with `pages`, and write an optional link as a `url`.
+`enabled` written as the string `"true"` is not the boolean opt-in; the build stays inert and warns.
 
 #### What it does not do
 
@@ -462,11 +468,19 @@ hugo --destination /tmp/site-check
 python3 .github/scripts/check_llms.py \
   --public public \
   --content content \
-  --base-url https://example.org/
+  --base-url https://example.org/ \
+  --expect enabled
 ```
 
-It checks the index structure, resolves every same-origin link in it, compares each published source file with its content original byte for byte, and — when the feature is off — asserts that the build carries no index, no source tree, and no discovery links.
-`.github/scripts/llms_fixture.sh` runs both directions against `exampleSite`, and CI calls it on every push.
+Pass `--expect enabled` in CI.
+With the default `auto`, a build that lost the feature entirely would look like an intentional opt-out.
+`--expect-index` and `--expect-sources` override the two halves independently, `--source-prefix` matches a configured prefix, and `--expect-source` / `--expect-no-source` assert that a specific language-scoped file was or was not published.
+
+The checker validates the index structure, resolves every same-origin link and every rendered-page citation link, compares each published source file with its content original byte for byte, and — when a half of the feature is off — asserts that the build carries no index, no source tree, and no discovery links.
+Discovery matching accepts quoted and minified-unquoted attributes, because a minified build writes `rel=describedby`.
+
+`.github/scripts/llms_fixture.sh` runs the enabled checker against the artifact the workflow already built, then builds a small generated site through the disabled cases (absent configuration, `enabled: false`, `enabled: "true"`), exact language selection, preview flags, exclusions, a custom prefix, and the configuration guards.
+It never edits `exampleSite/data/llms.yaml`, and CI calls it on every push.
 
 ### Shortcodes
 

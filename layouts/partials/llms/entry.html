@@ -5,34 +5,32 @@
   Returns: string, a single Markdown list line
 
   The link label points at the original source file when one was published,
-  because that is the artifact this feature exists to expose; the rendered page
+  because that is the artifact this feature exists to expose. The rendered page
   is offered as a second link so a reader can see the HTML output and cite a
-  stable URL. Pages with no source (generated taxonomy listings) link straight
-  to their HTML page.
+  stable URL; an HTML page linking to its source does not provide the reverse
+  navigation for an agent starting from llms.txt. Pages with no source
+  (generated taxonomy listings) link straight to their HTML page.
+
+  Formatting is fixed rather than punctuation-aware: `- [Label](source):
+  Description — [Rendered page](html)`, with no trailing periods. The
+  source-less form drops the citation link.
 */ -}}
 {{- $page := .page -}}
 {{- $src := index .sources $page.Path -}}
 
-{{- /* The homepage's _index file carries no title of its own, and an untitled
-       page would otherwise render as an empty link label. */ -}}
-{{- $title := "" -}}
-{{- with $page.Title -}}
-  {{- $title = partial "llms/text.html" (dict "text" . "max" 120) -}}
-{{- end -}}
-{{- if not $title -}}
-  {{- with $page.LinkTitle -}}
-    {{- $title = partial "llms/text.html" (dict "text" . "max" 120) -}}
-  {{- end -}}
-{{- end -}}
+{{- /* `.Title` first, then `.LinkTitle`; an untitled homepage has neither, so
+       fall back to the site title rather than rendering an empty label. */ -}}
+{{- $title := $page.Title | default $page.LinkTitle -}}
 {{- if not $title -}}
   {{- if $page.IsHome -}}
-    {{- $title = partial "llms/text.html" (dict "text" site.Title "max" 120) -}}
+    {{- $title = site.Title -}}
   {{- else -}}
     {{- with $page.File -}}
-      {{- $title = partial "llms/text.html" (dict "text" (humanize .TranslationBaseName) "max" 120) -}}
+      {{- $title = humanize .TranslationBaseName -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}
+{{- $title = partial "llms/text.html" (dict "text" $title "max" 120) -}}
 
 {{- $url := $page.Permalink -}}
 {{- with $src -}}{{- $url = . -}}{{- end -}}
@@ -43,17 +41,12 @@
 {{- else -}}
   {{- with $page.Summary -}}{{- $desc = . -}}{{- end -}}
 {{- end -}}
+
 {{- $line := printf "- [%s](%s)" $title $url -}}
 {{- with partial "llms/text.html" (dict "text" $desc "max" 200) -}}
   {{- $line = printf "%s: %s" $line . -}}
 {{- end -}}
-{{- /* Exactly one terminator between the note and the next link, whatever
-       punctuation the note itself ended with. */ -}}
 {{- if $src -}}
-  {{- $sep := "." -}}
-  {{- if findRE `[.!?]$` $line -}}{{- $sep = "" -}}{{- end -}}
-  {{- $line = printf "%s%s [Rendered page](%s)." $line $sep $page.Permalink -}}
-{{- else if not (findRE `[.!?]$` $line) -}}
-  {{- $line = printf "%s." $line -}}
+  {{- $line = printf "%s — [Rendered page](%s)" $line $page.Permalink -}}
 {{- end -}}
 {{- return $line -}}
