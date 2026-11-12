@@ -428,9 +428,8 @@ A relative `url` is resolved against the site base URL, so a deployment subpath 
 `languages` accepts `all` or a list of language codes.
 An empty list publishes no source files, and membership is exact: selecting `es` never matches `es-mx`.
 
-Structural mistakes are caught at build time.
-A section without a selector, an unsafe `prefix`, a featured page outside its section, or a missing page path fails or warns with a named diagnostic rather than silently producing a short index.
-The retired `taxonomy` selector and the retired optional `page` field fail with a migration message: list term pages explicitly with `pages`, and write an optional link as a `url`.
+The opt-in flag, the index language, an unsafe `prefix`, the source language list, a listed page path that does not exist, and a featured page outside its section are checked at build time; each fails or warns with a named diagnostic.
+Everything else is used as written, so a malformed section or optional record surfaces as a template error or as missing output rather than a bespoke message.
 `enabled` written as the string `"true"` is not the boolean opt-in; the build stays inert and warns.
 
 #### What it does not do
@@ -479,7 +478,7 @@ With the default `auto`, a build that lost the feature entirely would look like 
 The checker validates the index structure, resolves every same-origin link and every rendered-page citation link, compares each published source file with its content original byte for byte, and — when a half of the feature is off — asserts that the build carries no index, no source tree, and no discovery links.
 Discovery matching accepts quoted and minified-unquoted attributes, because a minified build writes `rel=describedby`.
 
-`.github/scripts/llms_fixture.sh` runs the enabled checker against the artifact the workflow already built, then builds a small generated site through the disabled cases (absent configuration, `enabled: false`, `enabled: "true"`), exact language selection, preview flags, exclusions, a custom prefix, and the configuration guards.
+`.github/scripts/llms_fixture.sh` runs the enabled checker against the artifact the workflow already built, then rebuilds one small generated site through the disabled cases (absent configuration, `enabled: false`, `enabled: "true"`) and exact language selection.
 It never edits `exampleSite/data/llms.yaml`, and CI calls it on every push.
 
 ### Shortcodes

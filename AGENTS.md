@@ -49,7 +49,7 @@ The GitHub Actions workflow (`.github/workflows/hugo.yml`) runs on all pushes an
 
 1. Installs Hugo Extended, Dart Sass, Node.js 24, pa11y-ci, serve, and Asciidoctor
 2. Builds the site with the GitHub Pages baseURL
-3. **Verifies the `/llms.txt` feature** with `.github/scripts/llms_fixture.sh`: the enabled checker runs against the build step's artifact, then a generated fixture site proves the disabled cases and the configuration guards (see "Machine-readable index and source files")
+3. **Verifies the `/llms.txt` feature** with `.github/scripts/llms_fixture.sh`: the enabled checker runs against the build step's artifact, then one small generated site covers the three opt-out values and exact language selection (see "Machine-readable index and source files")
 4. **Rebuilds with `--baseURL http://localhost:3000/`** for Pa11y (critical — without this, Chromium fetches stale CSS from the deployed site instead of freshly built assets)
 5. Runs Pa11y accessibility audit against all sitemap URLs
 6. Rebuilds again with the Pages baseURL for the deployment artifact
@@ -366,12 +366,13 @@ The user-facing documentation is in `README.md` under the same heading; this sec
 - **Sources are the complete files.** Read them with `os.ReadFile .File.Filename`; `.RawContent` drops front matter and `.Content` is rendered HTML.
   Byte fidelity is CI-checked, so any normalization, trimming, or rewriting shows up immediately as a failure.
 
-- **Eligibility lives in `llms/eligible.html`.** Drafts and pages outside their publish window are excluded even when a developer passes `--buildDrafts` or `--buildFuture`.
+- **Source eligibility lives in `llms/eligible.html`, which defers the shared publication rule to `llms/published.html`.** Drafts and pages outside their publish window are excluded even when a developer passes `--buildDrafts` or `--buildFuture`.
   Source-language selection is an exact list membership against `sources.langs`, with `sources.all` as a separate flag: never compare language codes with a substring test, and never let an explicit empty list fall back to "all" through truthiness.
   `hide_sitemap` and `taxonomy_exclude` are **not** consulted — they describe listing behavior, and reusing them here would drop public project pages.
 
-- **Index eligibility lives in `llms/published.html`.** It is shared by both selectors and by `featured`, and it filters drafts, pages outside their publish window, and pages with no rendered output before they can consume a section's `limit`.
+- **The publication rule lives in `llms/published.html`.** Both index selectors, `featured`, and source eligibility call it, so drafts, pages outside their publish window, and pages with no rendered output are excluded once, before they can consume a section's `limit`.
   Filtering on `.Draft` alone leaves future and expired pages in an index built with preview flags.
+  Source eligibility adds its own file-extension, language, and exclusion tests on top; the shared rule never looks for a backing file, because a generated term page is public HTML with no source.
 
 - **`partialCached` is a cache, not a once-only lock.** `llms/publish.html` is keyed on the language and may be evaluated more than once under concurrency, so every write must be deterministic and idempotent.
   Do not add a mutable "already published" flag.
@@ -394,7 +395,7 @@ The user-facing documentation is in `README.md` under the same heading; this sec
   Do not claim format-specific response headers without checking a real deployment.
 
 - **Verification is CI-enforced.** `.github/scripts/check_llms.py` checks index structure, source and citation link resolution, byte fidelity, exact language selection, and inert output against a finished build.
-  `.github/scripts/llms_fixture.sh` runs the enabled checker against the build the workflow already produced, then builds a generated fixture site through the disabled cases and the configuration guards.
+  `.github/scripts/llms_fixture.sh` runs the enabled checker against the build the workflow already produced, then rebuilds one small generated site through the three opt-out values and the exact-language case.
   It must never edit the committed `exampleSite/data/llms.yaml`.
   Both scripts run in the theme workflow, and every enabled invocation passes `--expect enabled`: `--expect auto` would let a total feature loss pass as an intentional opt-out.
 

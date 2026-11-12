@@ -63,7 +63,7 @@ sections:
 
 optional:
   - title: Full blog archive
-    url: /blog
+    url: /blog/
   - title: Sitemap
     url: sitemap.xml
   - title: RSS feed

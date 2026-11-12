@@ -9,11 +9,8 @@
 
   Deliberate exclusions:
     - No backing file, or a format other than Markdown/AsciiDoc.
-    - Drafts, and pages outside their publish window. This holds even when a
-      developer builds with --buildDrafts or --buildFuture: previewing HTML is
-      not permission to publish a source file.
-    - Pages with no rendered output (build.render: never, headless bundles),
-      which have an empty RelPermalink.
+    - A page the public build is withholding, which `llms/published.html`
+      decides for the index selectors as well.
     - A page in a language the sources config does not select.
 
   `hide_sitemap` and `taxonomy_exclude` are NOT consulted. They describe
@@ -25,22 +22,16 @@
 {{- $lang := .lang -}}
 {{- $ok := false -}}
 {{- with $page.File -}}
-  {{- if in (slice "md" "adoc") .Ext -}}
-    {{- if and (not $page.Draft) $page.RelPermalink (eq $page.Lang $lang) -}}
-      {{- $future := and (not $page.PublishDate.IsZero) (gt $page.PublishDate now) -}}
-      {{- $expired := and (not $page.ExpiryDate.IsZero) (lt $page.ExpiryDate now) -}}
-      {{- if not (or $future $expired) -}}
-        {{- $src := $cfg.sources -}}
-        {{- /* Exact membership against the validated list. `all` is a separate
-               flag, so no arbitrary string ever reaches this test and `es`
-               cannot match `es-mx`. */ -}}
-        {{- $lang_ok := or $src.all (in $src.langs $page.Lang) -}}
-        {{- if $lang_ok -}}
-          {{- $bare := strings.Trim $page.Path "/" -}}
-          {{- if not (or (in $src.exclude_pages $bare) (in $src.exclude_sections $page.Section)) -}}
-            {{- $ok = true -}}
-          {{- end -}}
-        {{- end -}}
+  {{- if and (in (slice "md" "adoc") .Ext) (eq $page.Lang $lang) (partial "llms/published.html" $page) -}}
+    {{- $src := $cfg.sources -}}
+    {{- /* Exact membership against the validated list. `all` is a separate
+           flag, so no arbitrary string ever reaches this test and `es` cannot
+           match `es-mx`. */ -}}
+    {{- $lang_ok := or $src.all (in $src.langs $page.Lang) -}}
+    {{- if $lang_ok -}}
+      {{- $bare := strings.Trim $page.Path "/" -}}
+      {{- if not (or (in $src.exclude_pages $bare) (in $src.exclude_sections $page.Section)) -}}
+        {{- $ok = true -}}
       {{- end -}}
     {{- end -}}
   {{- end -}}

@@ -19,16 +19,11 @@
 {{- $src := index .sources $page.Path -}}
 
 {{- /* `.Title` first, then `.LinkTitle`; an untitled homepage has neither, so
-       fall back to the site title rather than rendering an empty label. */ -}}
+       fall back to the site title rather than rendering an empty label. An
+       untitled regular page is an authoring mistake and gets no fallback. */ -}}
 {{- $title := $page.Title | default $page.LinkTitle -}}
-{{- if not $title -}}
-  {{- if $page.IsHome -}}
-    {{- $title = site.Title -}}
-  {{- else -}}
-    {{- with $page.File -}}
-      {{- $title = humanize .TranslationBaseName -}}
-    {{- end -}}
-  {{- end -}}
+{{- if and (not $title) $page.IsHome -}}
+  {{- $title = site.Title -}}
 {{- end -}}
 {{- $title = partial "llms/text.html" (dict "text" $title "max" 120) -}}
 
