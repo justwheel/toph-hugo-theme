@@ -1,0 +1,190 @@
+---
+title: "Publicar un /llms.txt real con Toph"
+date: 2026-11-12
+draft: false
+categories:
+  - "announcements"
+  - "features"
+tags:
+  - "toph"
+  - "hugo"
+  - "asciidoc"
+  - "web"
+author: "Justin Wheeler"
+description: "Toph v1.3.0 puede publicar un índice /llms.txt y una copia sin modificar del archivo Markdown o AsciiDoc de cada página. Qué es la convención y cómo activarla."
+---
+
+:toc:
+:toc-title: Tabla de contenidos
+
+Toph v1.3.0 añade un índice legible por máquinas y publicación nativa de fuentes, ambos controlados por un solo archivo de datos.
+El índice es `/llms.txt`; las fuentes son una copia sin modificar del archivo Markdown o AsciiDoc de cada página bajo `/source/`.
+Ninguno de los dos aparece hasta que un sitio lo pide, así que actualizar el tema no publica nada por sí solo.
+
+== Qué es `llms.txt`
+
+`llms.txt` es una convención propuesta, descrita en https://llmstxt.org/[llmstxt.org] y difundida desde septiembre de 2024, que consiste en colocar un archivo Markdown en la raíz de un sitio para presentarlo y enlazar sus páginas más útiles.
+La forma es sencilla: un H1 con el nombre del sitio, un resumen opcional en forma de cita, prosa breve opcional, secciones H2 con listas de enlaces y una sección `## Optional` al final para enlaces cruzados que no son páginas.
+Es una propuesta, no un estándar, y ningún rastreador ha prometido leerla.
+Como un sitemap o un feed, es una invitación y no un mecanismo de imposición.
+Tampoco es una licencia: publicar un archivo fuente no concede a nadie un derecho que no tuviera ya, y Toph no toca `robots.txt`.
+
+== Por qué un sitio publicaría uno
+
+Una página web está hecha para un navegador, así que la navegación, los pies de página, las insignias y los scripts viajan con el artículo, y un lector automatizado paga por todo ello antes de llegar a la primera frase.
+Markdown es más barato de leer y está más cerca de lo que estos sistemas manejan directamente, y por eso la convención se escribe en ese formato.
+
+El atajo que toman algunos sitios es convertir el HTML renderizado a Markdown, lo que pierde justo las partes que vale la pena conservar: el front matter, los atributos y las advertencias de AsciiDoc, los shortcodes y los párrafos del propio autor.
+Toph publica el archivo desde el disco, byte por byte, así que AsciiDoc sigue siendo AsciiDoc.
+
+Un archivo que nadie lee cuesta unos kilobytes en disco y nada en tiempo de respuesta, y borrar un archivo de datos elimina el índice, las fuentes y los enlaces de descubrimiento a la vez.
+El sitio de demostración muestra la escala: unos 4 KB de índice para 13 entradas y 88 archivos fuente.
+
+== Qué publica Toph
+
+Dos artefactos, escritos mediante el publicador de recursos de Hugo y no mediante un formato de salida personalizado:
+
+* *El índice*: `/llms.txt`, en un solo idioma.
+* *Las fuentes*: `/<prefix>/<language>/<content-relative-path>`, de modo que `content/about-me.md` pasa a ser `/source/en/about-me.md`, y cada traducción queda bajo su propio directorio de idioma.
+
+Cada página elegible anuncia ambos en `<head>`:
+
+[source,html]
+----
+<link rel="describedby" type="text/plain" href="/llms.txt">
+<link rel="alternate" type="text/markdown" href="/source/en/about-me.md">
+----
+
+El tipo por página es real, así que una página AsciiDoc se anuncia como `text/asciidoc` y nunca como Markdown.
+`describedby` aparece en las páginas del idioma indexado; los demás idiomas siguen publicando y enlazando sus propias fuentes.
+
+Las entradas tienen una forma fija: una etiqueta que apunta a la fuente, una descripción y un enlace de cita a la página renderizada.
+
+[source,text]
+----
+# Example Hugo site with Toph theme
+
+> A one-line description of the site, shown as a blockquote.
+
+## Writing
+- [Editorial Blockquotes and Verse in AsciiDoc](https://justwheel.github.io/toph-hugo-theme/source/en/blog/blockquote-styling.en.adoc): Toph introduces an editorial quotation system… — [Rendered page](https://justwheel.github.io/toph-hugo-theme/blog/blockquote-styling/)
+----
+
+Las etiquetas se limitan a 120 caracteres y las descripciones a 200, contados por carácter y no por byte.
+La descripción proviene del front matter `description` de la página y, si falta, del resumen que Hugo deriva del cuerpo.
+Las páginas sin archivo fuente, como los listados de taxonomía generados, enlazan directamente a su HTML y omiten la cita.
+
+== Cómo activarlo
+
+Copia el `data/llms.yaml` del sitio de ejemplo del tema (`themes/toph/exampleSite/data/llms.yaml`) y edítalo, o empieza por lo mínimo:
+
+[source,yaml]
+----
+# data/llms.yaml
+enabled: true
+----
+
+No hay que añadir una entrada en `outputs`, ni cambiar el front matter de la portada, ni sobrescribir un layout.
+Solo cuenta el booleano YAML `true`: `enabled: "true"` es una cadena, así que la compilación avisa y queda inerte en lugar de interpretar un error de comillas como consentimiento.
+
+Para desactivarlo, pon `enabled: false` o borra el archivo.
+Ninguna de las dos cosas elimina los archivos que ya están en `public/`, así que recompila en un destino limpio.
+
+== Configurar el índice
+
+* `index.enabled` (por defecto `true`): publicar `/llms.txt`; las fuentes se controlan por separado.
+* `index.language` (por defecto: el idioma de contenido predeterminado del sitio): qué idioma se indexa; debe ser un idioma que el sitio defina.
+* `index.title` (por defecto: el título del sitio en ese idioma): el H1.
+* `index.summary` (por defecto: ninguno): una línea, mostrada como cita.
+* `index.intro` (por defecto: ninguno): párrafos de texto plano, una línea cada uno, no Markdown.
+
+Con `index.enabled: false` las fuentes se siguen publicando y enlazando por página, pero no hay índice ni enlace `describedby`.
+
+== Elegir qué fuentes se publican
+
+* `sources.enabled` (por defecto `true`): publicar copias de las fuentes.
+* `sources.prefix` (por defecto `source`): el primer segmento de la ruta; debe ser relativo, sin esquema, sin barra inicial y sin `..`.
+* `sources.languages` (por defecto `all`): `all`, o una lista como `[en, ar]`; una lista vacía no publica nada.
+
+[source,yaml]
+----
+sources:
+  prefix: src
+  languages: [en, ar]
+  exclude_sections: [footer]
+  exclude_pages: [about-me, blog/hello-world]
+----
+
+La selección de idiomas es una pertenencia exacta a la lista, así que `es` nunca coincide con `es-mx`.
+Las exclusiones se escriben sin barras iniciales ni finales y afectan solo a la copia de la fuente: una página excluida de `sources` puede seguir apareciendo en el índice, apuntando a su página renderizada.
+`hide_sitemap` y `taxonomy_exclude` se ignoran a propósito, porque ambos describen el comportamiento de los listados y reutilizarlos ocultaría páginas de proyectos que son públicas.
+
+== Armar el índice
+
+Cada registro de `sections` usa un solo selector: `pages` conserva una lista ordenada tal como se escribe, mientras que `section` se llena con las páginas publicadas de esa sección, de la más reciente a la más antigua, incluidos los subdirectorios.
+El orden es determinista, por fecha descendente y luego por ruta ascendente, así que dos compilaciones del mismo checkout producen bytes idénticos.
+
+[source,yaml]
+----
+sections:
+  - title: Pages
+    pages: [/]
+  - title: Projects
+    section: projects
+  - title: Writing
+    section: blog
+    featured:
+      - /blog/2024/02/favourite-post
+    limit: 20
+
+optional:
+  - title: Full blog archive
+    url: /blog/
+  - title: Sitemap
+    url: sitemap.xml
+----
+
+`featured` encabeza su sección en el orden escrito; `limit` limita el relleno cronológico posterior, vale 20 por defecto y nunca recorta las entradas destacadas.
+Una ruta destacada debe ser una página publicada de esa sección, o la compilación falla.
+Las secciones vacías se omiten, y `optional` se convierte en la lista final `## Optional`, con las URL relativas resueltas contra la URL base del sitio para que sobreviva un despliegue en subruta.
+
+== Qué se publica y qué se rechaza
+
+Una fuente se publica cuando la página tiene un archivo `.md` o `.adoc` de respaldo, no es un borrador, está dentro de su ventana de publicación y tiene salida renderizada.
+Los borradores y las entradas con fecha futura siguen siendo privados incluso con `--buildDrafts` o `--buildFuture`, porque previsualizar el HTML no es permiso para publicar la fuente.
+También se omite una página cuyo `build.render` efectivo sea `link` o `never`, ya se defina en la página o se herede por `cascade`.
+
+La compilación falla en lugar de adivinar ante un `index.language` inválido, un `sources.prefix` inseguro, un idioma no definido en `sources.languages`, una ruta de `pages` que no resuelve o una página `featured` fuera de su sección.
+Avisa y omite la entrada cuando una página listada es un borrador, está caducada o usa `render: link`.
+
+== Subrutas, colisiones y verificación
+
+El índice y las fuentes pasan por el publicador de recursos de Hugo, así que ambos llevan la ruta configurada en `baseURL`.
+Una colisión importa: cuando el índice está activo, el `/llms.txt` generado reemplaza a un `static/llms.txt` escrito a mano, así que borra el archivo antiguo en lugar de depurar el equivocado.
+
+El tema incluye el verificador que usa su propia CI:
+
+[source,bash]
+----
+python3 themes/toph/.github/scripts/check_llms.py \
+  --public public --content content \
+  --base-url https://example.org/ --expect enabled
+----
+
+Funciona sobre una compilación terminada y comprueba que el índice se analiza, que todos los enlaces del mismo origen y de cita resuelven, que cada fuente publicada coincide byte por byte con su archivo de contenido y que ninguna fuente lleva front matter de borrador.
+Pasa `--expect enabled` en CI, ya que el valor por defecto `auto` dejaría que una pérdida total de la función pasara como una desactivación intencional.
+
+== Limitaciones
+
+* Las directivas `include::` de AsciiDoc no se expanden y las imágenes referenciadas no se copian; una fuente es el archivo del autor, no una reproducción de la compilación.
+* El front matter también se publica, comentarios incluidos.
+* No se garantiza ningún `Content-Type`: Hugo anuncia `text/markdown` y `text/asciidoc`, pero el host decide la cabecera, y GitHub Pages sirve `.adoc` como `application/octet-stream`.
+* No se descarga nada durante la compilación y no cambia ningún permalink, sitemap, feed ni metadato existente; la función solo añade los dos elementos `<link>`.
+
+== Pruébalo
+
+* https://justwheel.github.io/toph-hugo-theme/llms.txt[El índice de demostración] y https://justwheel.github.io/toph-hugo-theme/source/en/blog/blockquote-styling.en.adoc[una fuente publicada].
+* El `README.md` del tema, sección "Machine-readable index and source files", para el esquema completo.
+* https://github.com/justwheel/toph-hugo-theme[El repositorio] para incidencias y pull requests.
+
+Esta entrada también es una fuente publicada: su propio archivo está en `/source/es/blog/llms-txt.es.adoc`, con front matter incluido.

@@ -1,0 +1,189 @@
+---
+title: "Publishing a Real /llms.txt with Toph"
+date: 2026-11-12
+draft: false
+categories:
+  - "announcements"
+  - "features"
+tags:
+  - "toph"
+  - "hugo"
+  - "asciidoc"
+  - "web"
+author: "Justin Wheeler"
+description: "Toph v1.3.0 can publish a /llms.txt index and an unmodified copy of every page's Markdown or AsciiDoc source. What the convention is, and how to switch it on."
+---
+
+:toc:
+
+Toph v1.3.0 adds a machine-readable index and native source publishing, both controlled by one data file.
+The index is `/llms.txt`; the sources are an unmodified copy of every page's Markdown or AsciiDoc file under `/source/`.
+Neither appears until a site asks for it, so upgrading the theme publishes nothing on its own.
+
+== What `llms.txt` is
+
+`llms.txt` is a proposed convention, described at https://llmstxt.org/[llmstxt.org] and circulated since September 2024, for placing a Markdown file at a site's root that introduces the site and links to its most useful pages.
+The shape is plain: one H1 with the site name, an optional blockquote summary, optional short prose, H2 sections of link lists, and an `## Optional` section last for cross-links that are not pages.
+It is a proposal, not a standard, and no crawler has promised to read it.
+Like a sitemap or a feed, it is an invitation rather than an enforcement mechanism.
+It is also not a licence: publishing a source file grants nobody a right they did not already have, and Toph does not touch `robots.txt`.
+
+== Why a site would publish one
+
+A browser page is built for a browser, so navigation, footers, badges, and scripts travel with the article and an automated reader pays for all of it before reaching the first sentence.
+Markdown is cheaper to read and closer to what these systems handle directly, which is why the convention is written in it.
+
+The shortcut some sites take is converting rendered HTML to Markdown, which loses exactly the parts worth keeping: front matter, AsciiDoc attributes and admonitions, shortcodes, and the author's own paragraphs.
+Toph publishes the file from disk instead, byte for byte, so AsciiDoc stays AsciiDoc.
+
+A file nobody reads costs a few kilobytes on disk and nothing at request time, and deleting one data file removes the index, the sources, and the discovery links together.
+The demo site shows the scale: about 4 KB of index for 13 entries and 88 source files.
+
+== What Toph publishes
+
+Two artifacts, written through Hugo's resource publisher rather than through a custom output format:
+
+* *The index*: `/llms.txt`, in exactly one language.
+* *The sources*: `/<prefix>/<language>/<content-relative-path>`, so `content/about-me.md` becomes `/source/en/about-me.md`, with each translation under its own language directory.
+
+Every eligible page advertises both in `<head>`:
+
+[source,html]
+----
+<link rel="describedby" type="text/plain" href="/llms.txt">
+<link rel="alternate" type="text/markdown" href="/source/en/about-me.md">
+----
+
+The per-page type is real, so an AsciiDoc page is advertised as `text/asciidoc` and never as Markdown.
+`describedby` appears on pages in the indexed language; other languages still publish and link their own sources.
+
+Entries have one fixed shape: a label pointing at the source, a description, then a citation link to the rendered page.
+
+[source,text]
+----
+# Example Hugo site with Toph theme
+
+> A one-line description of the site, shown as a blockquote.
+
+## Writing
+- [Editorial Blockquotes and Verse in AsciiDoc](https://justwheel.github.io/toph-hugo-theme/source/en/blog/blockquote-styling.en.adoc): Toph introduces an editorial quotation system… — [Rendered page](https://justwheel.github.io/toph-hugo-theme/blog/blockquote-styling/)
+----
+
+Labels are capped at 120 characters and descriptions at 200, counted by character rather than by byte.
+A description comes from the page's `description` front matter and falls back to the summary Hugo derives from the body.
+Pages with no source file, such as generated taxonomy listings, link straight to their HTML and drop the citation.
+
+== Switching it on
+
+Copy the example site's `data/llms.yaml` from the theme (`themes/toph/exampleSite/data/llms.yaml`) and edit it, or start with the minimum:
+
+[source,yaml]
+----
+# data/llms.yaml
+enabled: true
+----
+
+There is no `outputs` entry to add, no homepage front matter to change, and no layout to override.
+Only the YAML boolean `true` counts: `enabled: "true"` is a string, so the build warns and stays inert instead of reading a quoting mistake as consent.
+
+To turn it off, set `enabled: false` or delete the file.
+Neither removes files already sitting in `public/`, so rebuild into a clean destination.
+
+== Configuring the index
+
+* `index.enabled` (default `true`): publish `/llms.txt` at all; sources are controlled separately.
+* `index.language` (default: the site's default content language): which language's index to write; it must be a language the site defines.
+* `index.title` (default: that language's site title): the H1.
+* `index.summary` (default: none): one line, rendered as a blockquote.
+* `index.intro` (default: none): plain text paragraphs, one line each, not Markdown.
+
+With `index.enabled: false` the sources still publish and still link per page, but there is no index and no `describedby` link.
+
+== Choosing which sources publish
+
+* `sources.enabled` (default `true`): publish source copies at all.
+* `sources.prefix` (default `source`): the first path segment; it must be relative, with no scheme, no leading slash, and no `..`.
+* `sources.languages` (default `all`): `all`, or a list such as `[en, ar]`; an empty list publishes nothing.
+
+[source,yaml]
+----
+sources:
+  prefix: src
+  languages: [en, ar]
+  exclude_sections: [footer]
+  exclude_pages: [about-me, blog/hello-world]
+----
+
+Language selection is exact list membership, so `es` never matches `es-mx`.
+Exclusions are written without leading or trailing slashes and affect the source copy only: a page kept out of `sources` can still appear in the index, pointing at its rendered page.
+`hide_sitemap` and `taxonomy_exclude` are deliberately ignored, because both describe listing behavior and reusing them would withhold public project pages.
+
+== Assembling the index
+
+Each record in `sections` uses one selector: `pages` keeps an ordered list exactly as written, while `section` fills with that section's published pages newest first, subdirectories included.
+Ordering is deterministic, sorting by date descending and then by path ascending, so two builds of the same checkout produce identical bytes.
+
+[source,yaml]
+----
+sections:
+  - title: Pages
+    pages: [/]
+  - title: Projects
+    section: projects
+  - title: Writing
+    section: blog
+    featured:
+      - /blog/2024/02/favourite-post
+    limit: 20
+
+optional:
+  - title: Full blog archive
+    url: /blog/
+  - title: Sitemap
+    url: sitemap.xml
+----
+
+`featured` leads its section in the order written; `limit` caps the chronological fill after it, defaults to 20, and never truncates featured entries.
+A featured path must be a published page in that section, or the build fails.
+Empty sections are omitted, and `optional` becomes the final `## Optional` list, with relative URLs resolved against the site's base URL so a subpath deployment survives.
+
+== What is published, and what is refused
+
+A source is published when the page has a backing `.md` or `.adoc` file, is not a draft, is inside its publish window, and has rendered output.
+Drafts and future-dated posts stay private even under `--buildDrafts` or `--buildFuture`, because previewing HTML is not permission to publish the source.
+A page whose effective `build.render` is `link` or `never` is skipped as well, whether that is set on the page or inherited through `cascade`.
+
+The build fails rather than guessing on a bad `index.language`, an unsafe `sources.prefix`, an undefined language in `sources.languages`, a `pages` path that does not resolve, or a `featured` page outside its section.
+It warns and omits the entry when a listed page is a draft, expired, or `render: link`.
+
+== Subpaths, collisions, and verification
+
+The index and the sources go through Hugo's resource publisher, so both carry the configured `baseURL` path.
+One collision matters: when the index is on, the generated `/llms.txt` replaces a hand-written `static/llms.txt`, so delete the old file instead of debugging the wrong one.
+
+The theme ships the checker its CI uses:
+
+[source,bash]
+----
+python3 themes/toph/.github/scripts/check_llms.py \
+  --public public --content content \
+  --base-url https://example.org/ --expect enabled
+----
+
+It works on a finished build, asserting that the index parses, that every same-origin and citation link resolves, that each published source matches its content file byte for byte, and that no source carries draft front matter.
+Pass `--expect enabled` in CI, since the default `auto` would let a total loss of the feature pass as an intentional opt-out.
+
+== Limitations
+
+* AsciiDoc `include::` directives are not expanded and referenced images are not copied; a source is the author's file, not a reproduction of the build.
+* Front matter is published too, comments included.
+* No `Content-Type` is guaranteed: Hugo advertises `text/markdown` and `text/asciidoc`, but the host decides the header, and GitHub Pages serves `.adoc` as `application/octet-stream`.
+* Nothing is fetched at build time, and no permalink, sitemap, feed, or existing metadata changes; the feature only adds the two `<link>` elements.
+
+== Try it
+
+* https://justwheel.github.io/toph-hugo-theme/llms.txt[The demo index] and https://justwheel.github.io/toph-hugo-theme/source/en/blog/blockquote-styling.en.adoc[a published source].
+* The theme's `README.md`, "Machine-readable index and source files", for the full schema.
+* https://github.com/justwheel/toph-hugo-theme[The repository] for issues and pull requests.
+
+This post is a published source itself: its own file sits at `/source/en/blog/llms-txt.en.adoc`, front matter and all.
