@@ -4,7 +4,8 @@
 #   1. Verify the build the workflow already produced; a fresh build here would
 #      only prove that a second build works.
 #   2. Build one tiny site through the promises that matter: the opt-out guard
-#      (absent data, `false`, string `"true"`) and exact language selection.
+#      (absent data, `false`, string `"true"`), exact language selection, and a
+#      `render: link` page staying out of the index and the source export.
 #
 # Runs from the theme root. Takes the build from LLMS_PUBLIC (default
 # exampleSite/public) and its base URL from LLMS_BASE_URL.
@@ -74,26 +75,35 @@ for case in absent false string-true; do
   fi
 done
 
-# 4. Exact language selection: es must not publish es-mx.
+# 4. Exact language selection: es must not publish es-mx. The index is Spanish
+#    so the listed link-only page is resolved in the same language it would be
+#    filtered through, and the assertions below prove the render check, not the
+#    language selector, is what excludes it.
+printf -- '---\ntitle: Linked Only\ndate: 2024-01-01T00:00:00Z\nbuild:\n  render: link\napi_key: SENTINEL-NOT-A-SECRET\n---\nLinked only body.\n' >"$site/content/blog/linked-only.es.md"
 cat >"$site/data/llms.yaml" <<'EOF'
 enabled: true
+index:
+  language: es
 sources:
   languages: [es]
 sections:
   - title: Pages
-    pages: [/]
+    pages: [/, /blog/alpha, /blog/linked-only]
 EOF
 out="$workdir/out-es"
 if hugo --source "$site" --destination "$out" --logLevel warn \
   && python3 "$checker" --public "$out" --content "$site/content" \
     --base-url "https://example.org/sub/" --expect enabled --expect-sources enabled \
-    --expect-source es/blog/alpha.es.md --expect-no-source es-mx/blog/alpha.es-mx.md; then
-  pass "exact language selection publishes es and not es-mx"
+    --expect-source es/blog/alpha.es.md --expect-no-source es-mx/blog/alpha.es-mx.md \
+    --expect-no-source es/blog/linked-only.es.md \
+  && [ ! -d "$out/es/blog/linked-only" ] \
+  && ! grep -q 'linked-only' "$out/llms.txt"; then
+  pass "exact language selection, and a render: link page is neither published nor indexed"
 else
-  fail "exact language selection failed"
+  fail "exact language selection or render: link withholding failed"
 fi
 if [ "$failures" -ne 0 ]; then
   printf '%d llms fixture check(s) failed\n' "$failures" >&2
   exit 1
 fi
-echo "== ok: enabled artifact verified, opt-out inert, language selection exact =="
+echo "== ok: enabled artifact verified, opt-out inert, language selection exact, link-only page withheld =="

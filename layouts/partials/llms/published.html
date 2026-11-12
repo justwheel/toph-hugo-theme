@@ -3,18 +3,25 @@
 
   Context: a Page. Returns: bool
 
-  Shared by the two places that select pages for the index or lead a section
-  with `featured`. Hugo already excludes drafts and out-of-window pages from a
-  normal build, but `--buildDrafts` and `--buildFuture` put them back, and an
-  index must not advertise a page the site is still withholding. An empty
-  RelPermalink covers pages built with `render: never` and headless bundles.
+  Called by everything that decides whether a page is exported: explicit page
+  selection, section selection, `featured` validation, and source eligibility.
+  Hugo already excludes drafts and out-of-window pages from a normal build, but
+  `--buildDrafts` and `--buildFuture` put them back, and an index must not
+  advertise a page the site is still withholding.
+
+  A non-empty RelPermalink does not prove a page has output. A headless bundle
+  and `render: never` have no permalink at all, while `render: link` keeps one
+  and still writes no HTML, so the effective `build.render` value is tested
+  rather than inferred from the permalink. `.Params.build` reports that value
+  after `cascade`, which is what catches an inherited mode.
 
   This says nothing about a page's source file, which llms/eligible.html
   decides; a generated taxonomy listing is published HTML with no source.
 */ -}}
 {{- $page := . -}}
 {{- $ok := false -}}
-{{- if and (not $page.Draft) $page.RelPermalink -}}
+{{- $render := index ($page.Params.build | default dict) "render" | default "always" -}}
+{{- if and (not $page.Draft) $page.RelPermalink (eq (printf "%v" $render) "always") -}}
   {{- $future := and (not $page.PublishDate.IsZero) (gt $page.PublishDate now) -}}
   {{- $expired := and (not $page.ExpiryDate.IsZero) (lt $page.ExpiryDate now) -}}
   {{- if not (or $future $expired) -}}

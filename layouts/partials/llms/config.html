@@ -4,8 +4,8 @@
 
   Defaults and the data file are combined with `merge`, and only values that
   decide what is published get a guard: the opt-in flag, the index language,
-  the source prefix, the language selector, and exclusion paths. `errorf` does
-  not stop the template, so every guard falls back to a safe value.
+  the source prefix, the language selector, and exclusion paths. `errorf` fails
+  the build without halting the template, so a guard may keep what it reported.
 */ -}}
 {{- $raw := hugo.Data.llms -}}
 {{- $default_lang := hugo.Sites.Default.Language.Lang -}}

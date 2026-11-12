@@ -372,6 +372,7 @@ The per-page relation carries the page's real type, so an AsciiDoc page is adver
 
 A page's source is published when it has a backing `.md` or `.adoc` file, is not a draft, is inside its publish window, and has rendered output.
 Drafts and future-dated posts stay private **even under `--buildDrafts` or `--buildFuture`**: previewing HTML is not permission to publish a source file.
+A page whose effective `build.render` is `link` or `never`, whether set directly or inherited through `cascade`, has no rendered output and is skipped the same way.
 `hide_sitemap` and `taxonomy_exclude` are not consulted, because they describe listing behavior; reusing them here would silently drop project pages, which are public.
 
 Generated listing pages have no source file and are simply skipped in the index, which links to their HTML instead.
@@ -449,6 +450,7 @@ Everything else is used as written, so a malformed section or optional record su
 Published sources are the author's files, not a self-contained reproduction of the build.
 Relative links still resolve against the original content location, AsciiDoc `include::` directives are not expanded, and images referenced by a page are not copied alongside it.
 Front matter is published too, so review comments and metadata for anything you would not want read before enabling this.
+When index generation is enabled, the generated `/llms.txt` replaces a site's own `static/llms.txt`.
 
 #### Turning it off
 
@@ -478,7 +480,7 @@ With the default `auto`, a build that lost the feature entirely would look like 
 The checker validates the index structure, resolves every same-origin link and every rendered-page citation link, compares each published source file with its content original byte for byte, and — when a half of the feature is off — asserts that the build carries no index, no source tree, and no discovery links.
 Discovery matching accepts quoted and minified-unquoted attributes, because a minified build writes `rel=describedby`.
 
-`.github/scripts/llms_fixture.sh` runs the enabled checker against the artifact the workflow already built, then rebuilds one small generated site through the disabled cases (absent configuration, `enabled: false`, `enabled: "true"`) and exact language selection.
+`.github/scripts/llms_fixture.sh` runs the enabled checker against the artifact the workflow already built, then builds one small generated site through the disabled cases (absent configuration, `enabled: false`, `enabled: "true"`), exact language selection, and a `render: link` page that must stay out of both the index and the source export.
 It never edits `exampleSite/data/llms.yaml`, and CI calls it on every push.
 
 ### Shortcodes
